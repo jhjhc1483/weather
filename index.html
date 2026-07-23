@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기상예보 상황판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#d7dee3; --paper:#fff; --head:#eef2f4; --ink:#0d1720; --ink2:#4a5d6c;
+  --rule:#0d1720; --hair:#c2cfd7; --accent:#12586e;
+  --g1:#1c67d7; --g2:#01b56e; --g3:#ff9a19; --g4:#e63c2e;
+  --advisory:#b07d00; --warning:#c62c1a;
+  --sans:"IBM Plex Sans KR",system-ui,sans-serif;
+  --mono:"IBM Plex Mono","IBM Plex Sans KR",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+  line-height:1.5;padding:22px 16px 48px;
+  background-image:linear-gradient(to right,rgba(13,23,32,.045) 1px,transparent 1px),
+                   linear-gradient(to bottom,rgba(13,23,32,.045) 1px,transparent 1px);
+  background-size:40px 40px}
+.wrap{max-width:1180px;margin:0 auto}
+
+.head{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+h1{font-size:1.3rem;font-weight:600;letter-spacing:-.02em}
+.base{font-family:var(--mono);font-size:.9rem;color:var(--ink2)}
+.tools{margin-left:auto;display:flex;gap:8px;align-items:center;
+  font-family:var(--mono);font-size:.72rem;color:var(--ink2)}
+button{font:inherit;font-family:var(--mono);font-size:.72rem;cursor:pointer;background:var(--paper);
+  border:1px solid var(--hair);border-radius:2px;padding:4px 10px;color:var(--ink2)}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.scroller{overflow-x:auto;background:var(--paper);border:1.5px solid var(--rule)}
+table{border-collapse:collapse;width:100%;min-width:920px}
+th,td{border:1px solid var(--hair);padding:9px 10px;vertical-align:middle;text-align:center;
+  font-size:.86rem}
+thead th{background:var(--head);font-weight:600;font-size:.88rem;
+  border-bottom:1.5px solid var(--rule)}
+tbody th{background:var(--head);font-weight:500;text-align:left;white-space:nowrap;
+  position:sticky;left:0;z-index:2}
+tbody th.sub{position:static;font-weight:400;color:var(--ink2);font-size:.8rem}
+tbody tr:not(:last-child) td{border-bottom:1px solid var(--hair)}
+td{font-family:var(--mono);font-weight:500;letter-spacing:-.01em}
+td.txt{font-family:var(--sans);font-weight:400}
+.muted{color:#93a3ad;font-weight:400}
+
+/* 미세먼지 등급 */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;
+  vertical-align:1px}
+.d1{background:var(--g1)}.d2{background:var(--g2)}.d3{background:var(--g3)}.d4{background:var(--g4)}
+.val{color:var(--ink2);font-size:.74rem;margin-left:4px}
+
+/* 풍향 관측 기호 */
+.wind{display:flex;flex-direction:column;align-items:center;gap:1px}
+.wind svg{display:block}
+.wind .t{white-space:nowrap}
+
+/* 강수 시간대 */
+.blocks{display:flex;flex-direction:column;gap:3px;font-size:.8rem}
+.blocks .b{white-space:nowrap}
+.blocks .b em{font-style:normal;color:var(--ink2);font-size:.72rem;margin-right:3px}
+.blocks .mm{color:var(--accent);font-weight:600}
+.total{font-size:.72rem;color:var(--ink2);margin-top:3px;border-top:1px dotted var(--hair);
+  padding-top:3px}
+
+/* 특보 */
+.chips{display:flex;flex-direction:column;gap:3px;align-items:center}
+.chip{font-family:var(--mono);font-size:.74rem;font-weight:600;padding:2px 7px;border-radius:2px;
+  white-space:nowrap;color:#fff}
+.chip.lv2{background:var(--warning)}
+.chip.lv1{background:var(--advisory)}
+
+.note{margin-top:12px;font-family:var(--mono);font-size:.7rem;color:var(--ink2);
+  display:flex;flex-wrap:wrap;gap:5px 18px}
+.err{margin-top:12px;border:1px dashed var(--g4);background:#fdf0ee;padding:9px 12px;
+  font-family:var(--mono);font-size:.7rem;color:#8c2418;line-height:1.7}
+.err b{display:block;margin-bottom:3px}
+details.sit{margin-top:14px;background:var(--paper);border:1px solid var(--hair);padding:10px 14px}
+details.sit summary{font-family:var(--mono);font-size:.74rem;color:var(--accent);cursor:pointer}
+details.sit p{margin-top:8px;font-size:.86rem;font-weight:300;line-height:1.75;white-space:pre-wrap}
+details.sit h4{font-size:.74rem;font-family:var(--mono);color:var(--ink2);margin-top:10px}
+
+@media (max-width:760px){
+  body{padding:14px 10px 36px;background-image:none}
+  h1{font-size:1.1rem} th,td{padding:7px 8px;font-size:.8rem}
+}
+@media print{
+  body{background:#fff;padding:0;background-image:none}
+  .tools,details.sit{display:none}
+  .scroller{border-color:#000;overflow:visible}
+  th,td{border-color:#666} thead th{background:#eee}
+  .chip{color:#000;background:none!important;border:1px solid #000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="title">기상예보</h1>
+    <span class="base" id="basetime"></span>
+    <div class="tools">
+      <span>갱신 <b id="updated">—</b></span>
+      <button id="copy" type="button">표 복사</button>
+      <button id="reload" type="button">지금 갱신</button>
+    </div>
+  </div>
+
+  <div class="scroller"><table id="board"><tbody>
+    <tr><td class="muted" style="padding:40px">불러오는 중…</td></tr>
+  </tbody></table></div>
+
+  <div class="note" id="note"></div>
+  <div id="errbox"></div>
+  <div id="sitbox"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let DATA = null;
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const dash = '<span class="muted">—</span>';
+
+/* 기상 관측 기호 — 깃대는 바람이 불어오는 쪽, 짧은깃 5kt·긴깃 10kt·삼각깃 50kt */
+function barb(deg, ms){
+  const S=30,c=S/2,R=11;
+  if(deg==null||ms==null) return '';
+  const kt=Math.round(ms*1.94384/5)*5;
+  if(kt<3) return `<svg width="${S}" height="${S}"><circle cx="${c}" cy="${c}" r="4"
+    fill="none" stroke="currentColor" stroke-width="1.3"/></svg>`;
+  let n=kt,y=c-R,p=[`<line x1="${c}" y1="${c}" x2="${c}" y2="${c-R}"
+    stroke="currentColor" stroke-width="1.4"/>`];
+  while(n>=50){p.push(`<polygon points="${c},${y} ${c+7},${y+2} ${c},${y+4.5}" fill="currentColor"/>`);y+=6;n-=50;}
+  while(n>=10){p.push(`<line x1="${c}" y1="${y}" x2="${c+7}" y2="${y-2.5}" stroke="currentColor" stroke-width="1.4"/>`);y+=3.5;n-=10;}
+  if(n>=5)   p.push(`<line x1="${c}" y1="${y}" x2="${c+4}" y2="${y-1.5}" stroke="currentColor" stroke-width="1.4"/>`);
+  return `<svg width="${S}" height="${S}" aria-hidden="true">
+    <g transform="rotate(${deg} ${c} ${c})">${p.join('')}</g></svg>`;
+}
+
+/* 셀 렌더러 — [화면 HTML, 복사용 텍스트] 를 함께 만든다 */
+const CELLS = {
+  '개황': r => {
+    const f=r.forecast||{};
+    if(!f.summary) return [dash,''];
+    const t = f.summary + (f.summaryNote ? ` (${f.summaryNote})` : '');
+    return [esc(t), t];
+  },
+  '미세': r => {
+    const a=r.air||{};
+    if(!a.pm10Text) return [dash,''];
+    return [`<span class="dot d${a.pm10Grade}"></span>${a.pm10Text}<span class="val">${a.pm10}</span>`,
+            `${a.pm10Text} (${a.pm10})`];
+  },
+  '초미세': r => {
+    const a=r.air||{};
+    if(!a.pm25Text) return [dash,''];
+    return [`<span class="dot d${a.pm25Grade}"></span>${a.pm25Text}<span class="val">${a.pm25}</span>`,
+            `${a.pm25Text} (${a.pm25})`];
+  },
+  '기온': r => {
+    const f=r.forecast||{};
+    if(f.tempMin==null&&f.tempMax==null) return [dash,''];
+    const t=`${f.tempMin??'—'}~${f.tempMax??'—'}`;
+    return [t, t];
+  },
+  '풍향/풍속': r => {
+    const f=r.forecast||{};
+    if(!f.windName) return [dash,''];
+    const lo=Math.round(f.windMin), hi=Math.round(f.windMax);
+    const t=`${f.windName} ${lo===hi?hi:lo+'~'+hi}m/s`;
+    return [`<div class="wind">${barb(f.windDeg,f.windMax)}<span class="t">${t}</span></div>`, t];
+  },
+  '일일 누적 강수량': r => {
+    const p=r.rain||{};
+    if(p.mm==null) return [dash,''];
+    const miss = p.missing?.length ? `<div class="total">결측 ${p.missing.length}시간</div>` : '';
+    return [`${p.mm.toFixed(1)}mm${miss}`, `${p.mm.toFixed(1)}mm`];
+  },
+  '일일 예상 강수량': r => {
+    const f=r.forecast||{}, b=f.rainBlocks||[];
+    if(!b.length) return ['<span class="muted">강수없음</span>','강수없음'];
+    const html = `<div class="blocks">${b.map(x=>
+      `<span class="b"><em>${x.startDay}</em>${x.start}~${x.end}
+       <span class="mm">(${x.mm}mm)</span></span>`).join('')}
+       ${b.length>1?`<span class="total">합계 ${f.rainTotal}mm</span>`:''}</div>`;
+    return [html, b.map(x=>`${x.startDay} ${x.start}~${x.end}(${x.mm}mm)`).join(' / ')];
+  },
+  '기상특보': r => {
+    const w=r.warnings||[];
+    if(!w.length) return [dash,''];
+    return [`<div class="chips">${w.map(x=>
+      `<span class="chip lv${x.level==='경보'?2:1}">${esc(x.name)}</span>`).join('')}</div>`,
+      w.map(x=>x.name).join(' ')];
+  },
+};
+
+function render(){
+  const R = DATA.regions;
+  $('#title').textContent = DATA.baseLabel;
+  $('#basetime').textContent = `${DATA.baseTime} 기준 · 예상강수 ~${DATA.windowEnd}`;
+  $('#updated').textContent = DATA.updatedAt.slice(5,16).replace('T',' ');
+
+  const head = `<thead><tr><th colspan="2">구분</th>${
+    R.map(r=>`<th title="${esc(r.label)} · 격자 ${r.grid.nx},${r.grid.ny}">${esc(r.short)}</th>`).join('')
+  }</tr></thead>`;
+
+  const row = (label, key, opts={}) => {
+    const cells = R.map(r=>{
+      const [html] = CELLS[key](r);
+      return `<td class="${opts.txt?'txt':''}">${html}</td>`;
+    }).join('');
+    return `<tr>${label}${cells}</tr>`;
+  };
+
+  const body = '<tbody>'
+    + row('<th colspan="2">개황</th>','개황',{txt:true})
+    + row('<th rowspan="2">미세먼지</th><th class="sub">미세</th>','미세',{txt:true})
+    + row('<th class="sub">초미세</th>','초미세',{txt:true})
+    + row('<th colspan="2">기온 <span class="muted">(℃)</span></th>','기온')
+    + row('<th colspan="2">풍향/풍속</th>','풍향/풍속')
+    + row('<th colspan="2">일일 누적 강수량</th>','일일 누적 강수량')
+    + row('<th colspan="2">일일 예상 강수량</th>','일일 예상 강수량')
+    + row('<th colspan="2">기상특보</th>','기상특보')
+    + '</tbody>';
+
+  $('#board').innerHTML = head + body;
+
+  $('#note').innerHTML = [
+    `누적강수 00:00~${DATA.baseTime} 실황 합산`,
+    `예상강수 ${DATA.baseTime}~${DATA.windowEnd}`,
+    `측정소 ${R.map(r=>`${r.short}:${r.air?.station??'미확인'}`).join(' · ')}`,
+  ].map(t=>`<span>${esc(t)}</span>`).join('');
+
+  const errs = R.flatMap(r=>Object.entries(r.errors||{}).map(([k,v])=>`${r.short} · ${k} — ${v}`));
+  $('#errbox').innerHTML = errs.length
+    ? `<div class="err"><b>수집 실패</b>${errs.map(esc).join('<br>')}</div>` : '';
+
+  const sits = [...new Map(R.filter(r=>r.situation?.text)
+    .map(r=>[r.situation.text,r])).values()];
+  $('#sitbox').innerHTML = sits.length ? `<details class="sit">
+    <summary>기상개황 통보문 전문 (${sits.length}개 관서)</summary>
+    ${sits.map(r=>`<h4>${esc(r.label)} · 발표 ${esc(r.situation.announced??'')}</h4>
+      <p>${esc(r.situation.text)}</p>`).join('')}</details>` : '';
+}
+
+/* 한글·엑셀에 그대로 붙는 TSV */
+function tsv(){
+  const R=DATA.regions;
+  const lines=[[DATA.baseLabel, DATA.baseTime+' 기준'].join('\t'),
+               ['구분','', ...R.map(r=>r.short)].join('\t')];
+  const add=(a,b,key)=>lines.push([a,b,...R.map(r=>CELLS[key](r)[1])].join('\t'));
+  add('개황','','개황');
+  add('미세먼지','미세','미세');
+  add('','초미세','초미세');
+  add('기온(℃)','','기온');
+  add('풍향/풍속','','풍향/풍속');
+  add('일일 누적 강수량','','일일 누적 강수량');
+  add('일일 예상 강수량','','일일 예상 강수량');
+  add('기상특보','','기상특보');
+  return lines.join('\n');
+}
+
+/* 정적 배포에서는 data.json, 로컬 서버에서는 /api/weather 를 읽는다 */
+let LIVE = false;
+async function load(){
+  let res = null;
+  try{ res = await fetch('/api/weather'); LIVE = res.ok || res.status===202; }catch{ LIVE = false; }
+  if(!LIVE){
+    try{ res = await fetch('data.json?t='+Date.now(), {cache:'no-store'}); }catch{ res = null; }
+  }
+  if(!res || !res.ok){
+    if(res && res.status===202){ setTimeout(load,3000); return; }
+    document.querySelector('#board tbody').innerHTML =
+      '<tr><td class="muted" style="padding:40px">데이터를 불러오지 못했습니다. '
+      + '수집이 한 번도 실행되지 않았을 수 있습니다.</td></tr>';
+    return;
+  }
+  if(res.status===202){ setTimeout(load,3000); return; }
+  DATA = await res.json();
+  $('#reload').hidden = !LIVE;
+  if(DATA.regions?.length) render();
+}
+
+$('#copy').onclick = async e => {
+  try{ await navigator.clipboard.writeText(tsv()); e.target.textContent='복사됨'; }
+  catch{ e.target.textContent='복사 실패'; }
+  setTimeout(()=>e.target.textContent='표 복사',1600);
+};
+$('#reload').onclick = async e => {
+  e.target.disabled=true; e.target.textContent='갱신 중…';
+  try{ await fetch('/api/refresh',{method:'POST'}); await load(); }
+  finally{ e.target.disabled=false; e.target.textContent='지금 갱신'; }
+};
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

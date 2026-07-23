@@ -1,0 +1,41 @@
+name: 기상자료 수집
+
+on:
+  schedule:
+    - cron: "5 * * * *"      # 매시 05분(UTC). GitHub 부하에 따라 5~30분 늦을 수 있음
+  workflow_dispatch:          # 수동 실행 — 최초 1회는 이걸로 돌려야 스케줄이 붙는다
+  push:
+    paths: [regions.json, collector.py]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 수집
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python collect.py
+
+      - name: 결과 커밋
+        run: |
+          git config user.name  "weather-bot"
+          git config user.email "weather-bot@users.noreply.github.com"
+          git add public/data.json state/
+          git diff --staged --quiet || git commit -m "기상자료 $(TZ=Asia/Seoul date +'%m.%d %H:%M KST')"
+          git push

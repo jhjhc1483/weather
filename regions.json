@@ -1,0 +1,41 @@
+[
+  { "id": "yangpyeong", "short": "양평", "label": "경기 양평군 양평읍",
+    "lat": 37.4720040715399, "lon": 127.521152413523,
+    "wrnStnId": "109", "sidoName": "경기", "umdName": "양평읍",
+    "sggName": "양평군", "warnKeywords": ["양평"], "airStation": null },
+
+  { "id": "gyeongsan", "short": "경산", "label": "경북 경산시",
+    "lat": 35.8251, "lon": 128.7411,
+    "wrnStnId": "143", "sidoName": "경북", "umdName": "중방동",
+    "sggName": "경산시", "warnKeywords": ["경산"], "airStation": null },
+
+  { "id": "sacheon", "short": "사천", "label": "경남 사천시",
+    "lat": 35.0034, "lon": 128.0642,
+    "wrnStnId": "159", "sidoName": "경남", "umdName": "용현면",
+    "sggName": "사천시", "warnKeywords": ["사천"], "airStation": null },
+
+  { "id": "haman", "short": "함안", "label": "경남 함안군 가야읍",
+    "lat": 35.2723, "lon": 128.4064,
+    "wrnStnId": "159", "sidoName": "경남", "umdName": "가야읍",
+    "sggName": "함안군", "warnKeywords": ["함안"], "airStation": null },
+
+  { "id": "seongju", "short": "성주", "label": "경북 성주군 성주읍",
+    "lat": 35.9192, "lon": 128.2830,
+    "wrnStnId": "143", "sidoName": "경북", "umdName": "성주읍",
+    "sggName": "성주군", "warnKeywords": ["성주"], "airStation": null },
+
+  { "id": "sejong", "short": "세종", "label": "세종특별자치시",
+    "lat": 36.4801, "lon": 127.2890,
+    "wrnStnId": "133", "sidoName": "세종", "umdName": "보람동",
+    "sggName": "세종특별자치시", "warnKeywords": ["세종"], "airStation": null },
+
+  { "id": "gyeryong", "short": "계룡", "label": "충남 계룡시 엄사면",
+    "lat": 36.2745, "lon": 127.2487,
+    "wrnStnId": "133", "sidoName": "충남", "umdName": "엄사면",
+    "sggName": "계룡시", "warnKeywords": ["계룡"], "airStation": null },
+
+  { "id": "imsil", "short": "임실", "label": "전북 임실군 임실읍",
+    "lat": 35.6178, "lon": 127.2890,
+    "wrnStnId": "146", "sidoName": "전북", "umdName": "임실읍",
+    "sggName": "임실군", "warnKeywords": ["임실"], "airStation": null }
+]
