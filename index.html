@@ -75,6 +75,9 @@ td.txt{font-family:var(--sans);font-weight:400}
 .chip.lv2{background:var(--warning)}
 .chip.lv1{background:var(--advisory)}
 
+.status{width:100%;margin-top:8px;font-family:var(--mono);font-size:.72rem;
+  padding:6px 10px;border-left:3px solid var(--accent);background:var(--paper);color:var(--ink2)}
+.status.bad{border-left-color:var(--g4);background:#fdf0ee;color:#8c2418}
 .note{margin-top:12px;font-family:var(--mono);font-size:.7rem;color:var(--ink2);
   display:flex;flex-wrap:wrap;gap:5px 18px}
 .err{margin-top:12px;border:1px dashed var(--g4);background:#fdf0ee;padding:9px 12px;
@@ -107,6 +110,8 @@ details.sit h4{font-size:.74rem;font-family:var(--mono);color:var(--ink2);margin
       <span>갱신 <b id="updated">—</b></span>
       <button id="copy" type="button">표 복사</button>
       <button id="reload" type="button">지금 갱신</button>
+    </div>
+    <div class="status" id="status" hidden></div>
     </div>
   </div>
 
@@ -264,25 +269,84 @@ function tsv(){
   return lines.join('\n');
 }
 
-/* 정적 배포에서는 data.json, 로컬 서버에서는 /api/weather 를 읽는다 */
-let LIVE = false;
+/* 로컬 서버가 있으면 /api/weather, 정적 배포면 data.json 을 읽는다 */
+let MODE = 'static';   // 'server' | 'static'
+let SECRET = null;
+const status = (msg, bad=false) => {
+  const el=$('#status');
+  if(!msg){ el.hidden=true; return; }
+  el.hidden=false; el.textContent=msg; el.classList.toggle('bad', bad);
+};
+
+async function fetchData(){
+  try{
+    const r = await fetch('/api/weather');
+    if(r.ok || r.status===202){ MODE='server'; return r; }
+  }catch{}
+  MODE='static';
+  try{ return await fetch('data.json?t='+Date.now(), {cache:'no-store'}); }catch{ return null; }
+}
+
 async function load(){
-  let res = null;
-  try{ res = await fetch('/api/weather'); LIVE = res.ok || res.status===202; }catch{ LIVE = false; }
-  if(!LIVE){
-    try{ res = await fetch('data.json?t='+Date.now(), {cache:'no-store'}); }catch{ res = null; }
-  }
+  const res = await fetchData();
+  if(res && res.status===202){ setTimeout(load,3000); return; }
   if(!res || !res.ok){
-    if(res && res.status===202){ setTimeout(load,3000); return; }
     document.querySelector('#board tbody').innerHTML =
-      '<tr><td class="muted" style="padding:40px">데이터를 불러오지 못했습니다. '
+      '<tr><td class="muted" style="padding:40px">데이터가 아직 없습니다. '
       + '수집이 한 번도 실행되지 않았을 수 있습니다.</td></tr>';
     return;
   }
-  if(res.status===202){ setTimeout(load,3000); return; }
   DATA = await res.json();
-  $('#reload').hidden = !LIVE;
   if(DATA.regions?.length) render();
+}
+
+/* [지금 갱신]
+   로컬 서버  → 그 자리에서 수집
+   정적 배포  → /api/refresh 가 GitHub Actions 워크플로를 수동 실행시키고,
+                커밋 → Vercel 재배포까지 1~3분 걸리므로 data.json 을 폴링한다 */
+async function triggerRefresh(){
+  const btn=$('#reload'), before=DATA?.updatedAt;
+  btn.disabled=true; btn.textContent='요청 중…';
+
+  const call = () => fetch('/api/refresh', {
+    method:'POST',
+    headers: SECRET ? {'x-refresh-key':SECRET} : {},
+  });
+
+  try{
+    let r = await call();
+    if(r.status===401){
+      SECRET = prompt('수집 실행 암호를 입력하세요');
+      if(!SECRET){ status(null); return; }
+      r = await call();
+    }
+    if(r.status===404){
+      status('수집 트리거가 배포되지 않았습니다. api/refresh.js 와 GH_TOKEN·GH_REPO 설정을 확인하세요.', true);
+      return;
+    }
+    const body = await r.json().catch(()=>({}));
+    if(!r.ok && r.status!==202){
+      status(`실행 실패 (${r.status}) ${body.error??''}`, true); return;
+    }
+
+    if(MODE==='server'){ await load(); status('갱신했습니다.'); return; }
+
+    /* 정적 배포: 반영될 때까지 20초 간격으로 5분간 확인 */
+    status('수집을 시작했습니다. 반영까지 1~3분 걸립니다…');
+    for(let i=0;i<15;i++){
+      await new Promise(f=>setTimeout(f,20000));
+      await load();
+      if(DATA?.updatedAt && DATA.updatedAt!==before){
+        status(`갱신 완료 · ${DATA.updatedAt.slice(5,16).replace('T',' ')}`); return;
+      }
+      status(`반영 대기 중… ${(i+1)*20}초`);
+    }
+    status('아직 반영되지 않았습니다. GitHub Actions 실행 기록을 확인하세요.', true);
+  }catch(e){
+    status('요청을 보내지 못했습니다: '+e, true);
+  }finally{
+    btn.disabled=false; btn.textContent='지금 갱신';
+  }
 }
 
 $('#copy').onclick = async e => {
@@ -290,11 +354,7 @@ $('#copy').onclick = async e => {
   catch{ e.target.textContent='복사 실패'; }
   setTimeout(()=>e.target.textContent='표 복사',1600);
 };
-$('#reload').onclick = async e => {
-  e.target.disabled=true; e.target.textContent='갱신 중…';
-  try{ await fetch('/api/refresh',{method:'POST'}); await load(); }
-  finally{ e.target.disabled=false; e.target.textContent='지금 갱신'; }
-};
+$('#reload').onclick = triggerRefresh;
 
 load();
 setInterval(load, 60000);
