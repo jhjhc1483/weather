@@ -1,0 +1,34 @@
+name: Update Weather Data
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Run every hour at minute 0
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install dotenv node-fetch
+
+      - name: Run update script
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: node scripts/update-weather.js
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update weather data [skip ci]" && git push)
