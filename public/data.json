@@ -1,126 +1,192 @@
 {
-  "updatedAt": "2026-07-24T00:53:04.546Z",
-  "accumulated": 0,
-  "expected": [
-    {
-      "date": "20260724",
-      "time": "1000",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1100",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1200",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1300",
-      "value": "2.0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1400",
-      "value": "6.0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1500",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1600",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1700",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "1800",
-      "value": "1mm 미만"
-    },
-    {
-      "date": "20260724",
-      "time": "1900",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "2000",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "2100",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "2200",
-      "value": "0mm"
-    },
-    {
-      "date": "20260724",
-      "time": "2300",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0000",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0100",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0200",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0300",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0400",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0500",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0600",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0700",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0800",
-      "value": "0mm"
-    },
-    {
-      "date": "20260725",
-      "time": "0900",
-      "value": "0mm"
-    }
-  ]
+ "updatedAt": "2026-07-24T13:05:00+09:00",
+ "baseLabel": "7.24 (금) 기상예보",
+ "baseTime": "13:00",
+ "windowEnd": "07.25 09:00",
+ "regions": [
+  {
+   "id": "yangpyeong",
+   "short": "양평",
+   "label": "경기 양평군 양평읍",
+   "grid": {
+    "nx": 69,
+    "ny": 125
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "gyeongsan",
+   "short": "경산",
+   "label": "경북 경산시",
+   "grid": {
+    "nx": 91,
+    "ny": 90
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "sacheon",
+   "short": "사천",
+   "label": "경남 사천시",
+   "grid": {
+    "nx": 80,
+    "ny": 71
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "haman",
+   "short": "함안",
+   "label": "경남 함안군 가야읍",
+   "grid": {
+    "nx": 86,
+    "ny": 77
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "seongju",
+   "short": "성주",
+   "label": "경북 성주군 성주읍",
+   "grid": {
+    "nx": 83,
+    "ny": 91
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "sejong",
+   "short": "세종",
+   "label": "세종특별자치시",
+   "grid": {
+    "nx": 66,
+    "ny": 103
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "gyeryong",
+   "short": "계룡",
+   "label": "충남 계룡시 엄사면",
+   "grid": {
+    "nx": 65,
+    "ny": 99
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  },
+  {
+   "id": "imsil",
+   "short": "임실",
+   "label": "전북 임실군 임실읍",
+   "grid": {
+    "nx": 66,
+    "ny": 84
+   },
+   "errors": {
+    "forecast": "서비스키 미설정 (.env 확인)",
+    "current": "서비스키 미설정 (.env 확인)",
+    "rain": "[Errno 2] No such file or directory: 'D:\\\\startcoding\\\\weather\\\\state\\\\rain.json'",
+    "situation": "서비스키 미설정 (.env 확인)",
+    "warnings": "서비스키 미설정 (.env 확인)",
+    "air": "서비스키 미설정 (.env 확인)"
+   },
+   "forecast": {},
+   "current": {},
+   "rain": {},
+   "situation": {},
+   "warnings": [],
+   "air": {}
+  }
+ ]
 }
