@@ -461,7 +461,7 @@ def run_once() -> dict:
     write_output(payload)
     bad = sum(len(r["errors"]) for r in payload["regions"])
     print(f"[{now:%Y-%m-%d %H:%M:%S}] {payload['baseLabel']} {payload['baseTime']} 기준 "
-          f"— {len(payload['regions'])}개 지역, 실패 {bad}건")
+          f"- {len(payload['regions'])}개 지역, 실패 {bad}건")
     for r in payload["regions"]:
         for k, v in r["errors"].items():
             print(f"  ! {r['short']} {k}: {v}")

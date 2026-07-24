@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-24T09:18:50+09:00",
+ "updatedAt": "2026-07-24T09:22:05+09:00",
  "baseLabel": "7.24 (금) 기상예보",
  "baseTime": "09:00",
  "windowEnd": "07.25 09:00",
@@ -12,32 +12,63 @@
     "nx": 69,
     "ny": 125
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 24.0,
+    "tempMax": 32.0,
+    "summary": "흐림",
+    "summaryNote": "이후 비",
+    "rainBlocks": [
+     {
+      "start": "13:00",
+      "end": "15:00",
+      "startDay": "오늘",
+      "mm": 8.0
+     },
+     {
+      "start": "18:00",
+      "end": "19:00",
+      "startDay": "오늘",
+      "mm": 0.5
+     }
+    ],
+    "rainTotal": 8.5,
+    "popMax": 60,
+    "windDeg": 214.0,
+    "windName": "남서풍",
+    "windMin": 1.7,
+    "windMax": 2.4,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 26.4,
+    "humidity": 85.0,
+    "windDeg": 172.0,
+    "windSpeed": 1.4,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 당분간 가끔 비, 소강상태 많겠음, 비 내리는 지역 천둥.번개 유의, 무더위와 열대야 유의, 당분간 서해중부해상 바다 안개\n○ (오늘, 24일) 대체로 흐림, 오후(12~18시)까지 서울.인천.경기도 가끔 비, 저녁(18~21시)까지 일부 경기남동부 비 이어짐, 곳에 따라 소강상태,\n                       서해5도 밤(18~24시)까지 가끔 비\n○ (내일, 25일) 대체로 흐림, 늦은 새벽(03~06시)부터 오후(12~18시) 사이 서울.인천.경기도 가끔 비, 저녁(18~21시)까지 일부 서울.경기북부 비 이어짐, 곳에 따라 소강상태,\n                       서해5도 새벽(00~06시)부터 오전(06~12시) 사이 가끔 비\n○ (모레, 26일) 대체로 흐림, 서울.인천.경기도, 서해5도 가끔 비\n○ (글피, 27일) 대체로 흐림, 서울.인천.경기도 가끔 비, 소강상태 많겠음,\n                       서해5도 새벽(00~06시)부터 저녁(18~21시)까지 가끔 비\n\n* 예상 강수량(24일)\n- 인천.경기북부, 서해5도: 10~60mm\n- 서울.경기남부: 5~40mm\n\n* 예상 강수량(25일)\n- 경기북부, 서해5도: 20~60mm\n- 서울.인천.경기남부: 5~40mm\n\n* 예상 강수량(26일)\n- 서울.인천.경기도, 서해5도: 10~50mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "양평읍",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 35.0,
+    "pm10Grade": 2,
+    "pm10Text": "보통",
+    "pm25": 15.0,
+    "pm25Grade": 1,
+    "pm25Text": "좋음"
+   }
   },
   {
    "id": "gyeongsan",
@@ -47,32 +78,50 @@
     "nx": 91,
     "ny": 90
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 25.0,
+    "tempMax": 36.0,
+    "summary": "맑음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 0,
+    "windDeg": 246.0,
+    "windName": "남서풍",
+    "windMin": 0.8,
+    "windMax": 1.1,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 30.2,
+    "humidity": 69.0,
+    "windDeg": 40.0,
+    "windSpeed": 0.7,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 오늘 대구, 경북 곳에 따라 소나기, 모레 경북중.북부 비, 소강상태 보이는 곳 많겠음, 무더위, 열대야 유의\n ○ (오늘, 24일) 대체로 맑음, 대구, 경북내륙, 경북북동산지 오후(12~18시)부터 저녁(18~21시) 사이 곳에 따라 소나기\n ○ (내일, 25일) 대체로 맑다가 낮부터 구름많음, 울릉도 독도 대체로 맑음\n ○ (모레, 26일) 가끔 구름많음, 울릉도.독도 대체로 흐리다가 낮부터 가끔 구름많음,\n                        경북중.북부 오전(09~12시)부터 밤(18~24시) 사이, 울릉도.독도  새벽(00~06시)과 늦은 오후(15~18시)부터 밤(18~24시) 사이 곳에 따라 비, 소강상태 보이는 곳 많겠음\n ○ (글피, 27일) 가끔 구름많음\n\n* 소나기에 의한 예상 강수량(24일)\n- 대구, 경북내륙, 경북북동산지: 5~40mm\n\n* 예상 강수량(26일)\n- 경북중.북부: 5~40mm\n- 울릉도.독도: 5~10mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "중방동",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 42.0,
+    "pm10Grade": 2,
+    "pm10Text": "보통",
+    "pm25": 25.0,
+    "pm25Grade": 2,
+    "pm25Text": "보통"
+   }
   },
   {
    "id": "sacheon",
@@ -82,32 +131,50 @@
     "nx": 80,
     "ny": 71
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 24.0,
+    "tempMax": 34.0,
+    "summary": "맑음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 0,
+    "windDeg": 210.5,
+    "windName": "남서풍",
+    "windMin": 1.8,
+    "windMax": 2.6,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 29.1,
+    "humidity": 73.0,
+    "windDeg": 236.0,
+    "windSpeed": 2.3,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 당분간 무더위와 열대야. 해상 안개 유의\n○ (오늘, 24일) 대체로 맑음\n○ (내일, 25일) 대체로 맑다가 오후부터 구름많음\n○ (모레, 26일) 대체로 맑겠으나 울산과 경남내륙은 오후부터 구름많음\n○ (글피, 27일) 대체로 맑다가 오후부터 구름많음",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "사천읍",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 21.0,
+    "pm10Grade": 1,
+    "pm10Text": "좋음",
+    "pm25": 11.0,
+    "pm25Grade": 1,
+    "pm25Text": "좋음"
+   }
   },
   {
    "id": "haman",
@@ -117,32 +184,50 @@
     "nx": 86,
     "ny": 77
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 24.0,
+    "tempMax": 35.0,
+    "summary": "맑음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 0,
+    "windDeg": 239.2,
+    "windName": "남서풍",
+    "windMin": 1.9,
+    "windMax": 2.2,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 29.1,
+    "humidity": 77.0,
+    "windDeg": 225.0,
+    "windSpeed": 3.1,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 당분간 무더위와 열대야. 해상 안개 유의\n○ (오늘, 24일) 대체로 맑음\n○ (내일, 25일) 대체로 맑다가 오후부터 구름많음\n○ (모레, 26일) 대체로 맑겠으나 울산과 경남내륙은 오후부터 구름많음\n○ (글피, 27일) 대체로 맑다가 오후부터 구름많음",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "가야읍",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 23.0,
+    "pm10Grade": 1,
+    "pm10Text": "좋음",
+    "pm25": 17.0,
+    "pm25Grade": 2,
+    "pm25Text": "보통"
+   }
   },
   {
    "id": "seongju",
@@ -152,32 +237,50 @@
     "nx": 83,
     "ny": 91
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 23.0,
+    "tempMax": 35.0,
+    "summary": "맑음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 0,
+    "windDeg": 237.3,
+    "windName": "남서풍",
+    "windMin": 0.2,
+    "windMax": 0.7,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 28.4,
+    "humidity": 80.0,
+    "windDeg": 185.0,
+    "windSpeed": 1.1,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 오늘 대구, 경북 곳에 따라 소나기, 모레 경북중.북부 비, 소강상태 보이는 곳 많겠음, 무더위, 열대야 유의\n ○ (오늘, 24일) 대체로 맑음, 대구, 경북내륙, 경북북동산지 오후(12~18시)부터 저녁(18~21시) 사이 곳에 따라 소나기\n ○ (내일, 25일) 대체로 맑다가 낮부터 구름많음, 울릉도 독도 대체로 맑음\n ○ (모레, 26일) 가끔 구름많음, 울릉도.독도 대체로 흐리다가 낮부터 가끔 구름많음,\n                        경북중.북부 오전(09~12시)부터 밤(18~24시) 사이, 울릉도.독도  새벽(00~06시)과 늦은 오후(15~18시)부터 밤(18~24시) 사이 곳에 따라 비, 소강상태 보이는 곳 많겠음\n ○ (글피, 27일) 가끔 구름많음\n\n* 소나기에 의한 예상 강수량(24일)\n- 대구, 경북내륙, 경북북동산지: 5~40mm\n\n* 예상 강수량(26일)\n- 경북중.북부: 5~40mm\n- 울릉도.독도: 5~10mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "성주군",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 30.0,
+    "pm10Grade": 1,
+    "pm10Text": "좋음",
+    "pm25": 19.0,
+    "pm25Grade": 2,
+    "pm25Text": "보통"
+   }
   },
   {
    "id": "sejong",
@@ -187,32 +290,57 @@
     "nx": 66,
     "ny": 103
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 24.0,
+    "tempMax": 32.0,
+    "summary": "구름많음",
+    "summaryNote": "이후 소나기",
+    "rainBlocks": [
+     {
+      "start": "15:00",
+      "end": "16:00",
+      "startDay": "오늘",
+      "mm": 5.0
+     }
+    ],
+    "rainTotal": 5.0,
+    "popMax": 60,
+    "windDeg": 229.0,
+    "windName": "남서풍",
+    "windMin": 2.4,
+    "windMax": 2.8,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 27.8,
+    "humidity": 79.0,
+    "windDeg": 194.0,
+    "windSpeed": 1.2,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 오늘과 내일 소나기, 모레 비, 돌풍.천둥.번개 유의, 당분간 무더위.열대야 유의, 당분간 서해중부해상 바다 안개 유의\n○ (오늘,  24일) 가끔 구름많음, 오후(12~18시)부터 저녁(18~21시) 사이 충남권내륙 곳에 따라 소나기, 소강상태 많겠음\n○ (내일, 25일) 가끔 구름많음, 오전(09~12시)부터 낮(12~15시) 사이 충남권 곳에 따라 소나기, 소강상태 많겠음\n○ (모레, 26일) 대체로 흐림, 새벽(00~06시)부터 밤(18~24시) 사이 충남권 가끔 비, 곳에 따라 소강상태\n○ (글피, 27일) 대체로 흐림\n\n* 소나기에 의한 예상 강수량\n- (24일) 대전.세종.충남내륙: 5~40mm\n- (25일) 대전.세종.충남: 5~40mm\n\n* 예상 강수량\n- (26일) 대전.세종.충남: 5~40mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "보람동",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 31.0,
+    "pm10Grade": 2,
+    "pm10Text": "보통",
+    "pm25": 11.0,
+    "pm25Grade": 1,
+    "pm25Text": "좋음"
+   }
   },
   {
    "id": "gyeryong",
@@ -222,32 +350,50 @@
     "nx": 65,
     "ny": 99
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 23.0,
+    "tempMax": 31.0,
+    "summary": "구름많음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 20,
+    "windDeg": 231.7,
+    "windName": "남서풍",
+    "windMin": 2.8,
+    "windMax": 3.1,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 27.6,
+    "humidity": 78.0,
+    "windDeg": 213.0,
+    "windSpeed": 1.6,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 오늘과 내일 소나기, 모레 비, 돌풍.천둥.번개 유의, 당분간 무더위.열대야 유의, 당분간 서해중부해상 바다 안개 유의\n○ (오늘,  24일) 가끔 구름많음, 오후(12~18시)부터 저녁(18~21시) 사이 충남권내륙 곳에 따라 소나기, 소강상태 많겠음\n○ (내일, 25일) 가끔 구름많음, 오전(09~12시)부터 낮(12~15시) 사이 충남권 곳에 따라 소나기, 소강상태 많겠음\n○ (모레, 26일) 대체로 흐림, 새벽(00~06시)부터 밤(18~24시) 사이 충남권 가끔 비, 곳에 따라 소강상태\n○ (글피, 27일) 대체로 흐림\n\n* 소나기에 의한 예상 강수량\n- (24일) 대전.세종.충남내륙: 5~40mm\n- (25일) 대전.세종.충남: 5~40mm\n\n* 예상 강수량\n- (26일) 대전.세종.충남: 5~40mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "엄사면",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 30.0,
+    "pm10Grade": 1,
+    "pm10Text": "좋음",
+    "pm25": 12.0,
+    "pm25Grade": 1,
+    "pm25Text": "좋음"
+   }
   },
   {
    "id": "imsil",
@@ -257,32 +403,50 @@
     "nx": 66,
     "ny": 84
    },
-   "errors": {
-    "forecast": "서비스키 미설정 (.env 확인)",
-    "current": "서비스키 미설정 (.env 확인)",
-    "situation": "서비스키 미설정 (.env 확인)",
-    "warnings": "서비스키 미설정 (.env 확인)",
-    "air": "서비스키 미설정 (.env 확인)"
+   "errors": {},
+   "forecast": {
+    "tempMin": 22.0,
+    "tempMax": 33.0,
+    "summary": "맑음",
+    "summaryNote": null,
+    "rainBlocks": [],
+    "rainTotal": 0,
+    "popMax": 20,
+    "windDeg": 206.2,
+    "windName": "남서풍",
+    "windMin": 1.8,
+    "windMax": 2.0,
+    "baseTime": "07.24 08:00",
+    "windowEnd": "07.25 09:00"
    },
-   "forecast": {},
-   "current": {},
+   "current": {
+    "temp": 27.6,
+    "humidity": 79.0,
+    "windDeg": 233.0,
+    "windSpeed": 1.5,
+    "obsTime": "2026-07-24 08:00"
+   },
    "rain": {
     "mm": 0.0,
-    "hours": 2,
-    "lastHour": "0100",
-    "missing": [
-     "0200",
-     "0300",
-     "0400",
-     "0500",
-     "0600",
-     "0700",
-     "0800"
-    ]
+    "hours": 9,
+    "lastHour": "0800",
+    "missing": []
    },
-   "situation": {},
+   "situation": {
+    "text": "□ (종합) 오늘 전북동부 소나기 곳, 당분간 무더위와 열대야 유의\n ○ (오늘, 24일) 대체로 맑겠으나 오후에 가끔 구름많음, 낮(12~15시)부터 저녁(18~21시) 사이 전북동부 곳에 따라 소나기\n ○ (내일, 25일) 가끔 구름많음\n ○ (모레, 26일) 대체로 흐림, 새벽(00~06시)부터 저녁(18~21시) 사이 전북 가끔 비\n ○ (글피, 27일) 대체로 흐리다가 오후부터 가끔 구름많음\n\n* 소나기에 의한 예상 강수량(24일)\n- 전북동부: 5~30mm\n\n* 예상 강수량(26일)\n- 전북: 5~20mm",
+    "announced": 202607240500
+   },
    "warnings": [],
-   "air": {}
+   "air": {
+    "station": "임실읍",
+    "obsTime": "2026-07-24 09:00",
+    "pm10": 29.0,
+    "pm10Grade": 1,
+    "pm10Text": "좋음",
+    "pm25": 14.0,
+    "pm25Grade": 1,
+    "pm25Text": "좋음"
+   }
   }
  ]
 }
