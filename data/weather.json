@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T10:53:39+09:00",
+  "updated_at": "2026-07-25T10:58:42+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "10:53",
+  "time_display": "10:58",
   "locations": {
     "양평": {
       "overview": "흐림",
@@ -14,13 +14,13 @@
         "pm25_grade": "좋음"
       },
       "temperature": {
-        "current": "29",
+        "current": "29.2",
         "min": "24.0",
         "max": "30.0"
       },
       "wind": {
-        "direction": "남서풍",
-        "speed": "0.5m/s"
+        "direction": "남남서풍",
+        "speed": "1.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [
@@ -48,13 +48,13 @@
         "pm25_grade": "좋음"
       },
       "temperature": {
-        "current": "32.5",
+        "current": "32.1",
         "min": "25.0",
         "max": "35.0"
       },
       "wind": {
-        "direction": "북풍",
-        "speed": "1.1m/s"
+        "direction": "서북서풍",
+        "speed": "1.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -72,13 +72,13 @@
         "pm25_grade": "좋음"
       },
       "temperature": {
-        "current": "31.6",
+        "current": "31.3",
         "min": "25.0",
         "max": "34.0"
       },
       "wind": {
-        "direction": "남서풍",
-        "speed": "2.3m/s"
+        "direction": "서남서풍",
+        "speed": "2.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -95,13 +95,13 @@
         "pm25_grade": "좋음"
       },
       "temperature": {
-        "current": "31.1",
+        "current": "31",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "2.1m/s"
+        "direction": "북풍",
+        "speed": "1.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -118,13 +118,13 @@
         "pm25_grade": "좋음"
       },
       "temperature": {
-        "current": "31.1",
+        "current": "32.4",
         "min": "24.0",
         "max": "35.0"
       },
       "wind": {
         "direction": "동북동풍",
-        "speed": "2.0m/s"
+        "speed": "1.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -160,10 +160,10 @@
     "계룡": {
       "overview": "흐림",
       "dust": {
-        "pm10": "-",
-        "pm10_grade": "-",
-        "pm25": "-",
-        "pm25_grade": "-"
+        "pm10": "9",
+        "pm10_grade": "좋음",
+        "pm25": "12",
+        "pm25_grade": "좋음"
       },
       "temperature": {
         "current": "30.2",
@@ -172,7 +172,7 @@
       },
       "wind": {
         "direction": "남남서풍",
-        "speed": "3.3m/s"
+        "speed": "3.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
