@@ -537,12 +537,18 @@
 
   function openModal(skipReadme) {
     $readmeModal.classList.add('show');
-    $readmeModal.setAttribute('aria-hidden', 'false');
+    $readmeModal.removeAttribute('aria-hidden');
     document.body.style.overflow = 'hidden';
     if (!skipReadme) loadReadme();
+    if ($modalCloseBtn) {
+      setTimeout(function () { $modalCloseBtn.focus(); }, 50);
+    }
   }
 
   function closeModal() {
+    if (document.activeElement && $readmeModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     $readmeModal.classList.remove('show');
     $readmeModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
