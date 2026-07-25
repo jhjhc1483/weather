@@ -41,14 +41,14 @@ if not API_KEY:
 # alert_region: 기상특보 검색 키워드
 # ============================================================
 LOCATIONS = {
-    '양평': {'nx': 69, 'ny': 125, 'station': '양평읍', 'alert_region': '양평'},
-    '경산': {'nx': 91, 'ny': 90,  'station': '시지동', 'alert_region': '경산'},
-    '사천': {'nx': 80, 'ny': 71,  'station': '사천읍', 'alert_region': '사천'},
-    '함안': {'nx': 86, 'ny': 77,  'station': '가야읍', 'alert_region': '함안'},
-    '성주': {'nx': 83, 'ny': 89,  'station': '성주군', 'alert_region': '성주'},
-    '세종': {'nx': 65, 'ny': 105, 'station': '조치원읍', 'alert_region': '세종'},
-    '계룡': {'nx': 65, 'ny': 99,  'station': '엄사면', 'fallback_station': '논산', 'alert_region': '계룡'},
-    '임실': {'nx': 66, 'ny': 84,  'station': '임실읍', 'alert_region': '임실'},
+    '양평': {'nx': 69, 'ny': 125, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평'},
+    '경산': {'nx': 91, 'ny': 90,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산'},
+    '사천': {'nx': 80, 'ny': 71,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천'},
+    '함안': {'nx': 86, 'ny': 77,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안'},
+    '성주': {'nx': 83, 'ny': 89,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주'},
+    '세종': {'nx': 65, 'ny': 105, 'station': '조치원읍', 'fallback_station': '아름동', 'alert_region': '세종'},
+    '계룡': {'nx': 65, 'ny': 99,  'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡'},
+    '임실': {'nx': 66, 'ny': 84,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실'},
 }
 
 LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실']
