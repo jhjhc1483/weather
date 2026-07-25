@@ -1,0 +1,484 @@
+/* ========================================================
+   기상예보 대시보드 — Design System (Dark & Light)
+   ======================================================== */
+
+:root {
+  /* 기본: 다크 모드 */
+  --bg-body: #0b1120;
+  --bg-card: rgba(15, 23, 42, 0.85);
+  --bg-cell: rgba(30, 41, 59, 0.45);
+  --bg-cell-alt: rgba(30, 41, 59, 0.25);
+  --bg-cell-hover: rgba(56, 189, 248, 0.08);
+  --bg-category: rgba(30, 41, 59, 0.7);
+
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-dim: #64748b;
+  --text-white: #ffffff;
+
+  --border: rgba(148, 163, 184, 0.12);
+  --border-header: rgba(255, 255, 255, 0.08);
+
+  --accent: #38bdf8;
+  --gradient-header: linear-gradient(135deg, #1e3a8a 0%, #6d28d9 100%);
+  --gradient-title: linear-gradient(135deg, #60a5fa, #c084fc);
+
+  /* 미세먼지 등급 */
+  --grade-good: #22c55e;
+  --grade-normal: #3b82f6;
+  --grade-bad: #f59e0b;
+  --grade-very-bad: #ef4444;
+
+  /* 기상특보 */
+  --alert-bg: rgba(239, 68, 68, 0.12);
+  --alert-text: #fca5a5;
+
+  /* 테마 버튼 */
+  --theme-btn-bg: rgba(255, 255, 255, 0.08);
+  --theme-btn-border: rgba(255, 255, 255, 0.15);
+  --theme-btn-text: #e2e8f0;
+
+  /* 기타 */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.25s ease;
+}
+
+/* ========================================================
+   라이트 (화이트) 모드
+   ======================================================== */
+[data-theme="light"] {
+  --bg-body: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-cell: #ffffff;
+  --bg-cell-alt: #f1f5f9;
+  --bg-cell-hover: rgba(37, 99, 235, 0.06);
+  --bg-category: #e2e8f0;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-dim: #64748b;
+  --text-white: #ffffff;
+
+  --border: rgba(203, 213, 225, 0.8);
+  --border-header: rgba(255, 255, 255, 0.2);
+
+  --accent: #2563eb;
+  --gradient-header: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --gradient-title: linear-gradient(135deg, #1d4ed8, #6d28d9);
+
+  /* 미세먼지 등급 */
+  --grade-good: #16a34a;
+  --grade-normal: #2563eb;
+  --grade-bad: #d97706;
+  --grade-very-bad: #dc2626;
+
+  /* 기상특보 */
+  --alert-bg: rgba(254, 226, 226, 0.8);
+  --alert-text: #991b1b;
+
+  /* 테마 버튼 */
+  --theme-btn-bg: #ffffff;
+  --theme-btn-border: #cbd5e1;
+  --theme-btn-text: #0f172a;
+
+  --shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* ---- Reset & Base ---- */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { font-size: 15px; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 1.5rem 1rem 2rem;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ---- Container ---- */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ========================================================
+   Header
+   ======================================================== */
+.header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: var(--gradient-title);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.65rem;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.date-badge {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.time-badge {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+/* ---- 테마 전환 버튼 ---- */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--theme-btn-border);
+  border-radius: 20px;
+  background: var(--theme-btn-bg);
+  color: var(--theme-btn-text);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.theme-toggle-btn:hover {
+  transform: translateY(-1px);
+}
+
+.sun-icon { display: inline-block; }
+.moon-icon { display: none; }
+
+[data-theme="light"] .sun-icon { display: none; }
+[data-theme="light"] .moon-icon { display: inline-block; }
+
+/* ---- Refresh Button ---- */
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.9rem;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: var(--text-white);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.3);
+}
+.refresh-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.45);
+}
+.refresh-btn:active { transform: scale(0.97); }
+
+.refresh-btn.loading .refresh-icon {
+  animation: spin 0.8s linear infinite;
+}
+.refresh-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+.refresh-btn.cooldown {
+  background: #64748b;
+  box-shadow: none;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.refresh-icon { flex-shrink: 0; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================================
+   Table Card
+   ======================================================== */
+.table-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========================================================
+   Table
+   ======================================================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* ---- Header ---- */
+thead th {
+  background: var(--gradient-header);
+  color: var(--text-white);
+  padding: 0.7rem 0.55rem;
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--border-header);
+}
+
+thead .th-cat {
+  min-width: 110px;
+  text-align: center;
+}
+thead .th-loc {
+  min-width: 80px;
+}
+
+/* ---- Body Cells ---- */
+tbody td, tbody th {
+  padding: 0.55rem 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+
+tbody tr:hover td {
+  background: var(--bg-cell-hover);
+}
+
+/* Category Column */
+.cat-main {
+  background: var(--bg-category) !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  text-align: center;
+  min-width: 62px;
+  border-right: 1px solid var(--border);
+}
+
+.cat-sub {
+  background: var(--bg-category) !important;
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  min-width: 48px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+/* 줄무늬 */
+tbody tr:nth-child(even) td:not(.cat-main):not(.cat-sub) {
+  background: var(--bg-cell-alt);
+}
+tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
+  background: var(--bg-cell);
+}
+
+/* ---- Data Cells ---- */
+.cell-data {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+}
+
+/* 미세먼지 등급 뱃지 */
+.dust-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.dust-good     { background: rgba(34,197,94,0.15);  color: var(--grade-good); }
+.dust-normal   { background: rgba(59,130,246,0.15); color: var(--grade-normal); }
+.dust-bad      { background: rgba(245,158,11,0.15); color: var(--grade-bad); }
+.dust-very-bad { background: rgba(239,68,68,0.15);  color: var(--grade-very-bad); }
+
+/* 기상특보 */
+.alert-cell {
+  background: var(--alert-bg) !important;
+}
+.alert-tag {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin: 0.1rem 0;
+  white-space: nowrap;
+}
+.alert-warn    { background: rgba(245,158,11,0.18); color: #d97706; }
+.alert-danger  { background: rgba(239,68,68,0.18);  color: #dc2626; }
+
+[data-theme="dark"] .alert-warn   { color: #fbbf24; }
+[data-theme="dark"] .alert-danger { color: #fca5a5; }
+
+/* 강수량 */
+.rain-value { color: var(--accent); font-weight: 600; }
+.rain-forecast-item {
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+.rain-forecast-item strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 기온 */
+.temp-value { font-weight: 500; }
+.temp-min { color: #2563eb; }
+.temp-max { color: #dc2626; }
+
+[data-theme="dark"] .temp-min { color: #60a5fa; }
+[data-theme="dark"] .temp-max { color: #f87171; }
+
+.temp-sep { color: var(--text-dim); margin: 0 0.1rem; }
+
+/* 풍향풍속 */
+.wind-dir { font-weight: 500; }
+.wind-speed { color: var(--text-secondary); font-size: 0.78rem; }
+
+/* 개황 */
+.overview-text { font-weight: 500; }
+
+/* ========================================================
+   Loading
+   ======================================================== */
+.loading-cell {
+  padding: 3rem 1rem !important;
+  text-align: center !important;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(37, 99, 235, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+/* ========================================================
+   Footer
+   ======================================================== */
+.footer {
+  text-align: center;
+  margin-top: 1.2rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+/* ========================================================
+   Toast
+   ======================================================== */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  z-index: 100;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.toast.success { border-color: rgba(34,197,94,0.4); }
+.toast.error   { border-color: rgba(239,68,68,0.4); }
+
+/* ========================================================
+   Responsive
+   ======================================================== */
+@media (max-width: 768px) {
+  html { font-size: 13px; }
+  body { padding: 1rem 0.5rem; }
+  .title { font-size: 1.5rem; }
+  .table-card { border-radius: var(--radius-md); }
+}
+
+.error-cell {
+  padding: 3rem 1rem !important;
+  text-align: center !important;
+  color: var(--grade-bad);
+  font-size: 0.85rem;
+}
+
+tbody tr {
+  animation: fadeIn 0.3s ease both;
+}
+tbody tr:nth-child(1) { animation-delay: 0.02s; }
+tbody tr:nth-child(2) { animation-delay: 0.04s; }
+tbody tr:nth-child(3) { animation-delay: 0.06s; }
+tbody tr:nth-child(4) { animation-delay: 0.08s; }
+tbody tr:nth-child(5) { animation-delay: 0.10s; }
+tbody tr:nth-child(6) { animation-delay: 0.12s; }
+tbody tr:nth-child(7) { animation-delay: 0.14s; }
+tbody tr:nth-child(8) { animation-delay: 0.16s; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

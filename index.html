@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="양평, 경산, 사천, 함안, 성주, 세종, 계룡, 임실 8개 지역 실시간 기상예보 대시보드">
+  <title>기상예보 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- 헤더 -->
+    <header class="header" id="header">
+      <h1 class="title">기상예보</h1>
+      <div class="meta-row">
+        <span class="badge date-badge" id="date-display">로딩 중...</span>
+        <span class="badge time-badge" id="time-display">--:-- 기준</span>
+        
+        <!-- 테마 전환 버튼 (다크 / 라이트) -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" title="다크 / 라이트 모드 전환">
+          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="theme-text" id="theme-text">라이트 모드</span>
+        </button>
+
+        <!-- 갱신 버튼 -->
+        <button class="refresh-btn" id="refresh-btn" title="지금 데이터 갱신 요청">
+          <svg class="refresh-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span>지금 갱신</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 테이블 영역 -->
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table id="weather-table">
+          <thead>
+            <tr>
+              <th class="th-cat" colspan="2">구분</th>
+              <th class="th-loc">양평</th>
+              <th class="th-loc">경산</th>
+              <th class="th-loc">사천</th>
+              <th class="th-loc">함안</th>
+              <th class="th-loc">성주</th>
+              <th class="th-loc">세종</th>
+              <th class="th-loc">계룡</th>
+              <th class="th-loc">임실</th>
+            </tr>
+          </thead>
+          <tbody id="weather-body">
+            <tr>
+              <td colspan="10" class="loading-cell">
+                <div class="loading-spinner"></div>
+                <span>데이터를 불러오는 중...</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+      <p>데이터 출처: 기상청 · 에어코리아 &nbsp;|&nbsp; 1시간 간격 자동 갱신</p>
+    </footer>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
