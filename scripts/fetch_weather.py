@@ -234,7 +234,8 @@ def fetch_vilage_fcst(nx, ny, now_time, today_str):
             except (KeyError, TypeError):
                 pass
 
-    return [i for i in items if i.get('fcstDate') == today_str]
+    tomorrow_str = (now_time.date() + timedelta(days=1)).strftime('%Y%m%d')
+    return [i for i in items if i.get('fcstDate') in (today_str, tomorrow_str)]
 
 
 def fetch_air(station):
@@ -378,48 +379,74 @@ def process_location(name, cfg, now, today_str, alerts_data):
     curr_rn1 = parse_rain_val(ncst.get('RN1', 0))
     acc_rain += curr_rn1
 
-    # 일일 예상 강수량 (현재 시각 이후 시간대별 강수량)
+    tomorrow_str = (now.date() + timedelta(days=1)).strftime('%Y%m%d')
+
+    # 일일 예상 강수량 (현재 시각 ~ 내일 오전 09:00 시각까지)
     # 초단기예보(RN1)를 향후 1~6시간 동안 최우선 적용, 그 이후 시간은 단기예보(PCP) 적용
     hourly_rain = {}
 
-    # 초단기예보 반영
+    # 1. 초단기예보 반영
     for it in u_items:
-        if it['category'] == 'RN1' and it.get('fcstDate') == today_str:
+        if it['category'] == 'RN1':
+            fdate = it.get('fcstDate', today_str)
             try:
                 fh = int(it['fcstTime'][:2])
-                if fh > current_hour:
-                    hourly_rain[fh] = parse_rain_val(it['fcstValue'])
+                if fdate == today_str and fh > current_hour:
+                    hourly_rain[(0, fh)] = parse_rain_val(it['fcstValue'])
+                elif fdate == tomorrow_str and fh <= 9:
+                    hourly_rain[(1, fh)] = parse_rain_val(it['fcstValue'])
             except (ValueError, TypeError):
                 pass
 
-    # 6시간 이후 단기예보 반영
+    # 2. 단기예보 반영
     for it in v_items:
-        if it['category'] == 'PCP' and it.get('fcstDate') == today_str:
+        if it['category'] == 'PCP':
+            fdate = it.get('fcstDate')
             try:
                 fh = int(it['fcstTime'][:2])
-                if fh > current_hour and fh not in hourly_rain:
-                    hourly_rain[fh] = parse_rain_val(it['fcstValue'])
+                if fdate == today_str and fh > current_hour:
+                    if (0, fh) not in hourly_rain:
+                        hourly_rain[(0, fh)] = parse_rain_val(it['fcstValue'])
+                elif fdate == tomorrow_str and fh <= 9:
+                    if (1, fh) not in hourly_rain:
+                        hourly_rain[(1, fh)] = parse_rain_val(it['fcstValue'])
             except (ValueError, TypeError):
                 pass
 
-    # 강수가 있는 시간대 필터링 및 연속 구간 그룹화
-    rain_hours = [{'hour': h, 'amount': amt} for h, amt in sorted(hourly_rain.items()) if amt > 0]
+    # 3. 강수가 있는 시간대 필터링 및 연속 구간 그룹화 (내일 09시까지)
+    rain_slots = []
+    for (d, h), amt in sorted(hourly_rain.items()):
+        if amt > 0:
+            rain_slots.append({'day': d, 'hour': h, 'amount': amt})
 
     rain_forecast = []
-    if rain_hours:
-        grp = {'start': rain_hours[0]['hour'], 'end': rain_hours[0]['hour'], 'total': rain_hours[0]['amount']}
-        for i in range(1, len(rain_hours)):
-            if rain_hours[i]['hour'] == grp['end'] + 1:
-                grp['end'] = rain_hours[i]['hour']
-                grp['total'] += rain_hours[i]['amount']
+    if rain_slots:
+        grp = {'day': rain_slots[0]['day'], 'start': rain_slots[0]['hour'], 'end': rain_slots[0]['hour'], 'total': rain_slots[0]['amount']}
+        for i in range(1, len(rain_slots)):
+            curr = rain_slots[i]
+            prev_end_day = grp['day']
+            prev_end_hour = grp['end']
+
+            is_consecutive = False
+            if curr['day'] == prev_end_day and curr['hour'] == prev_end_hour + 1:
+                is_consecutive = True
+            elif prev_end_day == 0 and prev_end_hour == 23 and curr['day'] == 1 and curr['hour'] == 0:
+                is_consecutive = True
+
+            if is_consecutive:
+                grp['end'] = curr['hour']
+                grp['total'] += curr['amount']
             else:
+                prefix = "(내일) " if grp['day'] == 1 else ""
                 rain_forecast.append({
-                    'time_range': f"{grp['start']:02d}:00~{grp['end']+1:02d}:00",
+                    'time_range': f"{prefix}{grp['start']:02d}:00~{grp['end']+1:02d}:00",
                     'amount': round(grp['total'], 1)
                 })
-                grp = {'start': rain_hours[i]['hour'], 'end': rain_hours[i]['hour'], 'total': rain_hours[i]['amount']}
+                grp = {'day': curr['day'], 'start': curr['hour'], 'end': curr['hour'], 'total': curr['amount']}
+
+        prefix = "(내일) " if grp['day'] == 1 else ""
         rain_forecast.append({
-            'time_range': f"{grp['start']:02d}:00~{min(grp['end']+1, 24):02d}:00",
+            'time_range': f"{prefix}{grp['start']:02d}:00~{grp['end']+1:02d}:00",
             'amount': round(grp['total'], 1)
         })
 
