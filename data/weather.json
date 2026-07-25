@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T11:17:12+09:00",
+  "updated_at": "2026-07-25T11:23:55+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "11:17",
+  "time_display": "11:23",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -179,9 +179,9 @@
       "overview": "구름많음",
       "dust": {
         "pm10": "3",
-        "pm10_grade": "-",
+        "pm10_grade": "좋음",
         "pm25": "6",
-        "pm25_grade": "-",
+        "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
         "primary_station": "엄사면"

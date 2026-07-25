@@ -77,10 +77,11 @@
 
   function renderDustPM10(loc) {
     const g = loc.dust.pm10_grade;
-    const cls = dustBadgeClass(g);
     const val = loc.dust.pm10;
     if (val === '-') return '-';
-    let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    const cls = dustBadgeClass(g);
+    const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;
+    let html = `<span class="dust-badge ${cls}">${text}</span>`;
     if (loc.dust && loc.dust.is_fallback) {
       const info = `1차 관측소(${loc.dust.primary_station}) 점검으로 인근 관측소(${loc.dust.station_used})에서 수집`;
       html += ` <span class="fallback-badge" title="${escHtml(info)}" data-tooltip="${escHtml(info)}">!</span>`;
@@ -90,10 +91,11 @@
 
   function renderDustPM25(loc) {
     const g = loc.dust.pm25_grade;
-    const cls = dustBadgeClass(g);
     const val = loc.dust.pm25;
     if (val === '-') return '-';
-    let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    const cls = dustBadgeClass(g);
+    const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;
+    let html = `<span class="dust-badge ${cls}">${text}</span>`;
     if (loc.dust && loc.dust.is_fallback) {
       const info = `1차 관측소(${loc.dust.primary_station}) 점검으로 인근 관측소(${loc.dust.station_used})에서 수집`;
       html += ` <span class="fallback-badge" title="${escHtml(info)}" data-tooltip="${escHtml(info)}">!</span>`;

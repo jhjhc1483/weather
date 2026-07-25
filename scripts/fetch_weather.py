@@ -166,6 +166,34 @@ def sky_pty_to_text(sky, pty):
     return {1: '맑음', 3: '구름많음', 4: '흐림'}.get(sky, '-')
 
 
+def calc_pm10_grade(val_str, grade_str):
+    t = {'1': '좋음', '2': '보통', '3': '나쁨', '4': '매우나쁨'}.get(str(grade_str), '')
+    if t:
+        return t
+    try:
+        v = float(val_str)
+        if v <= 30: return '좋음'
+        if v <= 80: return '보통'
+        if v <= 150: return '나쁨'
+        return '매우나쁨'
+    except (ValueError, TypeError):
+        return '-'
+
+
+def calc_pm25_grade(val_str, grade_str):
+    t = {'1': '좋음', '2': '보통', '3': '나쁨', '4': '매우나쁨'}.get(str(grade_str), '')
+    if t:
+        return t
+    try:
+        v = float(val_str)
+        if v <= 15: return '좋음'
+        if v <= 35: return '보통'
+        if v <= 75: return '나쁨'
+        return '매우나쁨'
+    except (ValueError, TypeError):
+        return '-'
+
+
 def dust_grade_text(grade):
     return {'1': '좋음', '2': '보통', '3': '나쁨', '4': '매우나쁨'}.get(str(grade), '-')
 
@@ -183,8 +211,11 @@ def fetch_ncst(nx, ny, now_time):
     if not data:
         return {}
     try:
-        return {item['category']: item['obsrValue']
-                for item in data['response']['body']['items']['item']}
+        items = data['response']['body']['items']['item']
+        res = {}
+        for it in items:
+            res[it['category']] = it['obsrValue']
+        return res
     except (KeyError, TypeError):
         return {}
 
@@ -254,11 +285,13 @@ def fetch_air(station, fallback_station=None):
                 p10 = it.get('pm10Value')
                 p25 = it.get('pm25Value')
                 if p10 is not None and p10 != '-' and p10 != '':
+                    g10 = calc_pm10_grade(p10, it.get('pm10Grade', ''))
+                    g25 = calc_pm25_grade(p25, it.get('pm25Grade', ''))
                     return {
                         'pm10': str(p10),
-                        'pm10_grade': dust_grade_text(it.get('pm10Grade', '')),
+                        'pm10_grade': g10,
                         'pm25': str(p25) if p25 is not None else '-',
-                        'pm25_grade': dust_grade_text(it.get('pm25Grade', '')),
+                        'pm25_grade': g25,
                     }
         except (KeyError, TypeError):
             pass
