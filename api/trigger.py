@@ -9,12 +9,19 @@ class handler(BaseHTTPRequestHandler):
     """GitHub Actions workflow_dispatch 트리거 (Vercel 서버리스 함수)"""
 
     def do_POST(self):
-        token = os.environ.get('GITHUB_TOKEN', '')
+        token = (
+            os.environ.get('GH_TOKEN', '')
+            or os.environ.get('GITHUB_TOKEN', '')
+            or os.environ.get('VERCEL_GITHUB_TOKEN', '')
+        )
         if not token:
-            self._respond(500, {'error': 'GITHUB_TOKEN이 설정되지 않았습니다'})
+            self._respond(
+                500, {'error': 'GH_TOKEN 또는 GITHUB_TOKEN이 설정되지 않았습니다'}
+            )
             return
 
-        url = 'https://api.github.com/repos/jhjhc1483/weather/actions/workflows/weather-update.yml/dispatches'
+        repo = os.environ.get('GH_REPO', 'jhjhc1483/weather')
+        url = f'https://api.github.com/repos/{repo}/actions/workflows/weather-update.yml/dispatches'
         body = json.dumps({'ref': 'main'}).encode('utf-8')
 
         req = Request(url, data=body, method='POST')
