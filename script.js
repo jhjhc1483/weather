@@ -13,7 +13,7 @@
   const DATA_URL = 'data/weather.json';
   const TRIGGER_URL = '/api/trigger';
   const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
-  const POLL_INTERVAL_MS = 20000;        // 갱신 요청 후 20초 간격 감지
+  const POLL_INTERVAL_MS = 8000;         // 갱신 요청 후 8초 간격 신속 감지
   const POLL_TIMEOUT_MS = 3 * 60 * 1000; // 3분 후 감지 중단
 
   const LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실'];
@@ -28,6 +28,7 @@
 
   /* ======== 상태 변수 ======== */
   let currentUpdatedAt = '';
+  let pollingStartUpdatedAt = '';
   let isPolling = false;
   let pollIntervalId = null;
   let pollTimeoutId = null;
@@ -217,7 +218,7 @@
 
   /* ======== 데이터 로드 및 갱신 감지 ======== */
   function loadData(onSuccess) {
-    return fetch(DATA_URL + '?t=' + Date.now())
+    return fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
@@ -228,7 +229,8 @@
           return null;
         }
 
-        const isNewData = currentUpdatedAt && data.updated_at && (data.updated_at !== currentUpdatedAt);
+        const baseline = isPolling ? pollingStartUpdatedAt : currentUpdatedAt;
+        const isNewData = baseline && data.updated_at && (data.updated_at !== baseline);
         currentUpdatedAt = data.updated_at || '';
 
         updateMeta(data);
@@ -261,12 +263,13 @@
   function startPolling() {
     if (isPolling) return;
     isPolling = true;
+    pollingStartUpdatedAt = currentUpdatedAt; // 갱신 요청 시점 스냅샷
     $btn.classList.add('loading');
 
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 8초마다 weather.json 타임스탬프 체크
+    // 8초마다 weather.json 타임스탬프 체크 (no-store 신속 감지)
     pollIntervalId = setInterval(function () {
       loadData(function (isNewData, data) {
         if (isNewData) {
@@ -279,7 +282,7 @@
     pollTimeoutId = setTimeout(function () {
       if (isPolling) {
         stopPolling(false);
-        showToast('ℹ️ 갱신 처리 시간이 길어지고 있습니다. 1~2분 후 새로고침해 보세요.', 'info');
+        showToast('ℹ️ 갱신 처리 시간이 길어지고 있습니다. 잠시 후 새로고침해 보세요.', 'info');
       }
     }, POLL_TIMEOUT_MS);
   }
