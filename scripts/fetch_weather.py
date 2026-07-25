@@ -11,6 +11,7 @@
 """
 
 import json
+import math
 import os
 import sys
 import time
@@ -196,6 +197,48 @@ def calc_pm25_grade(val_str, grade_str):
 
 def dust_grade_text(grade):
     return {'1': '좋음', '2': '보통', '3': '나쁨', '4': '매우나쁨'}.get(str(grade), '-')
+
+
+def calculate_feels_like(temp_str, reh_str, wsd_str, month):
+    """
+    기상청 공식 체감온도 산출 함수
+    - 여름철(5~9월 또는 기온>=20℃): Stull 습구온도 기반 기상청 습도 체감온도 공식
+    - 겨울철(10~4월 또는 기온<=10℃): WMO/JAG/TI 바람 체감온도 공식
+    """
+    try:
+        t = float(temp_str)
+    except (ValueError, TypeError):
+        return '-'
+
+    try:
+        h = float(reh_str)
+    except (ValueError, TypeError):
+        h = 50.0
+
+    try:
+        w = float(wsd_str)
+    except (ValueError, TypeError):
+        w = 0.0
+
+    v_kmh = w * 3.6
+
+    # 1. 겨울철 체감온도 (기온 10℃ 이하 및 풍속 1.3m/s(4.68km/h) 이상 시 바람 체감온도 적용)
+    if (month in [10, 11, 12, 1, 2, 3, 4] or t <= 10.0) and t <= 10.0 and v_kmh >= 4.68:
+        fl = 13.12 + 0.6215 * t - 11.37 * (v_kmh ** 0.16) + 0.3965 * t * (v_kmh ** 0.16)
+        return f"{fl:.1f}"
+
+    # 2. 여름철 체감온도 (기온 20℃ 이상 시 Stull 습구온도 기반 체감온도 적용)
+    if (month in [5, 6, 7, 8, 9] or t >= 20.0) and t >= 20.0:
+        tw = (t * math.atan(0.151977 * ((h + 8.313659) ** 0.5)) +
+              math.atan(t + h) -
+              math.atan(h - 1.676331) +
+              0.00391838 * (h ** 1.5) * math.atan(0.023101 * h) -
+              4.686035)
+        fl = -0.2442 + 0.55399 * tw + 0.45535 * t - 0.0022 * (tw ** 2) + 0.00278 * tw * t + 3.0
+        return f"{fl:.1f}"
+
+    # 3. 온화한 기온대 (10℃ ~ 20℃)
+    return f"{t:.1f}"
 
 
 # ============================================================
@@ -526,15 +569,20 @@ def process_location(name, cfg, now, today_str, alerts_data):
             'amount': round(grp['total'], 1)
         })
 
+    # 체감온도 계산
+    cur_reh = ncst.get('REH', '-')
+    feels_like = calculate_feels_like(cur_temp, cur_reh, w_spd_raw, now.month)
+
     return {
         'overview': overview,
         'dust': air,
-        'temperature': {'current': cur_temp, 'min': min_temp, 'max': max_temp},
+        'temperature': {'current': cur_temp, 'feels_like': feels_like, 'min': min_temp, 'max': max_temp},
         'wind': {'direction': w_dir, 'speed': w_spd_text},
         'rain_accumulated': round(acc_rain, 1),
         'rain_forecast': rain_forecast,
         'alerts': alerts_data.get(name, []),
     }
+
 
 
 # ============================================================
@@ -561,7 +609,7 @@ def main():
             locations_data[name] = {
                 'overview': '-',
                 'dust': {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'},
-                'temperature': {'current': '-', 'min': '-', 'max': '-'},
+                'temperature': {'current': '-', 'feels_like': '-', 'min': '-', 'max': '-'},
                 'wind': {'direction': '-', 'speed': '-'},
                 'rain_accumulated': 0,
                 'rain_forecast': [],

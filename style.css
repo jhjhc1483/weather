@@ -445,9 +445,20 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 .temp-value { font-weight: 500; }
 .temp-min { color: #2563eb; }
 .temp-max { color: #dc2626; }
+.temp-feels {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+.temp-feels .feels-num {
+  font-weight: 600;
+  color: #ea580c;
+}
 
 [data-theme="dark"] .temp-min { color: #60a5fa; }
 [data-theme="dark"] .temp-max { color: #f87171; }
+[data-theme="dark"] .temp-feels .feels-num { color: #fb923c; }
 
 .temp-sep { color: var(--text-dim); margin: 0 0.1rem; }
 
@@ -747,9 +758,10 @@ tbody tr:nth-child(8) { animation-delay: 0.16s; }
 .markdown-body code { background: rgba(37, 99, 235, 0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
 
 /* ========================================================
-   미세먼지 인포 아이콘
+   미세먼지 & 기온 인포 아이콘
    ======================================================== */
-.dust-info-icon {
+.dust-info-icon,
+.temp-info-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -767,10 +779,23 @@ tbody tr:nth-child(8) { animation-delay: 0.16s; }
   vertical-align: middle;
   transition: all 0.2s ease;
 }
-.dust-info-icon:hover {
+.dust-info-icon:hover,
+.temp-info-icon:hover {
   background: rgba(59, 130, 246, 0.3);
   border-color: rgba(59, 130, 246, 0.6);
   transform: scale(1.15);
+}
+
+.temp-info-box {
+  line-height: 1.65;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+.temp-info-box h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
 }
 
 /* ========================================================

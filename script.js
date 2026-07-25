@@ -166,8 +166,13 @@
   function renderTemp(loc) {
     const mn = loc.temperature.min;
     const mx = loc.temperature.max;
+    const fl = loc.temperature.feels_like;
     if (mn === '-' && mx === '-') return '-';
-    return `<span class="temp-value"><span class="temp-min">${escHtml(String(mn))}</span><span class="temp-sep">~</span><span class="temp-max">${escHtml(String(mx))}</span></span>`;
+    let html = `<span class="temp-value"><span class="temp-min">${escHtml(String(mn))}</span><span class="temp-sep">~</span><span class="temp-max">${escHtml(String(mx))}</span></span>`;
+    if (fl && fl !== '-') {
+      html += `<div class="temp-feels">체감 <span class="feels-num">${escHtml(String(fl))}℃</span></div>`;
+    }
+    return html;
   }
 
   function renderWind(loc) {
@@ -204,11 +209,12 @@
 
   /* ======== 행 구조 정의 (미세먼지 외 항목 카테고리 셀 병합) ======== */
   const DUST_INFO_ICON = '<span class="dust-info-icon" data-tooltip-dust="true" title="미세먼지 등급 기준">ℹ</span>';
+  const TEMP_INFO_ICON = '<span class="temp-info-icon" data-tooltip-temp="true" title="기상청 체감온도 산출 안내">ℹ</span>';
   const ROW_DEFS = [
     { cat: '개황', colspan: 2, sub: null, render: renderOverview, alertRow: false },
     { cat: '미세먼지', catHtml: '미세먼지 ' + DUST_INFO_ICON, rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
-    { cat: '기온(℃)', colspan: 2, sub: null, render: renderTemp, alertRow: false },
+    { cat: '기온(℃)', catHtml: '기온(℃) ' + TEMP_INFO_ICON, colspan: 2, sub: null, render: renderTemp, alertRow: false },
     { cat: '풍향/풍속', colspan: 2, sub: null, render: renderWind, alertRow: false },
     { cat: '일일 누적 강수량', colspan: 2, sub: null, render: renderRainAcc, alertRow: false },
     { cat: '일일 예상 강수량', colspan: 2, sub: null, render: renderRainFcst, alertRow: false },
@@ -642,6 +648,31 @@
 
     $modalBody.innerHTML = dustHtml;
     document.getElementById('modal-title-text').textContent = 'ℹ️ 미세먼지 등급 기준';
+    readmeLoaded = false;
+    openModal(true);
+  });
+
+  /* ======== 체감온도 인포 아이콘 클릭 → 산출 방식 팝업 ======== */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.temp-info-icon')) return;
+
+    const tempHtml = '<div class="alert-popup-content">'
+      + '<h3>🌡️ 기상청 체감온도 산출 및 안내</h3>'
+      + '<div class="temp-info-box">'
+      + '<p>본 대시보드는 <strong>대한민국 기상청(KMA) 공식 체감온도 산출식</strong>을 적용하여 실시간 기온, 습도, 풍속 데이터를 바탕으로 체감온도를 자동 계산합니다.</p>'
+      + '<hr style="border:none;border-top:1px solid var(--border);margin:0.8rem 0;">'
+      + '<h4>☀️ 여름철 (5월~9월 또는 기온 ≥ 20℃)</h4>'
+      + '<p style="margin-bottom:0.6rem;">기온과 <strong>상대습도</strong>(Stull 습구온도 T<sub>w</sub> 추정식)를 결합한 기상청 습도 체감온도 공식을 적용합니다.<br>'
+      + '<span style="font-size:0.8rem;color:var(--text-secondary);display:inline-block;margin-top:0.2rem;">※ 습도가 높으면 실제 기온(28~29℃)이 낮더라도 체감온도는 33℃/35℃ 이상으로 급상승하여 폭염특보 발효 기준이 됩니다.</span></p>'
+      + '<h4>❄️ 겨울철 (10월~4월 또는 기온 ≤ 10℃ & 풍속 ≥ 1.3m/s)</h4>'
+      + '<p style="margin-bottom:0.6rem;">기온과 <strong>풍속</strong>(바람)을 반영한 WMO/JAG/TI 바람 체감온도 공식을 적용합니다.</p>'
+      + '<h4>🍃 온화한 기온대 (10℃ ~ 20℃)</h4>'
+      + '<p>체감온도가 기온과 거의 유사하여 기온 수치를 그대로 표출합니다.</p>'
+      + '</div>'
+      + '</div>';
+
+    $modalBody.innerHTML = tempHtml;
+    document.getElementById('modal-title-text').textContent = '🌡️ 체감온도 산출 및 안내';
     readmeLoaded = false;
     openModal(true);
   });
