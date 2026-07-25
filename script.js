@@ -498,11 +498,11 @@
       });
   }
 
-  function openModal() {
+  function openModal(skipReadme) {
     $readmeModal.classList.add('show');
     $readmeModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    loadReadme();
+    if (!skipReadme) loadReadme();
   }
 
   function closeModal() {
@@ -512,7 +512,11 @@
   }
 
   if ($readmeBtn && $readmeModal) {
-    $readmeBtn.addEventListener('click', openModal);
+    $readmeBtn.addEventListener('click', function () {
+      readmeLoaded = false;
+      document.getElementById('modal-title-text').textContent = '📖 프로젝트 안내 (README)';
+      openModal();
+    });
     if ($modalCloseBtn) $modalCloseBtn.addEventListener('click', closeModal);
     $readmeModal.addEventListener('click', function (e) {
       if (e.target === $readmeModal) closeModal();
@@ -567,7 +571,7 @@
     $modalBody.innerHTML = popupHtml;
     document.getElementById('modal-title-text').textContent = '⚠️ 기상특보 발표 기준';
     readmeLoaded = false;
-    openModal();
+    openModal(true);
   });
 
   /* ======== 미세먼지 인포 아이콘 클릭 → 기준 팝업 ======== */
@@ -590,6 +594,6 @@
     $modalBody.innerHTML = dustHtml;
     document.getElementById('modal-title-text').textContent = 'ℹ️ 미세먼지 등급 기준';
     readmeLoaded = false;
-    openModal();
+    openModal(true);
   });
 })();
