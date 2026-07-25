@@ -1,14 +1,14 @@
 {
-  "updated_at": "2026-07-25T12:09:13+09:00",
+  "updated_at": "2026-07-25T12:17:36+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "12:09",
+  "time_display": "12:17",
   "locations": {
     "양평": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "25",
+        "pm10": "21",
         "pm10_grade": "좋음",
         "pm25": "6",
         "pm25_grade": "좋음",
@@ -45,9 +45,9 @@
     "경산": {
       "overview": "흐림",
       "dust": {
-        "pm10": "22",
+        "pm10": "24",
         "pm10_grade": "좋음",
-        "pm25": "13",
+        "pm25": "19",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
@@ -72,9 +72,9 @@
     "사천": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "14",
+        "pm10": "27",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "10",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -98,9 +98,9 @@
     "함안": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "18",
+        "pm10": "17",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "7",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
@@ -149,7 +149,7 @@
       ]
     },
     "세종": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
         "pm10": "13",
         "pm10_grade": "좋음",
@@ -160,21 +160,16 @@
         "primary_station": "조치원읍"
       },
       "temperature": {
-        "current": "-",
+        "current": "30.7",
         "min": "25.0",
         "max": "32.0"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "남남서풍",
+        "speed": "2.2m/s"
       },
       "rain_accumulated": 0.0,
-      "rain_forecast": [
-        {
-          "time_range": "13:00~15:00",
-          "amount": 23.0
-        }
-      ],
+      "rain_forecast": [],
       "alerts": [
         "폭염경보",
         "폭염주의보"
