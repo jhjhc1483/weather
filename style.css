@@ -416,6 +416,12 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   font-size: 0.72rem;
   color: var(--text-dim);
 }
+.footer .copyright {
+  margin-top: 0.35rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+}
 
 /* ========================================================
    Toast

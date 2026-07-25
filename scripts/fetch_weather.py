@@ -47,7 +47,7 @@ LOCATIONS = {
     '함안': {'nx': 86, 'ny': 77,  'station': '가야읍', 'alert_region': '함안'},
     '성주': {'nx': 83, 'ny': 89,  'station': '성주군', 'alert_region': '성주'},
     '세종': {'nx': 65, 'ny': 105, 'station': '조치원읍', 'alert_region': '세종'},
-    '계룡': {'nx': 65, 'ny': 99,  'station': '엄사면', 'alert_region': '계룡'},
+    '계룡': {'nx': 65, 'ny': 99,  'station': '엄사면', 'fallback_station': '논산', 'alert_region': '계룡'},
     '임실': {'nx': 66, 'ny': 84,  'station': '임실읍', 'alert_region': '임실'},
 }
 
@@ -238,28 +238,37 @@ def fetch_vilage_fcst(nx, ny, now_time, today_str):
     return [i for i in items if i.get('fcstDate') in (today_str, tomorrow_str)]
 
 
-def fetch_air(station):
-    """에어코리아 미세먼지"""
-    data = api_call(f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", {
-        'returnType': 'json', 'stationName': station,
-        'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1',
-    })
-    empty = {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'}
-    if not data:
-        return empty
-    try:
-        items = data['response']['body']['items']
-        if items and len(items) > 0:
-            it = items[0]
-            return {
-                'pm10': it.get('pm10Value', '-'),
-                'pm10_grade': dust_grade_text(it.get('pm10Grade', '')),
-                'pm25': it.get('pm25Value', '-'),
-                'pm25_grade': dust_grade_text(it.get('pm25Grade', '')),
-            }
-    except (KeyError, TypeError):
-        pass
-    return empty
+def fetch_air(station, fallback_station=None):
+    """에어코리아 미세먼지 (점검 중일 때 fallback 측정소 자동 전환)"""
+    def _query(st):
+        data = api_call(f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", {
+            'returnType': 'json', 'stationName': st,
+            'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1',
+        })
+        if not data:
+            return None
+        try:
+            items = data['response']['body']['items']
+            if items and len(items) > 0:
+                it = items[0]
+                p10 = it.get('pm10Value')
+                p25 = it.get('pm25Value')
+                if p10 is not None and p10 != '-' and p10 != '':
+                    return {
+                        'pm10': str(p10),
+                        'pm10_grade': dust_grade_text(it.get('pm10Grade', '')),
+                        'pm25': str(p25) if p25 is not None else '-',
+                        'pm25_grade': dust_grade_text(it.get('pm25Grade', '')),
+                    }
+        except (KeyError, TypeError):
+            pass
+        return None
+
+    res = _query(station)
+    if not res and fallback_station:
+        res = _query(fallback_station)
+
+    return res or {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'}
 
 
 def fetch_alerts():
@@ -328,7 +337,7 @@ def process_location(name, cfg, now, today_str, alerts_data):
     time.sleep(0.2)
 
     # 4. 미세먼지
-    air = fetch_air(cfg['station'])
+    air = fetch_air(cfg['station'], cfg.get('fallback_station'))
     time.sleep(0.2)
 
     current_hour = int(now.strftime('%H'))
