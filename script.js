@@ -36,7 +36,7 @@
 
   /* ======== 테마 관리 ======== */
   function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
   }
 
