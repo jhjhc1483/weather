@@ -170,7 +170,7 @@
     if (mn === '-' && mx === '-') return '-';
     let html = `<span class="temp-value"><span class="temp-min">${escHtml(String(mn))}</span><span class="temp-sep">~</span><span class="temp-max">${escHtml(String(mx))}</span></span>`;
     if (fl && fl !== '-') {
-      html += `<div class="temp-feels">체감 <span class="feels-num">${escHtml(String(fl))}℃</span></div>`;
+      html += `<div class="temp-feels">현재체감 <span class="feels-num">${escHtml(String(fl))}℃</span></div>`;
     }
     return html;
   }
@@ -668,6 +668,10 @@
       + '<p style="margin-bottom:0.6rem;">기온과 <strong>풍속</strong>(바람)을 반영한 WMO/JAG/TI 바람 체감온도 공식을 적용합니다.</p>'
       + '<h4>🍃 온화한 기온대 (10℃ ~ 20℃)</h4>'
       + '<p>체감온도가 기온과 거의 유사하여 기온 수치를 그대로 표출합니다.</p>'
+      + '<p style="margin-top:0.8rem;font-size:0.82rem;color:var(--accent);background:rgba(37,99,235,0.08);padding:0.6rem 0.8rem;border-radius:8px;border:1px solid rgba(37,99,235,0.2);">'
+      + '💡 <strong>[현재체감 vs 폭염특보 참고]</strong><br>'
+      + '표의 <strong>"현재체감"</strong>은 지금 이 순간의 실시간 관측 체감온도이며, <strong>폭염특보</strong>는 오늘 낮 최고 예상 <strong>"일 최고 체감온도(33℃/35℃ 이상)"</strong>를 기준으로 하루 동안 발효·유지됩니다.'
+      + '</p>'
       + '</div>'
       + '</div>';
 
