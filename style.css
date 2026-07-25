@@ -415,6 +415,14 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   font-weight: 600;
   white-space: nowrap;
 }
+.alert-tag-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.alert-tag-clickable:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 .alert-warn    { background: rgba(245,158,11,0.18); color: #d97706; }
 .alert-danger  { background: rgba(239,68,68,0.18);  color: #dc2626; }
 
@@ -446,6 +454,12 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 /* 풍향풍속 */
 .wind-dir { font-weight: 500; }
 .wind-speed { color: var(--text-secondary); font-size: 0.78rem; }
+.wind-arrow {
+  font-size: 1.1em;
+  color: var(--accent);
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
 
 /* 개황 */
 .overview-text { font-weight: 500; }
@@ -731,3 +745,102 @@ tbody tr:nth-child(8) { animation-delay: 0.16s; }
 .markdown-body th { background: var(--bg-category); font-weight: 600; }
 .markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
 .markdown-body code { background: rgba(37, 99, 235, 0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+
+/* ========================================================
+   미세먼지 인포 아이콘
+   ======================================================== */
+.dust-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-style: normal;
+  cursor: pointer;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+.dust-info-icon:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+  transform: scale(1.15);
+}
+
+/* ========================================================
+   기상특보 & 미세먼지 기준 팝업 컨텐츠
+   ======================================================== */
+.alert-popup-content {
+  padding: 0.2rem 0;
+}
+.alert-popup-content h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+.alert-criteria-item {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.6rem;
+  background: var(--bg-cell-alt);
+  border-left: 3px solid transparent;
+  transition: background 0.2s ease;
+}
+.alert-criteria-item.active {
+  background: rgba(59, 130, 246, 0.08);
+  border-left-color: var(--accent);
+}
+.alert-criteria-item strong {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  margin-bottom: 0.4rem;
+}
+.alert-warn-label {
+  background: rgba(245,158,11,0.18);
+  color: #d97706;
+}
+.alert-danger-label {
+  background: rgba(239,68,68,0.18);
+  color: #dc2626;
+}
+[data-theme="dark"] .alert-warn-label { color: #fbbf24; }
+[data-theme="dark"] .alert-danger-label { color: #fca5a5; }
+
+.alert-criteria-item p {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* 미세먼지 기준 테이블 */
+.dust-criteria-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.88rem;
+}
+.dust-criteria-table th,
+.dust-criteria-table td {
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+}
+.dust-criteria-table th {
+  background: var(--bg-category);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+.dust-criteria-table tr.dust-good td:first-child { color: var(--grade-good); font-weight: 600; }
+.dust-criteria-table tr.dust-normal td:first-child { color: var(--grade-normal); font-weight: 600; }
+.dust-criteria-table tr.dust-bad td:first-child { color: var(--grade-bad); font-weight: 600; }
+.dust-criteria-table tr.dust-very-bad td:first-child { color: var(--grade-very-bad); font-weight: 600; }

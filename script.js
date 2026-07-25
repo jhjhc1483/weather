@@ -72,6 +72,28 @@
     return d.innerHTML;
   }
 
+  /* ======== 풍향 → 화살표 매핑 (바람이 불어오는 방향 → 이동 방향 화살표) ======== */
+  const WIND_ARROW_MAP = {
+    '북풍': 180, '북북동풍': 202.5, '북동풍': 225, '동북동풍': 247.5,
+    '동풍': 270, '동남동풍': 292.5, '남동풍': 315, '남남동풍': 337.5,
+    '남풍': 0, '남남서풍': 22.5, '남서풍': 45, '서남서풍': 67.5,
+    '서풍': 90, '서북서풍': 112.5, '북서풍': 135, '북북서풍': 157.5,
+  };
+
+  /* ======== 기상특보 발표 기준 데이터 ======== */
+  const ALERT_CRITERIA = {
+    '폭염': { '주의보': '일 최고체감온도 33℃ 이상이 2일 이상 지속될 것으로 예상될 때', '경보': '일 최고체감온도 35℃ 이상이 2일 이상 지속될 것으로 예상될 때' },
+    '한파': { '주의보': '아침 최저기온이 전날보다 10℃ 이상 하강하여 3℃ 이하이고 평년값보다 3℃ 이상 낮을 것으로 예상될 때, 또는 아침 최저기온이 −12℃ 이하가 2일 이상 지속될 것으로 예상될 때', '경보': '아침 최저기온이 전날보다 15℃ 이상 하강하여 3℃ 이하이고 평년값보다 3℃ 이상 낮을 것으로 예상될 때, 또는 아침 최저기온이 −15℃ 이하가 2일 이상 지속될 것으로 예상될 때' },
+    '호우': { '주의보': '6시간 강우량 70mm 이상 또는 12시간 강우량 110mm 이상 예상될 때', '경보': '6시간 강우량 110mm 이상 또는 12시간 강우량 180mm 이상 예상될 때' },
+    '대설': { '주의보': '24시간 신적설이 5cm 이상 예상될 때', '경보': '24시간 신적설이 20cm 이상 예상될 때 (산지는 30cm 이상)' },
+    '강풍': { '주의보': '육상에서 풍속 14m/s 이상 또는 순간풍속 20m/s 이상 예상될 때', '경보': '육상에서 풍속 21m/s 이상 또는 순간풍속 26m/s 이상 예상될 때' },
+    '건조': { '주의보': '실효습도 35% 이하가 2일 이상 지속될 것으로 예상될 때', '경보': '실효습도 25% 이하가 2일 이상 지속될 것으로 예상될 때' },
+    '태풍': { '주의보': '태풍으로 인하여 풍속 17m/s 이상 또는 강우량 100mm 이상 예상될 때', '경보': '태풍으로 인하여 풍속 25m/s 이상 또는 강우량 200mm 이상 예상될 때' },
+    '황사': { '주의보': 'PM10 농도 400㎍/㎥ 이상이 2시간 이상 지속될 것으로 예상될 때', '경보': 'PM10 농도 800㎍/㎥ 이상이 2시간 이상 지속될 것으로 예상될 때' },
+    '풍랑': { '주의보': '해상에서 풍속 14m/s 이상이 3시간 이상 또는 유의파고 3m 이상 예상될 때', '경보': '해상에서 풍속 21m/s 이상이 3시간 이상 또는 유의파고 5m 이상 예상될 때' },
+    '호우': { '주의보': '6시간 강우량 70mm 이상 또는 12시간 강우량 110mm 이상 예상될 때', '경보': '6시간 강우량 110mm 이상 또는 12시간 강우량 180mm 이상 예상될 때' },
+  };
+
   /* ======== 데이터 표출 렌더러 ======== */
   function renderOverview(loc) {
     return `<span class="overview-text">${escHtml(loc.overview)}</span>`;
@@ -114,7 +136,12 @@
 
   function renderWind(loc) {
     if (loc.wind.direction === '-') return '-';
-    return `<span class="wind-dir">${escHtml(loc.wind.direction)}</span><br><span class="wind-speed">${escHtml(loc.wind.speed)}</span>`;
+    const dir = loc.wind.direction;
+    const deg = WIND_ARROW_MAP[dir];
+    const arrowHtml = (deg !== undefined)
+      ? `<span class="wind-arrow" style="display:inline-block;transform:rotate(${deg}deg)">↑</span> `
+      : '';
+    return `<span class="wind-dir">${arrowHtml}${escHtml(dir)}</span><br><span class="wind-speed">${escHtml(loc.wind.speed)}</span>`;
   }
 
   function renderRainAcc(loc) {
@@ -135,14 +162,15 @@
     const a = loc.alerts;
     if (!a || a.length === 0) return '-';
     return a.map(function (t) {
-      return `<div class="alert-tag ${alertTagClass(t)}">${escHtml(t)}</div>`;
+      return `<div class="alert-tag alert-tag-clickable ${alertTagClass(t)}" data-alert="${escHtml(t)}">${escHtml(t)}</div>`;
     }).join('');
   }
 
   /* ======== 행 구조 정의 (미세먼지 외 항목 카테고리 셀 병합) ======== */
+  const DUST_INFO_ICON = '<span class="dust-info-icon" data-tooltip-dust="true" title="미세먼지 등급 기준">ℹ</span>';
   const ROW_DEFS = [
     { cat: '개황', colspan: 2, sub: null, render: renderOverview, alertRow: false },
-    { cat: '미세먼지', rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
+    { cat: '미세먼지', catHtml: '미세먼지 ' + DUST_INFO_ICON, rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
     { cat: '기온(℃)', colspan: 2, sub: null, render: renderTemp, alertRow: false },
     { cat: '풍향/풍속', colspan: 2, sub: null, render: renderWind, alertRow: false },
@@ -164,7 +192,8 @@
         let attrs = '';
         if (def.rowspan) attrs += ` rowspan="${def.rowspan}"`;
         if (def.colspan) attrs += ` colspan="${def.colspan}"`;
-        html += `<td class="cat-main"${attrs}>${escHtml(def.cat)}</td>`;
+        const catLabel = def.catHtml || escHtml(def.cat);
+        html += `<td class="cat-main"${attrs}>${catLabel}</td>`;
       }
 
       if (def.sub !== null) {
@@ -351,10 +380,19 @@
   }
 
   /* ======== 갱신 버튼 이벤트 ======== */
+  let refreshAutoReloadId = null;
+
   function handleRefresh() {
     initAudioContext(); // 클릭 시점에 오디오 컨텍스트 사전 활성화 (브라우저 Autoplay 락 해제!)
     requestNotificationPermission();
     $btn.classList.add('loading');
+
+    // 3분 후 자동 새로고침 (Actions 완료 후 최신 데이터 보장)
+    clearTimeout(refreshAutoReloadId);
+    refreshAutoReloadId = setTimeout(function () {
+      loadData();
+      showToast('🔄 3분 경과 — 데이터를 자동 새로고침했습니다.', 'info', 4000);
+    }, 3 * 60 * 1000);
 
     fetch(TRIGGER_URL, { method: 'POST' })
       .then(function (res) { return res.json(); })
@@ -491,4 +529,67 @@
   setInterval(function () {
     if (!isPolling) loadData();
   }, AUTO_RELOAD_MS);
+
+  /* ======== 기상특보 태그 클릭 → 기준 팝업 (이벤트 위임) ======== */
+  document.addEventListener('click', function (e) {
+    const tag = e.target.closest('.alert-tag-clickable');
+    if (!tag) return;
+
+    const alertText = tag.getAttribute('data-alert') || '';
+    let matchedType = '';
+    let matchedLevel = '';
+
+    Object.keys(ALERT_CRITERIA).forEach(function (type) {
+      if (alertText.includes(type)) {
+        matchedType = type;
+        if (alertText.includes('경보')) matchedLevel = '경보';
+        else if (alertText.includes('주의보')) matchedLevel = '주의보';
+      }
+    });
+
+    let popupHtml = '';
+    if (matchedType && ALERT_CRITERIA[matchedType]) {
+      const criteria = ALERT_CRITERIA[matchedType];
+      popupHtml = '<div class="alert-popup-content">';
+      popupHtml += '<h3>⚠️ ' + escHtml(matchedType) + ' 발표 기준</h3>';
+      if (criteria['주의보']) {
+        popupHtml += '<div class="alert-criteria-item' + (matchedLevel === '주의보' ? ' active' : '') + '"><strong class="alert-warn-label">주의보</strong><p>' + escHtml(criteria['주의보']) + '</p></div>';
+      }
+      if (criteria['경보']) {
+        popupHtml += '<div class="alert-criteria-item' + (matchedLevel === '경보' ? ' active' : '') + '"><strong class="alert-danger-label">경보</strong><p>' + escHtml(criteria['경보']) + '</p></div>';
+      }
+      popupHtml += '</div>';
+    } else {
+      popupHtml = '<div class="alert-popup-content"><p>' + escHtml(alertText) + '</p></div>';
+    }
+
+    // 모달 재활용
+    $modalBody.innerHTML = popupHtml;
+    document.getElementById('modal-title-text').textContent = '⚠️ 기상특보 발표 기준';
+    readmeLoaded = false;
+    openModal();
+  });
+
+  /* ======== 미세먼지 인포 아이콘 클릭 → 기준 팝업 ======== */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.dust-info-icon')) return;
+
+    const dustHtml = '<div class="alert-popup-content">'
+      + '<h3>ℹ️ 미세먼지 등급 기준</h3>'
+      + '<table class="dust-criteria-table">'
+      + '<thead><tr><th>등급</th><th>미세먼지 (PM10)</th><th>초미세먼지 (PM2.5)</th></tr></thead>'
+      + '<tbody>'
+      + '<tr class="dust-good"><td>좋음</td><td>0 ~ 30 ㎍/㎥</td><td>0 ~ 15 ㎍/㎥</td></tr>'
+      + '<tr class="dust-normal"><td>보통</td><td>31 ~ 80 ㎍/㎥</td><td>16 ~ 35 ㎍/㎥</td></tr>'
+      + '<tr class="dust-bad"><td>나쁨</td><td>81 ~ 150 ㎍/㎥</td><td>36 ~ 75 ㎍/㎥</td></tr>'
+      + '<tr class="dust-very-bad"><td>매우나쁨</td><td>151 ㎍/㎥ 이상</td><td>76 ㎍/㎥ 이상</td></tr>'
+      + '</tbody></table>'
+      + '<p style="margin-top:0.8rem;font-size:0.78rem;color:var(--text-dim)">출처: 환경부 에어코리아</p>'
+      + '</div>';
+
+    $modalBody.innerHTML = dustHtml;
+    document.getElementById('modal-title-text').textContent = 'ℹ️ 미세먼지 등급 기준';
+    readmeLoaded = false;
+    openModal();
+  });
 })();
