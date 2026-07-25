@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T20:40:37+09:00",
+  "updated_at": "2026-07-25T20:45:32+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "20:40",
+  "time_display": "20:45",
   "locations": {
     "양평": {
       "overview": "맑음",
@@ -17,21 +17,16 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "24.2",
+        "current": "24.1",
         "min": "22.0",
         "max": "29.0"
       },
       "wind": {
         "direction": "서풍",
-        "speed": "1.2m/s"
+        "speed": "1.1m/s"
       },
       "rain_accumulated": 0.0,
-      "rain_forecast": [
-        {
-          "time_range": "23:00~24:00",
-          "amount": 13.0
-        }
-      ],
+      "rain_forecast": [],
       "alerts": [
         "폭염경보",
         "폭염주의보",
@@ -50,13 +45,13 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "29.7",
+        "current": "29.3",
         "min": "24.0",
         "max": "35.0"
       },
       "wind": {
         "direction": "북북서풍",
-        "speed": "1.7m/s"
+        "speed": "0.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -82,7 +77,7 @@
         "max": "35.0"
       },
       "wind": {
-        "direction": "남동풍",
+        "direction": "동남동풍",
         "speed": "2.3m/s"
       },
       "rain_accumulated": 0.0,
@@ -103,7 +98,7 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "28.9",
+        "current": "28.6",
         "min": "24.0",
         "max": "36.0"
       },
@@ -129,13 +124,13 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "29.2",
+        "current": "29",
         "min": "25.0",
         "max": "35.0"
       },
       "wind": {
         "direction": "북북동풍",
-        "speed": "0.9m/s"
+        "speed": "0.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -145,7 +140,7 @@
       ]
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
         "pm10": "8",
         "pm10_grade": "좋음",
@@ -156,13 +151,13 @@
         "primary_station": "조치원읍"
       },
       "temperature": {
-        "current": "26.3",
+        "current": "26.1",
         "min": "23.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "남남서풍",
-        "speed": "0.4m/s"
+        "direction": "남서풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -183,13 +178,13 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "29.7",
+        "current": "29.6",
         "min": "24.0",
         "max": "32.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "1.4m/s"
+        "direction": "서북서풍",
+        "speed": "0.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -207,13 +202,13 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "28.4",
+        "current": "28.2",
         "min": "23.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "북풍",
-        "speed": "1.2m/s"
+        "direction": "북북서풍",
+        "speed": "0.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
