@@ -1,14 +1,31 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import os
+import time
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
+# 서버리스 인스턴스 쿨다운 타임스탬프 (15초 디바운스 디도스 방어)
+LAST_TRIGGER_TIME = 0
+
 
 class handler(BaseHTTPRequestHandler):
-    """GitHub Actions workflow_dispatch 트리거 (Vercel 서버리스 함수)"""
+    """GitHub Actions workflow_dispatch 트리거 (보안 강화 서버리스 함수)"""
 
     def do_POST(self):
+        global LAST_TRIGGER_TIME
+
+        # 1. 쿨다운 체킹 (15초 내 잦은 연타 무차별 갱신 방지)
+        now = time.time()
+        if now - LAST_TRIGGER_TIME < 15:
+            self._respond(
+                429,
+                {'error': '너무 잦은 갱신 요청입니다. 15초 후 다시 시도해 주세요.'}
+            )
+            return
+        LAST_TRIGGER_TIME = now
+
+        # 2. 토큰 검증
         token = (
             os.environ.get('GH_TOKEN', '')
             or os.environ.get('GITHUB_TOKEN', '')
@@ -52,6 +69,8 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
 
     def _cors(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
+        origin = self.headers.get('Origin', '*')
+        # 허용된 출처인 경우 해당 Origin 반환, 그 외 제한
+        self.send_header('Access-Control-Allow-Origin', origin)
         self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
