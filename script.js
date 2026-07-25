@@ -142,7 +142,7 @@
     { cat: '개황', colspan: 2, sub: null, render: renderOverview, alertRow: false },
     { cat: '미세먼지', rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
-    { cat: '기온', colspan: 2, sub: null, render: renderTemp, alertRow: false },
+    { cat: '기온(℃)', colspan: 2, sub: null, render: renderTemp, alertRow: false },
     { cat: '풍향/풍속', colspan: 2, sub: null, render: renderWind, alertRow: false },
     { cat: '일일 누적 강수량', colspan: 2, sub: null, render: renderRainAcc, alertRow: false },
     { cat: '일일 예상 강수량', colspan: 2, sub: null, render: renderRainFcst, alertRow: false },
