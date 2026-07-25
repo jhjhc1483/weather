@@ -1,9 +1,9 @@
 /**
- * 기상예보 대시보드 — 프론트엔드 스크립트
+ * 기상예보 대시보드 — 프론트엔드 스크립트 (완료 알림 및 스마트 폴링 지원)
  *
  * - data/weather.json fetch 및 동적 표출
- * - 다크 / 라이트 모드 전환 (localStorage 저장)
- * - 5분 자동 갱신 및 지금 갱신 트리거
+ * - 다크 / 라이트 모드 전환 (localStorage)
+ * - 갱신 버튼 클릭 시 백그라운드 트리거 및 갱신 완료 자동 감지 & 토스트 알림
  */
 
 (function () {
@@ -12,8 +12,9 @@
   /* ======== 상수 ======== */
   const DATA_URL = 'data/weather.json';
   const TRIGGER_URL = '/api/trigger';
-  const AUTO_RELOAD_MS = 5 * 60 * 1000;
-  const COOLDOWN_MS = 60 * 1000;
+  const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
+  const POLL_INTERVAL_MS = 8000;         // 갱신 요청 후 8초 간격 감지
+  const POLL_TIMEOUT_MS = 3 * 60 * 1000; // 3분 후 감지 중단
 
   const LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실'];
 
@@ -25,6 +26,12 @@
   const $toast = document.getElementById('toast');
   const $themeBtn = document.getElementById('theme-toggle-btn');
   const $themeText = document.getElementById('theme-text');
+
+  /* ======== 상태 변수 ======== */
+  let currentUpdatedAt = '';
+  let isPolling = false;
+  let pollIntervalId = null;
+  let pollTimeoutId = null;
 
   /* ======== 테마 관리 ======== */
   function initTheme() {
@@ -45,8 +52,7 @@
 
   $themeBtn.addEventListener('click', function () {
     const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
+    setTheme(currentTheme === 'light' ? 'dark' : 'light');
   });
 
   /* ======== 유틸 ======== */
@@ -121,7 +127,7 @@
   }
 
   /* ======== 행 구조 정의 ======== */
-  var ROW_DEFS = [
+  const ROW_DEFS = [
     { cat: '개황', sub: '', render: renderOverview, alertRow: false },
     { cat: '미세먼지', sub: '미세', render: renderDustPM10, rowspan: 2, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
@@ -134,23 +140,23 @@
 
   /* ======== 테이블 렌더링 ======== */
   function renderTable(data) {
-    var locs = data.locations;
-    var order = data.location_order || LOCATION_ORDER;
-    var html = '';
+    const locs = data.locations;
+    const order = data.location_order || LOCATION_ORDER;
+    let html = '';
 
     ROW_DEFS.forEach(function (def) {
       html += '<tr>';
 
       if (def.cat !== null) {
-        var rs = def.rowspan ? ` rowspan="${def.rowspan}"` : '';
+        const rs = def.rowspan ? ` rowspan="${def.rowspan}"` : '';
         html += `<td class="cat-main"${rs}>${escHtml(def.cat)}</td>`;
       }
 
       html += `<td class="cat-sub">${escHtml(def.sub)}</td>`;
 
       order.forEach(function (locName) {
-        var loc = locs[locName];
-        var cellClass = 'cell-data';
+        const loc = locs[locName];
+        let cellClass = 'cell-data';
         if (def.alertRow && loc && loc.alerts && loc.alerts.length > 0) {
           cellClass += ' alert-cell';
         }
@@ -179,9 +185,24 @@
     }
   }
 
-  /* ======== 데이터 로드 ======== */
-  function loadData() {
-    fetch(DATA_URL + '?t=' + Date.now())
+  /* ======== 데스크톱 알림 ======== */
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  function sendDesktopNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(title, { body: body, icon: '/favicon.ico' });
+      } catch (e) {}
+    }
+  }
+
+  /* ======== 데이터 로드 및 갱신 감지 ======== */
+  function loadData(onSuccess) {
+    return fetch(DATA_URL + '?t=' + Date.now())
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
@@ -189,53 +210,96 @@
       .then(function (data) {
         if (!data.locations || Object.keys(data.locations).length === 0) {
           $body.innerHTML = '<tr><td colspan="10" class="loading-cell">아직 수집된 데이터가 없습니다. 잠시 후 다시 시도해 주세요.</td></tr>';
-          return;
+          return null;
         }
+
+        const isNewData = currentUpdatedAt && data.updated_at && (data.updated_at !== currentUpdatedAt);
+        currentUpdatedAt = data.updated_at || '';
+
         updateMeta(data);
         renderTable(data);
+
+        if (onSuccess) onSuccess(isNewData, data);
+        return data;
       })
       .catch(function (err) {
         console.error('데이터 로드 실패:', err);
-        $body.innerHTML = '<tr><td colspan="10" class="error-cell">⚠️ 데이터를 불러올 수 없습니다.</td></tr>';
+        if (!currentUpdatedAt) {
+          $body.innerHTML = '<tr><td colspan="10" class="error-cell">⚠️ 데이터를 불러올 수 없습니다.</td></tr>';
+        }
+        return null;
       });
   }
 
-  /* ======== 토스트 ======== */
-  var toastTimer = null;
-  function showToast(msg, type) {
+  /* ======== 토스트 알림 ======== */
+  let toastTimer = null;
+  function showToast(msg, type, duration) {
     $toast.textContent = msg;
     $toast.className = 'toast show ' + (type || '');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
       $toast.className = 'toast';
-    }, 3500);
+    }, duration || 4000);
   }
 
-  /* ======== 갱신 버튼 ======== */
-  var cooldownTimer = null;
+  /* ======== 스마트 폴링 (갱신 완료 감지) ======== */
+  function startPolling() {
+    if (isPolling) return;
+    isPolling = true;
+    $btn.classList.add('loading');
 
+    clearInterval(pollIntervalId);
+    clearTimeout(pollTimeoutId);
+
+    // 8초마다 weather.json 타임스탬프 체크
+    pollIntervalId = setInterval(function () {
+      loadData(function (isNewData, data) {
+        if (isNewData) {
+          stopPolling(true);
+        }
+      });
+    }, POLL_INTERVAL_MS);
+
+    // 3분 타임아웃
+    pollTimeoutId = setTimeout(function () {
+      if (isPolling) {
+        stopPolling(false);
+        showToast('ℹ️ 갱신 처리 시간이 길어지고 있습니다. 1~2분 후 새로고침해 보세요.', 'info');
+      }
+    }, POLL_TIMEOUT_MS);
+  }
+
+  function stopPolling(isSuccess) {
+    isPolling = false;
+    clearInterval(pollIntervalId);
+    clearTimeout(pollTimeoutId);
+    $btn.classList.remove('loading');
+
+    if (isSuccess) {
+      showToast('🎉 최신 날씨 데이터로 갱신이 완료되었습니다!', 'success', 5000);
+      sendDesktopNotification('기상예보 대시보드', '🎉 8개 지역 날씨 데이터 갱신이 완료되었습니다!');
+    }
+  }
+
+  /* ======== 갱신 버튼 이벤트 ======== */
   function handleRefresh() {
+    requestNotificationPermission();
     $btn.classList.add('loading');
 
     fetch(TRIGGER_URL, { method: 'POST' })
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (data.message) {
-          showToast('✅ ' + data.message, 'success');
+          showToast('⌛ 갱신 요청 완료! 기상청 데이터 수집 중... (약 1~2분 소요)', 'info', 6000);
+          startPolling();
         } else {
           showToast('⚠️ ' + (data.error || '알 수 없는 오류'), 'error');
+          $btn.classList.remove('loading');
         }
       })
       .catch(function () {
         showToast('⚠️ 갱신 요청 실패', 'error');
-      })
-      .finally(function () {
         $btn.classList.remove('loading');
-        $btn.classList.add('cooldown');
-        clearTimeout(cooldownTimer);
-        cooldownTimer = setTimeout(function () {
-          $btn.classList.remove('cooldown');
-        }, COOLDOWN_MS);
       });
   }
 
@@ -243,5 +307,7 @@
   initTheme();
   $btn.addEventListener('click', handleRefresh);
   loadData();
-  setInterval(loadData, AUTO_RELOAD_MS);
+  setInterval(function () {
+    if (!isPolling) loadData();
+  }, AUTO_RELOAD_MS);
 })();
