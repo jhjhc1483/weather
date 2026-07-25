@@ -569,33 +569,13 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
     padding: 0.7rem 0.45rem;
   }
 
+  /* 모바일 스크롤 시 셀 겹침 방지를 위해 표준 테이블 스크롤 유지 */
+  thead .th-cat {
+    min-width: 100px;
+  }
+
   thead .th-loc {
-    min-width: 88px;
-  }
-
-  /* 좌측 카테고리 고정 (Sticky Column - 모바일 스크롤 시 항목명 고정) */
-  thead th.th-cat {
-    position: sticky;
-    left: 0;
-    z-index: 25;
-    background: var(--gradient-header) !important;
-    box-shadow: 3px 0 8px rgba(0,0,0,0.2);
-  }
-
-  tbody td.cat-main {
-    position: sticky;
-    left: 0;
-    z-index: 15;
-    background: var(--bg-category) !important;
-    box-shadow: 2px 0 6px rgba(0,0,0,0.1);
-  }
-
-  tbody td.cat-sub {
-    position: sticky;
-    left: 60px;
-    z-index: 14;
-    background: var(--bg-category) !important;
-    box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+    min-width: 85px;
   }
 
   /* 터치 스크롤 바 미니멀화 */
