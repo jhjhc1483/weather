@@ -284,6 +284,33 @@
     }, POLL_TIMEOUT_MS);
   }
 
+  /* ======== 알림 소리 (Web Audio API 차임 벨) ======== */
+  function playNotificationSound() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      const playNote = function (freq, startTime, duration) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      };
+
+      const now = ctx.currentTime;
+      playNote(523.25, now, 0.2);       // C5
+      playNote(659.25, now + 0.12, 0.2); // E5
+      playNote(783.99, now + 0.24, 0.4); // G5 (Bright Chime)
+    } catch (e) {}
+  }
+
   function stopPolling(isSuccess) {
     isPolling = false;
     clearInterval(pollIntervalId);
@@ -291,6 +318,7 @@
     $btn.classList.remove('loading');
 
     if (isSuccess) {
+      playNotificationSound();
       showToast('🎉 최신 날씨 데이터로 갱신이 완료되었습니다!', 'success', 5000);
       sendDesktopNotification('기상예보 대시보드', '🎉 8개 지역 날씨 데이터 갱신이 완료되었습니다!');
     }
