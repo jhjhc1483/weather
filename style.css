@@ -159,11 +159,9 @@ body {
 
 /* ---- 테마 전환 버튼 (우측 상단 동그란 아이콘 버튼) ---- */
 .theme-toggle-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 42px;
-  height: 42px;
+  position: relative;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   padding: 0;
   display: inline-flex;
@@ -175,7 +173,7 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, background 0.25s ease;
-  z-index: 10;
+  flex-shrink: 0;
 }
 .theme-toggle-btn:hover {
   transform: scale(1.12) rotate(15deg);
