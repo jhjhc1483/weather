@@ -13,7 +13,7 @@
   const DATA_URL = 'data/weather.json';
   const TRIGGER_URL = '/api/trigger';
   const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
-  const POLL_INTERVAL_MS = 8000;         // 갱신 요청 후 8초 간격 신속 감지
+  const POLL_INTERVAL_MS = 20000;        // 갱신 요청 후 20초 간격 감지
   const POLL_TIMEOUT_MS = 3 * 60 * 1000; // 3분 후 감지 중단
 
   const LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실'];
