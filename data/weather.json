@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T16:22:15+09:00",
+  "updated_at": "2026-07-25T16:26:53+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "16:22",
+  "time_display": "16:26",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -18,8 +18,8 @@
       },
       "temperature": {
         "current": "29.8",
-        "min": "23.0",
-        "max": "28.0"
+        "min": "22.0",
+        "max": "29.8"
       },
       "wind": {
         "direction": "북북동풍",
@@ -55,8 +55,8 @@
       },
       "temperature": {
         "current": "35.5",
-        "min": "25.0",
-        "max": "35.0"
+        "min": "24.0",
+        "max": "35.5"
       },
       "wind": {
         "direction": "서북서풍",
@@ -82,7 +82,7 @@
       },
       "temperature": {
         "current": "33.5",
-        "min": "25.0",
+        "min": "24.0",
         "max": "35.0"
       },
       "wind": {
@@ -108,7 +108,7 @@
       },
       "temperature": {
         "current": "35.2",
-        "min": "25.0",
+        "min": "24.0",
         "max": "36.0"
       },
       "wind": {
@@ -135,7 +135,7 @@
       "temperature": {
         "current": "36.2",
         "min": "25.0",
-        "max": "35.0"
+        "max": "36.2"
       },
       "wind": {
         "direction": "북북서풍",
@@ -161,8 +161,8 @@
       },
       "temperature": {
         "current": "33.1",
-        "min": "24.0",
-        "max": "31.0"
+        "min": "23.0",
+        "max": "33.1"
       },
       "wind": {
         "direction": "서풍",
@@ -193,8 +193,8 @@
       },
       "temperature": {
         "current": "32.9",
-        "min": "25.0",
-        "max": "32.0"
+        "min": "24.0",
+        "max": "32.9"
       },
       "wind": {
         "direction": "서풍",
@@ -218,7 +218,7 @@
       "temperature": {
         "current": "32.6",
         "min": "23.0",
-        "max": "32.0"
+        "max": "32.6"
       },
       "wind": {
         "direction": "북북서풍",

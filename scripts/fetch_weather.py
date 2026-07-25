@@ -68,7 +68,7 @@ def api_call(url, params, retries=3):
 
     for attempt in range(retries):
         try:
-            resp = requests.get(full_url, params=params, timeout=30)
+            resp = requests.get(full_url, params=params, timeout=10)
             resp.raise_for_status()
 
             try:
@@ -415,11 +415,40 @@ def process_location(name, cfg, now, today_str, alerts_data):
     cur_temp = ncst.get('T1H', '-')
     min_temp = '-'
     max_temp = '-'
+    today_tmps = []
+
     for it in v_items:
-        if it['category'] == 'TMN':
-            min_temp = it['fcstValue']
-        elif it['category'] == 'TMX':
-            max_temp = it['fcstValue']
+        if it.get('fcstDate') == today_str:
+            if it['category'] == 'TMN':
+                min_temp = it['fcstValue']
+            elif it['category'] == 'TMX':
+                max_temp = it['fcstValue']
+            elif it['category'] == 'TMP':
+                try:
+                    today_tmps.append(float(it['fcstValue']))
+                except (ValueError, TypeError):
+                    pass
+
+    # TMN/TMX 누락 시 오늘 TMP 시간별 예보값의 최소/최대값으로 보완
+    if today_tmps:
+        try:
+            if min_temp == '-':
+                min_temp = f"{min(today_tmps):.1f}"
+            if max_temp == '-':
+                max_temp = f"{max(today_tmps):.1f}"
+        except Exception:
+            pass
+
+    # 현재 실황 기온이 최고 기온보다 높거나 최저 기온보다 낮으면 실황값으로 범위 보정
+    try:
+        if cur_temp != '-':
+            c_val = float(cur_temp)
+            if max_temp != '-' and float(max_temp) < c_val:
+                max_temp = f"{c_val:.1f}"
+            if min_temp != '-' and float(min_temp) > c_val:
+                min_temp = f"{c_val:.1f}"
+    except (ValueError, TypeError):
+        pass
 
     # 풍향/풍속
     w_dir = wind_dir_text(ncst.get('VEC', '-'))
