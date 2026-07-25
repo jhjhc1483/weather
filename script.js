@@ -198,28 +198,6 @@
     if (data.time_display && $time) {
       $time.textContent = data.time_display + ' 기준';
     }
-  }   if (loc) {
-          html += def.render(loc);
-        } else {
-          html += '-';
-        }
-        html += '</td>';
-      });
-
-      html += '</tr>';
-    });
-
-    $body.innerHTML = html;
-  }
-
-  /* ======== 메타 업데이트 ======== */
-  function updateMeta(data) {
-    if (data.date_display && data.day_of_week) {
-      $date.textContent = data.date_display + ' (' + data.day_of_week + ') 기상예보';
-    }
-    if (data.time_display) {
-      $time.textContent = data.time_display + ' 기준';
-    }
   }
 
   /* ======== 데스크톱 알림 ======== */
