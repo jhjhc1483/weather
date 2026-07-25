@@ -20,7 +20,7 @@
 
   /* ======== DOM ======== */
   const $body = document.getElementById('weather-body');
-  const $date = document.getElementById('date-display');
+  const $mainTitle = document.getElementById('main-title');
   const $time = document.getElementById('time-display');
   const $btn = document.getElementById('refresh-btn');
   const $toast = document.getElementById('toast');
@@ -70,7 +70,7 @@
     return d.innerHTML;
   }
 
-  /* ======== 셀 렌더러 ======== */
+  /* ======== 데이터 표출 렌더러 ======== */
   function renderOverview(loc) {
     return `<span class="overview-text">${escHtml(loc.overview)}</span>`;
   }
@@ -177,6 +177,28 @@
         }
         html += `<td class="${cellClass}">`;
         if (loc) {
+          html += def.render(loc);
+        } else {
+          html += '-';
+        }
+        html += '</td>';
+      });
+
+      html += '</tr>';
+    });
+
+    $body.innerHTML = html;
+  }
+
+  /* ======== 메타 업데이트 ======== */
+  function updateMeta(data) {
+    if (data.date_display && data.day_of_week && $mainTitle) {
+      $mainTitle.textContent = data.date_display + '(' + data.day_of_week + ') 기상예보';
+    }
+    if (data.time_display && $time) {
+      $time.textContent = data.time_display + ' 기준';
+    }
+  }   if (loc) {
           html += def.render(loc);
         } else {
           html += '-';
