@@ -25,7 +25,6 @@
   const $btn = document.getElementById('refresh-btn');
   const $toast = document.getElementById('toast');
   const $themeBtn = document.getElementById('theme-toggle-btn');
-  const $themeText = document.getElementById('theme-text');
 
   /* ======== 상태 변수 ======== */
   let currentUpdatedAt = '';
@@ -42,10 +41,10 @@
   function setTheme(theme) {
     if (theme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
-      $themeText.textContent = '다크 모드';
+      $themeBtn.setAttribute('title', '다크 모드로 전환');
     } else {
       document.documentElement.removeAttribute('data-theme');
-      $themeText.textContent = '라이트 모드';
+      $themeBtn.setAttribute('title', '라이트 모드로 전환');
     }
     localStorage.setItem('theme', theme);
   }

@@ -112,6 +112,7 @@ body {
    Header
    ======================================================== */
 .header {
+  position: relative;
   text-align: center;
   margin-bottom: 1.8rem;
 }
@@ -156,24 +157,29 @@ body {
   border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
-/* ---- 테마 전환 버튼 ---- */
+/* ---- 테마 전환 버튼 (우측 상단 동그란 아이콘 버튼) ---- */
 .theme-toggle-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  padding: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.85rem;
+  justify-content: center;
   border: 1px solid var(--theme-btn-border);
-  border-radius: 20px;
   background: var(--theme-btn-bg);
   color: var(--theme-btn-text);
-  font-family: var(--font);
-  font-size: 0.8rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, background 0.25s ease;
+  z-index: 10;
 }
 .theme-toggle-btn:hover {
-  transform: translateY(-1px);
+  transform: scale(1.12) rotate(15deg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
 .sun-icon { display: inline-block; }
