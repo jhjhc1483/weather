@@ -81,7 +81,12 @@
     const cls = dustBadgeClass(g);
     const val = loc.dust.pm10;
     if (val === '-') return '-';
-    return `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    if (loc.dust && loc.dust.is_fallback) {
+      const info = `1차 관측소(${escHtml(loc.dust.primary_station)}) 점검으로 2차 백업관측소(${escHtml(loc.dust.station_used)}) 수집`;
+      html += ` <span class="fallback-badge" title="${info}">!</span>`;
+    }
+    return html;
   }
 
   function renderDustPM25(loc) {
@@ -89,7 +94,12 @@
     const cls = dustBadgeClass(g);
     const val = loc.dust.pm25;
     if (val === '-') return '-';
-    return `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
+    if (loc.dust && loc.dust.is_fallback) {
+      const info = `1차 관측소(${escHtml(loc.dust.primary_station)}) 점검으로 2차 백업관측소(${escHtml(loc.dust.station_used)}) 수집`;
+      html += ` <span class="fallback-badge" title="${info}">!</span>`;
+    }
+    return html;
   }
 
   function renderTemp(loc) {
@@ -126,16 +136,16 @@
     }).join('');
   }
 
-  /* ======== 행 구조 정의 ======== */
+  /* ======== 행 구조 정의 (미세먼지 외 항목 카테고리 셀 병합) ======== */
   const ROW_DEFS = [
-    { cat: '개황', sub: '', render: renderOverview, alertRow: false },
-    { cat: '미세먼지', sub: '미세', render: renderDustPM10, rowspan: 2, alertRow: false },
+    { cat: '개황', colspan: 2, sub: null, render: renderOverview, alertRow: false },
+    { cat: '미세먼지', rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
-    { cat: '기온', sub: '', render: renderTemp, alertRow: false },
-    { cat: '풍향/풍속', sub: '', render: renderWind, alertRow: false },
-    { cat: '일일 누적 강수량', sub: '', render: renderRainAcc, alertRow: false },
-    { cat: '일일 예상 강수량', sub: '', render: renderRainFcst, alertRow: false },
-    { cat: '기상특보', sub: '', render: renderAlerts, alertRow: true },
+    { cat: '기온', colspan: 2, sub: null, render: renderTemp, alertRow: false },
+    { cat: '풍향/풍속', colspan: 2, sub: null, render: renderWind, alertRow: false },
+    { cat: '일일 누적 강수량', colspan: 2, sub: null, render: renderRainAcc, alertRow: false },
+    { cat: '일일 예상 강수량', colspan: 2, sub: null, render: renderRainFcst, alertRow: false },
+    { cat: '기상특보', colspan: 2, sub: null, render: renderAlerts, alertRow: true },
   ];
 
   /* ======== 테이블 렌더링 ======== */
@@ -148,11 +158,15 @@
       html += '<tr>';
 
       if (def.cat !== null) {
-        const rs = def.rowspan ? ` rowspan="${def.rowspan}"` : '';
-        html += `<td class="cat-main"${rs}>${escHtml(def.cat)}</td>`;
+        let attrs = '';
+        if (def.rowspan) attrs += ` rowspan="${def.rowspan}"`;
+        if (def.colspan) attrs += ` colspan="${def.colspan}"`;
+        html += `<td class="cat-main"${attrs}>${escHtml(def.cat)}</td>`;
       }
 
-      html += `<td class="cat-sub">${escHtml(def.sub)}</td>`;
+      if (def.sub !== null) {
+        html += `<td class="cat-sub">${escHtml(def.sub)}</td>`;
+      }
 
       order.forEach(function (locName) {
         const loc = locs[locName];

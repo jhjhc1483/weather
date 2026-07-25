@@ -265,10 +265,24 @@ def fetch_air(station, fallback_station=None):
         return None
 
     res = _query(station)
-    if not res and fallback_station:
-        res = _query(fallback_station)
+    if res:
+        res['is_fallback'] = False
+        res['station_used'] = station
+        res['primary_station'] = station
+        return res
 
-    return res or {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'}
+    if fallback_station:
+        res = _query(fallback_station)
+        if res:
+            res['is_fallback'] = True
+            res['station_used'] = fallback_station
+            res['primary_station'] = station
+            return res
+
+    return {
+        'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-',
+        'is_fallback': False, 'station_used': station, 'primary_station': station
+    }
 
 
 def fetch_alerts():
