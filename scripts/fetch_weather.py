@@ -411,44 +411,35 @@ def process_location(name, cfg, now, today_str, alerts_data):
 
     overview = sky_pty_to_text(sky, pty)
 
-    # 기온 (현재 T1H, 최저 TMN, 최고 TMX)
+    # 기온 (현재 T1H, 최저 TMN, 최고 TMX, 시간별 TMP 통합 비교)
     cur_temp = ncst.get('T1H', '-')
-    min_temp = '-'
-    max_temp = '-'
-    today_tmps = []
+    all_today_temps = []
 
+    # 현재 실황 기온 추가
+    try:
+        if cur_temp != '-':
+            all_today_temps.append(float(cur_temp))
+    except (ValueError, TypeError):
+        pass
+
+    # 오늘 날짜의 모든 기온 항목(TMN, TMX, TMP) 수집
     for it in v_items:
         if it.get('fcstDate') == today_str:
-            if it['category'] == 'TMN':
-                min_temp = it['fcstValue']
-            elif it['category'] == 'TMX':
-                max_temp = it['fcstValue']
-            elif it['category'] == 'TMP':
+            cat = it.get('category')
+            val = it.get('fcstValue')
+            if cat in ('TMN', 'TMX', 'TMP'):
                 try:
-                    today_tmps.append(float(it['fcstValue']))
+                    all_today_temps.append(float(val))
                 except (ValueError, TypeError):
                     pass
 
-    # TMN/TMX 누락 시 오늘 TMP 시간별 예보값의 최소/최대값으로 보완
-    if today_tmps:
-        try:
-            if min_temp == '-':
-                min_temp = f"{min(today_tmps):.1f}"
-            if max_temp == '-':
-                max_temp = f"{max(today_tmps):.1f}"
-        except Exception:
-            pass
-
-    # 현재 실황 기온이 최고 기온보다 높거나 최저 기온보다 낮으면 실황값으로 범위 보정
-    try:
-        if cur_temp != '-':
-            c_val = float(cur_temp)
-            if max_temp != '-' and float(max_temp) < c_val:
-                max_temp = f"{c_val:.1f}"
-            if min_temp != '-' and float(min_temp) > c_val:
-                min_temp = f"{c_val:.1f}"
-    except (ValueError, TypeError):
-        pass
+    # 하루 중 실제 가장 낮은 기온과 가장 높은 기온 계산
+    if all_today_temps:
+        min_temp = f"{min(all_today_temps):.1f}"
+        max_temp = f"{max(all_today_temps):.1f}"
+    else:
+        min_temp = '-'
+        max_temp = '-'
 
     # 풍향/풍속
     w_dir = wind_dir_text(ncst.get('VEC', '-'))
