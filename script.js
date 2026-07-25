@@ -11,10 +11,11 @@
 
   /* ======== 상수 ======== */
   const DATA_URL = 'data/weather.json';
+  const RAW_DATA_URL = 'https://raw.githubusercontent.com/jhjhc1483/weather/main/data/weather.json';
   const TRIGGER_URL = '/api/trigger';
   const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
   const POLL_INTERVAL_MS = 20000;        // 갱신 요청 후 20초 간격 감지
-  const POLL_TIMEOUT_MS = 3 * 60 * 1000; // 3분 후 감지 중단
+  const POLL_TIMEOUT_MS = 5 * 60 * 1000; // 5분 후 감지 중단
 
   const LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실'];
 
@@ -218,14 +219,21 @@
 
   /* ======== 데이터 로드 및 갱신 감지 ======== */
   function loadData(onSuccess) {
-    return fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
+    const targetUrl = isPolling ? (RAW_DATA_URL + '?t=' + Date.now()) : (DATA_URL + '?t=' + Date.now());
+
+    return fetch(targetUrl, { cache: 'no-store' })
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
       })
+      .catch(function () {
+        return fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); });
+      })
       .then(function (data) {
-        if (!data.locations || Object.keys(data.locations).length === 0) {
-          $body.innerHTML = '<tr><td colspan="10" class="loading-cell">아직 수집된 데이터가 없습니다. 잠시 후 다시 시도해 주세요.</td></tr>';
+        if (!data || !data.locations || Object.keys(data.locations).length === 0) {
+          if (!currentUpdatedAt) {
+            $body.innerHTML = '<tr><td colspan="10" class="loading-cell">아직 수집된 데이터가 없습니다. 잠시 후 다시 시도해 주세요.</td></tr>';
+          }
           return null;
         }
 
@@ -269,7 +277,7 @@
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 8초마다 weather.json 타임스탬프 체크 (no-store 신속 감지)
+    // 20초마다 weather.json 타임스탬프 체크 (GitHub Raw 우선 감지)
     pollIntervalId = setInterval(function () {
       loadData(function (isNewData, data) {
         if (isNewData) {
@@ -278,7 +286,7 @@
       });
     }, POLL_INTERVAL_MS);
 
-    // 3분 타임아웃
+    // 5분 타임아웃
     pollTimeoutId = setTimeout(function () {
       if (isPolling) {
         stopPolling(false);
