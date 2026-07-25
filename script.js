@@ -380,14 +380,28 @@
 
   function loadReadme() {
     if (readmeLoaded) return;
-    fetch('README.md?t=' + Date.now())
-      .then(function (res) { return res.text(); })
+    fetch('data/readme.txt?t=' + Date.now())
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.text();
+      })
       .then(function (text) {
+        if (text.includes('NOT_FOUND') || text.includes('could not be found')) {
+          throw new Error('Not found');
+        }
         $modalBody.innerHTML = simpleMarkdownToHtml(text);
         readmeLoaded = true;
       })
       .catch(function () {
-        $modalBody.innerHTML = '<p class="error-cell">⚠️ README.md 파일을 불러올 수 없습니다.</p>';
+        fetch('README.md?t=' + Date.now())
+          .then(function (res) { return res.text(); })
+          .then(function (text) {
+            $modalBody.innerHTML = simpleMarkdownToHtml(text);
+            readmeLoaded = true;
+          })
+          .catch(function () {
+            $modalBody.innerHTML = '<p class="error-cell">⚠️ README 안내 파일을 불러올 수 없습니다.</p>';
+          });
       });
   }
 
