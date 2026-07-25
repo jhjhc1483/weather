@@ -395,12 +395,13 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   background: var(--alert-bg) !important;
 }
 .alert-tag {
-  display: inline-block;
-  padding: 0.12rem 0.45rem;
+  display: block;
+  width: fit-content;
+  margin: 0.15rem auto;
+  padding: 0.15rem 0.5rem;
   border-radius: 6px;
   font-size: 0.7rem;
   font-weight: 600;
-  margin: 0.1rem 0;
   white-space: nowrap;
 }
 .alert-warn    { background: rgba(245,158,11,0.18); color: #d97706; }
