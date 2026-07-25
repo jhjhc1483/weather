@@ -193,7 +193,7 @@
   /* ======== 메타 업데이트 ======== */
   function updateMeta(data) {
     if (data.date_display && data.day_of_week && $mainTitle) {
-      $mainTitle.textContent = data.date_display + '(' + data.day_of_week + ') 기상예보';
+      $mainTitle.textContent = data.date_display + '.(' + data.day_of_week + ') 기상예보';
     }
     if (data.time_display && $time) {
       $time.textContent = data.time_display + ' 기준';
