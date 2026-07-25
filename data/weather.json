@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T12:57:08+09:00",
+  "updated_at": "2026-07-25T13:05:54+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "12:57",
+  "time_display": "13:05",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -29,7 +29,7 @@
       "rain_forecast": [
         {
           "time_range": "17:00~18:00",
-          "amount": 5.0
+          "amount": 4.0
         },
         {
           "time_range": "(내일) 08:00~10:00",
@@ -96,7 +96,7 @@
       ]
     },
     "함안": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
         "pm10": "17",
         "pm10_grade": "좋음",
