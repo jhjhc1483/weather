@@ -598,21 +598,27 @@
     if (matchedType && ALERT_CRITERIA[matchedType]) {
       const criteria = ALERT_CRITERIA[matchedType];
       popupHtml = '<div class="alert-popup-content">';
-      popupHtml += '<h3>⚠️ ' + escHtml(matchedType) + ' 발표 기준</h3>';
-      if (criteria['주의보']) {
-        popupHtml += '<div class="alert-criteria-item' + (matchedLevel === '주의보' ? ' active' : '') + '"><strong class="alert-warn-label">주의보</strong><p>' + escHtml(criteria['주의보']) + '</p></div>';
-      }
-      if (criteria['경보']) {
-        popupHtml += '<div class="alert-criteria-item' + (matchedLevel === '경보' ? ' active' : '') + '"><strong class="alert-danger-label">경보</strong><p>' + escHtml(criteria['경보']) + '</p></div>';
-      }
+      Object.keys(criteria).forEach(function (levelKey) {
+        const text = criteria[levelKey];
+        let labelClass = 'alert-info-label';
+        if (levelKey === '주의보') labelClass = 'alert-warn-label';
+        else if (levelKey === '경보') labelClass = 'alert-danger-label';
+
+        const isActive = matchedLevel ? (matchedLevel === levelKey) : true;
+        popupHtml += '<div class="alert-criteria-item' + (isActive ? ' active' : '') + '">';
+        popupHtml += '<strong class="' + labelClass + '">' + escHtml(levelKey) + '</strong>';
+        popupHtml += '<p>' + escHtml(text) + '</p>';
+        popupHtml += '</div>';
+      });
       popupHtml += '</div>';
     } else {
-      popupHtml = '<div class="alert-popup-content"><p>' + escHtml(alertText) + '</p></div>';
+      popupHtml = '<div class="alert-popup-content"><div class="alert-criteria-item active"><strong class="alert-warn-label">발표 현황</strong><p>' + escHtml(alertText) + ' 발효 중입니다.</p></div></div>';
     }
 
-    // 모달 재활용
+    // 모달 재활용 및 맞춤 제목 적용
     $modalBody.innerHTML = popupHtml;
-    document.getElementById('modal-title-text').textContent = '⚠️ 기상특보 발표 기준';
+    const titleEl = document.getElementById('modal-title-text');
+    if (titleEl) titleEl.textContent = '⚠️ ' + alertText + ' 발표 기준';
     readmeLoaded = false;
     openModal(true);
   });
