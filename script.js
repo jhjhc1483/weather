@@ -11,7 +11,6 @@
 
   /* ======== 상수 ======== */
   const DATA_URL = 'data/weather.json';
-  const RAW_DATA_URL = 'https://raw.githubusercontent.com/jhjhc1483/weather/main/data/weather.json';
   const TRIGGER_URL = '/api/trigger';
   const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
   const POLL_INTERVAL_MS = 20000;        // 갱신 요청 후 20초 간격 감지
@@ -33,6 +32,7 @@
   let isPolling = false;
   let pollIntervalId = null;
   let pollTimeoutId = null;
+  let audioCtx = null;
 
   /* ======== 테마 관리 ======== */
   function initTheme() {
@@ -219,15 +219,13 @@
 
   /* ======== 데이터 로드 및 갱신 감지 ======== */
   function loadData(onSuccess) {
-    const targetUrl = isPolling ? (RAW_DATA_URL + '?t=' + Date.now()) : (DATA_URL + '?t=' + Date.now());
+    // Vercel / 브라우저 CDN 캐시를 완전히 무력화하는 강력한 캐시 버스팅 URL
+    const targetUrl = DATA_URL + '?t=' + Date.now() + '&r=' + Math.random().toString(36).substring(2, 7);
 
     return fetch(targetUrl, { cache: 'no-store' })
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         return res.json();
-      })
-      .catch(function () {
-        return fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.json(); });
       })
       .then(function (data) {
         if (!data || !data.locations || Object.keys(data.locations).length === 0) {
@@ -277,7 +275,7 @@
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 20초마다 weather.json 타임스탬프 체크 (GitHub Raw 우선 감지)
+    // 20초마다 weather.json 타임스탬프 체크 (no-store 캐시 우회)
     pollIntervalId = setInterval(function () {
       loadData(function (isNewData, data) {
         if (isNewData) {
@@ -295,30 +293,42 @@
     }, POLL_TIMEOUT_MS);
   }
 
-  /* ======== 알림 소리 (Web Audio API 차임 벨) ======== */
+  /* ======== 알림 소리 (Web Audio API 차임 벨 - Autoplay 락 해제 포함) ======== */
+  function initAudioContext() {
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+      if (!audioCtx) {
+        audioCtx = new AudioCtxClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    } catch (e) {}
+  }
+
   function playNotificationSound() {
     try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      initAudioContext();
+      if (!audioCtx) return;
 
       const playNote = function (freq, startTime, duration) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(0.12, startTime);
+        gain.gain.setValueAtTime(0.15, startTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
         osc.start(startTime);
         osc.stop(startTime + duration);
       };
 
-      const now = ctx.currentTime;
-      playNote(523.25, now, 0.2);       // C5
-      playNote(659.25, now + 0.12, 0.2); // E5
-      playNote(783.99, now + 0.24, 0.4); // G5 (Bright Chime)
+      const now = audioCtx.currentTime;
+      playNote(523.25, now, 0.2);        // C5
+      playNote(659.25, now + 0.12, 0.2);  // E5
+      playNote(783.99, now + 0.24, 0.45); // G5 (맑은 3음계 알림음)
     } catch (e) {}
   }
 
@@ -337,6 +347,7 @@
 
   /* ======== 갱신 버튼 이벤트 ======== */
   function handleRefresh() {
+    initAudioContext(); // 클릭 시점에 오디오 컨텍스트 사전 활성화 (브라우저 Autoplay 락 해제!)
     requestNotificationPermission();
     $btn.classList.add('loading');
 
