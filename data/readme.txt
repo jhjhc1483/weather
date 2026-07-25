@@ -35,15 +35,6 @@
 
 ---
 
-## 🛠️ 기술 스택 (Tech Stack)
-
-- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+)
-- **Data Collection**: Python 3.x (`requests`, `python-dotenv`)
-- **Automation & Serverless**: GitHub Actions (`workflow_dispatch`), Vercel Serverless Functions (`api/trigger.py`)
-- **Data Storage**: GitHub Repository JSON File (`data/weather.json`)
-
----
-
 ## 📜 Copyright
 
 Copyright © Maj.cjh All rights reserved.
