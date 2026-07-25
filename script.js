@@ -217,10 +217,9 @@
     }
   }
 
-  /* ======== 데이터 로드 및 갱신 감지 ======== */
+  /* ======== 데이터 로드 (화면 렌더링 전용) ======== */
   function loadData(onSuccess) {
-    // Vercel / 브라우저 CDN 캐시를 완전히 무력화하는 강력한 캐시 버스팅 URL
-    const targetUrl = DATA_URL + '?t=' + Date.now() + '&r=' + Math.random().toString(36).substring(2, 7);
+    const targetUrl = DATA_URL + '?t=' + Date.now();
 
     return fetch(targetUrl, { cache: 'no-store' })
       .then(function (res) {
@@ -235,14 +234,12 @@
           return null;
         }
 
-        const baseline = isPolling ? pollingStartUpdatedAt : currentUpdatedAt;
-        const isNewData = baseline && data.updated_at && (data.updated_at !== baseline);
         currentUpdatedAt = data.updated_at || '';
 
         updateMeta(data);
         renderTable(data);
 
-        if (onSuccess) onSuccess(isNewData, data);
+        if (onSuccess) onSuccess(data);
         return data;
       })
       .catch(function (err) {
@@ -265,7 +262,7 @@
     }, duration || 4000);
   }
 
-  /* ======== 스마트 폴링 (갱신 완료 감지) ======== */
+  /* ======== 스마트 폴링 (갱신 완료 감지 — /api/check 서버리스 함수로 CDN 캐시 우회) ======== */
   function startPolling() {
     if (isPolling) return;
     isPolling = true;
@@ -275,13 +272,21 @@
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 20초마다 weather.json 타임스탬프 체크 (no-store 캐시 우회)
+    // 20초마다 /api/check로 타임스탬프 확인 (CDN 캐시 100% 우회)
     pollIntervalId = setInterval(function () {
-      loadData(function (isNewData, data) {
-        if (isNewData) {
-          stopPolling(true);
-        }
-      });
+      fetch('/api/check?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+          if (result.updated_at && pollingStartUpdatedAt && result.updated_at !== pollingStartUpdatedAt) {
+            // 새 데이터 감지 → 화면에 반영하고 폴링 종료
+            loadData(function () {
+              stopPolling(true);
+            });
+          }
+        })
+        .catch(function (err) {
+          console.warn('폴링 체크 실패:', err);
+        });
     }, POLL_INTERVAL_MS);
 
     // 5분 타임아웃
