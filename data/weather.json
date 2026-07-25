@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T12:02:27+09:00",
+  "updated_at": "2026-07-25T12:09:13+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "12:02",
+  "time_display": "12:09",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -28,8 +28,8 @@
       "rain_accumulated": 0.0,
       "rain_forecast": [
         {
-          "time_range": "16:00~17:00",
-          "amount": 0.5
+          "time_range": "16:00~18:00",
+          "amount": 11.0
         },
         {
           "time_range": "(내일) 08:00~10:00",
@@ -124,9 +124,9 @@
     "성주": {
       "overview": "흐림",
       "dust": {
-        "pm10": "23",
+        "pm10": "28",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "15",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
@@ -149,27 +149,32 @@
       ]
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "15",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "7",
+        "pm25": "6",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "조치원읍",
         "primary_station": "조치원읍"
       },
       "temperature": {
-        "current": "30.7",
+        "current": "-",
         "min": "25.0",
         "max": "32.0"
       },
       "wind": {
-        "direction": "남남서풍",
-        "speed": "2.2m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
-      "rain_forecast": [],
+      "rain_forecast": [
+        {
+          "time_range": "13:00~15:00",
+          "amount": 23.0
+        }
+      ],
       "alerts": [
         "폭염경보",
         "폭염주의보"
@@ -178,9 +183,9 @@
     "계룡": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "3",
+        "pm10": "18",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
@@ -202,9 +207,9 @@
     "임실": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "10",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "5",
+        "pm25": "6",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "임실읍",
