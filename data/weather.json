@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-25T10:58:42+09:00",
+  "updated_at": "2026-07-25T11:02:06+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "10:58",
+  "time_display": "11:02",
   "locations": {
     "양평": {
       "overview": "흐림",
@@ -64,7 +64,7 @@
       ]
     },
     "사천": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "10",
         "pm10_grade": "좋음",
@@ -110,7 +110,7 @@
       ]
     },
     "성주": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
         "pm10": "27",
         "pm10_grade": "좋음",
@@ -158,7 +158,7 @@
       ]
     },
     "계룡": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
         "pm10": "9",
         "pm10_grade": "좋음",
@@ -179,7 +179,7 @@
       "alerts": []
     },
     "임실": {
-      "overview": "흐림",
+      "overview": "맑음",
       "dust": {
         "pm10": "12",
         "pm10_grade": "좋음",
