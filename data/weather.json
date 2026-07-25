@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-07-25T16:07:03+09:00",
+  "updated_at": "2026-07-25T16:22:15+09:00",
   "base_date": "20260725",
   "date_display": "07.25",
   "day_of_week": "토",
-  "time_display": "16:07",
+  "time_display": "16:22",
   "locations": {
     "양평": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "10",
+        "pm10": "15",
         "pm10_grade": "좋음",
-        "pm25": "0",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
@@ -45,9 +45,9 @@
     "경산": {
       "overview": "흐림",
       "dust": {
-        "pm10": "16",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "10",
+        "pm25": "7",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
@@ -74,7 +74,7 @@
       "dust": {
         "pm10": "15",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "7",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -98,9 +98,9 @@
     "함안": {
       "overview": "흐림",
       "dust": {
-        "pm10": "17",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "12",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
@@ -124,9 +124,9 @@
     "성주": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "14",
+        "pm10": "11",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "9",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
@@ -151,9 +151,9 @@
     "세종": {
       "overview": "맑음",
       "dust": {
-        "pm10": "10",
+        "pm10": "8",
         "pm10_grade": "좋음",
-        "pm25": "3",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "조치원읍",
@@ -183,9 +183,9 @@
     "계룡": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "10",
+        "pm10": "23",
         "pm10_grade": "좋음",
-        "pm25": "5",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
@@ -207,9 +207,9 @@
     "임실": {
       "overview": "흐림",
       "dust": {
-        "pm10": "10",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "임실읍",
