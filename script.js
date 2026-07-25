@@ -83,8 +83,8 @@
     if (val === '-') return '-';
     let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
     if (loc.dust && loc.dust.is_fallback) {
-      const info = `1차 관측소(${escHtml(loc.dust.primary_station)}) 점검으로 2차 백업관측소(${escHtml(loc.dust.station_used)}) 수집`;
-      html += ` <span class="fallback-badge" title="${info}">!</span>`;
+      const info = `1차 관측소(${loc.dust.primary_station}) 점검으로 인근 관측소(${loc.dust.station_used})에서 수집`;
+      html += ` <span class="fallback-badge" title="${escHtml(info)}" data-tooltip="${escHtml(info)}">!</span>`;
     }
     return html;
   }
@@ -96,8 +96,8 @@
     if (val === '-') return '-';
     let html = `<span class="dust-badge ${cls}">${escHtml(g)} (${val})</span>`;
     if (loc.dust && loc.dust.is_fallback) {
-      const info = `1차 관측소(${escHtml(loc.dust.primary_station)}) 점검으로 2차 백업관측소(${escHtml(loc.dust.station_used)}) 수집`;
-      html += ` <span class="fallback-badge" title="${info}">!</span>`;
+      const info = `1차 관측소(${loc.dust.primary_station}) 점검으로 인근 관측소(${loc.dust.station_used})에서 수집`;
+      html += ` <span class="fallback-badge" title="${escHtml(info)}" data-tooltip="${escHtml(info)}">!</span>`;
     }
     return html;
   }

@@ -337,26 +337,57 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 .dust-bad      { background: rgba(245,158,11,0.15); color: var(--grade-bad); }
 .dust-very-bad { background: rgba(239,68,68,0.15);  color: var(--grade-very-bad); }
 
-/* 백업 측정소 표시 배지 */
+/* 백업 측정소 표시 배지 (은은하고 세련된 디자인 + 즉각 툴팁) */
 .fallback-badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: #f59e0b;
-  color: #ffffff;
-  font-size: 0.68rem;
-  font-weight: 700;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-secondary);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  font-size: 0.65rem;
+  font-weight: 600;
   cursor: help;
-  margin-left: 0.15rem;
+  margin-left: 0.2rem;
   vertical-align: middle;
-  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 .fallback-badge:hover {
-  transform: scale(1.25);
+  background: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+/* 즉각 반응 커스텀 툴팁 */
+.fallback-badge::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  z-index: 999;
+}
+.fallback-badge:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* 기상특보 */
