@@ -113,8 +113,11 @@ body {
    ======================================================== */
 .header {
   position: relative;
-  text-align: center;
-  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin-bottom: 0.15rem;
 }
 
 .title {
@@ -126,16 +129,18 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 0.2rem;
-  line-height: 1.2;
+  margin: 0;
+  line-height: 1.1;
 }
 
 .meta-row {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0.2rem;
 }
 
 .badge {
