@@ -318,6 +318,103 @@
       });
   }
 
+  /* ======== README 모달 관리 ======== */
+  const $readmeBtn = document.getElementById('readme-btn');
+  const $readmeModal = document.getElementById('readme-modal');
+  const $modalCloseBtn = document.getElementById('modal-close-btn');
+  const $modalBody = document.getElementById('modal-body');
+  let readmeLoaded = false;
+
+  function simpleMarkdownToHtml(md) {
+    let html = md
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/^&gt; (.*$)/gim, '<blockquote>$1</blockquote>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^---$/gim, '<hr>');
+
+    const lines = html.split('\n');
+    let inTable = false;
+    let tableHtml = '';
+    let resultLines = [];
+
+    lines.forEach(function (line) {
+      if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+        if (!inTable) {
+          inTable = true;
+          tableHtml = '<table>';
+        }
+        const cells = line.split('|').slice(1, -1).map(function (c) { return c.trim(); });
+        if (line.includes('---')) return;
+        if (tableHtml === '<table>') {
+          tableHtml += '<thead><tr>' + cells.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead><tbody>';
+        } else {
+          tableHtml += '<tr>' + cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>';
+        }
+      } else {
+        if (inTable) {
+          inTable = false;
+          tableHtml += '</tbody></table>';
+          resultLines.push(tableHtml);
+          tableHtml = '';
+        }
+        if (line.trim().startsWith('- ')) {
+          resultLines.push('<ul><li>' + line.trim().substring(2) + '</li></ul>');
+        } else if (line.trim().length > 0 && !line.trim().startsWith('<h') && !line.trim().startsWith('<hr')) {
+          resultLines.push('<p>' + line + '</p>');
+        } else {
+          resultLines.push(line);
+        }
+      }
+    });
+    if (inTable) {
+      tableHtml += '</tbody></table>';
+      resultLines.push(tableHtml);
+    }
+
+    return '<div class="markdown-body">' + resultLines.join('\n') + '</div>';
+  }
+
+  function loadReadme() {
+    if (readmeLoaded) return;
+    fetch('README.md?t=' + Date.now())
+      .then(function (res) { return res.text(); })
+      .then(function (text) {
+        $modalBody.innerHTML = simpleMarkdownToHtml(text);
+        readmeLoaded = true;
+      })
+      .catch(function () {
+        $modalBody.innerHTML = '<p class="error-cell">⚠️ README.md 파일을 불러올 수 없습니다.</p>';
+      });
+  }
+
+  function openModal() {
+    $readmeModal.classList.add('show');
+    $readmeModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    loadReadme();
+  }
+
+  function closeModal() {
+    $readmeModal.classList.remove('show');
+    $readmeModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if ($readmeBtn && $readmeModal) {
+    $readmeBtn.addEventListener('click', openModal);
+    if ($modalCloseBtn) $modalCloseBtn.addEventListener('click', closeModal);
+    $readmeModal.addEventListener('click', function (e) {
+      if (e.target === $readmeModal) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && $readmeModal.classList.contains('show')) closeModal();
+    });
+  }
+
   /* ======== 초기화 ======== */
   initTheme();
   $btn.addEventListener('click', handleRefresh);

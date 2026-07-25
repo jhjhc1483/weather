@@ -611,3 +611,123 @@ tbody tr:nth-child(8) { animation-delay: 0.16s; }
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ========================================================
+   README Floating Button & Modal Popup
+   ======================================================== */
+.readme-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: 30px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  z-index: 90;
+}
+.readme-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+  padding: 1rem;
+}
+.modal-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 840px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+.modal-backdrop.show .modal-content {
+  transform: scale(1);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-category);
+}
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+.modal-body {
+  padding: 1.6rem 1.8rem;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Modal Markdown Content Styles */
+.markdown-body h1 { font-size: 1.35rem; margin-bottom: 0.8rem; font-weight: 700; color: var(--accent); }
+.markdown-body h2 { font-size: 1.12rem; margin: 1.3rem 0 0.6rem; font-weight: 600; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+.markdown-body h3 { font-size: 0.98rem; margin: 1rem 0 0.4rem; font-weight: 600; }
+.markdown-body p { margin-bottom: 0.8rem; color: var(--text-secondary); }
+.markdown-body ul { margin-bottom: 1rem; padding-left: 1.4rem; }
+.markdown-body li { margin-bottom: 0.35rem; }
+.markdown-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+.markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 0.5rem 0.8rem; text-align: left; }
+.markdown-body th { background: var(--bg-category); font-weight: 600; }
+.markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.markdown-body code { background: rgba(37, 99, 235, 0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }

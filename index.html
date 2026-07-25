@@ -84,8 +84,30 @@
     </footer>
   </div>
 
-  <!-- 토스트 알림 -->
-  <div class="toast" id="toast"></div>
+  <!-- 우측 하단 README 플로팅 버튼 -->
+  <button id="readme-btn" class="readme-btn" title="프로젝트 안내 (README)">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+    </svg>
+    <span>README</span>
+  </button>
+
+  <!-- README 모달 팝업 -->
+  <div id="readme-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">📖 프로젝트 안내 (README)</h2>
+        <button id="modal-close-btn" class="modal-close-btn" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <div class="loading-cell">
+          <div class="loading-spinner"></div>
+          <span>README를 불러오는 중...</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
