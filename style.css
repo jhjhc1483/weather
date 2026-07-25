@@ -91,7 +91,7 @@
 /* ---- Reset & Base ---- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+html { font-size: 17px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font);
@@ -104,7 +104,7 @@ body {
 
 /* ---- Container ---- */
 .container {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -261,33 +261,33 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-size: 1.02rem;
+  line-height: 1.6;
 }
 
 /* ---- Header ---- */
 thead th {
   background: var(--gradient-header);
   color: var(--text-white);
-  padding: 0.85rem 0.65rem;
+  padding: 1.05rem 0.8rem;
   font-weight: 700;
-  font-size: 0.92rem;
+  font-size: 1.02rem;
   text-align: center;
   white-space: nowrap;
   border-bottom: 2px solid var(--border-header);
 }
 
 thead .th-cat {
-  min-width: 125px;
+  min-width: 145px;
   text-align: center;
 }
 thead .th-loc {
-  min-width: 95px;
+  min-width: 110px;
 }
 
 /* ---- Body Cells ---- */
 tbody td, tbody th {
-  padding: 0.75rem 0.6rem;
+  padding: 0.95rem 0.75rem;
   text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid var(--border);
@@ -302,20 +302,20 @@ tbody tr:hover td {
 .cat-main {
   background: var(--bg-category) !important;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   color: var(--text-primary);
   white-space: nowrap;
   text-align: center;
-  min-width: 70px;
+  min-width: 80px;
   border-right: 1px solid var(--border);
 }
 
 .cat-sub {
   background: var(--bg-category) !important;
   font-weight: 400;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
-  min-width: 52px;
+  min-width: 58px;
   text-align: center;
   border-right: 1px solid var(--border);
 }
@@ -331,15 +331,15 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 /* ---- Data Cells ---- */
 .cell-data {
   font-variant-numeric: tabular-nums;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
 }
 
 /* 미세먼지 등급 뱃지 */
 .dust-badge {
   display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.78rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 14px;
+  font-size: 0.84rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
