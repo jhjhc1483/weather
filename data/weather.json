@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-27T06:23:46+09:00",
+  "updated_at": "2026-07-27T06:52:15+09:00",
   "base_date": "20260727",
   "date_display": "07.27",
   "day_of_week": "월",
-  "time_display": "06:23",
+  "time_display": "06:52",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -17,8 +17,8 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "22.5",
-        "feels_like": "25.8",
+        "current": "23",
+        "feels_like": "26.3",
         "min": "22.0",
         "max": "29.0"
       },
@@ -51,21 +51,21 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "23.3",
-        "feels_like": "26.3",
-        "min": "23.3",
+        "current": "24.4",
+        "feels_like": "27.3",
+        "min": "24.0",
         "max": "35.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "0.3m/s"
+        "direction": "남서풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": []
     },
     "사천": {
-      "overview": "흐림",
+      "overview": "맑음",
       "dust": {
         "pm10": "7",
         "pm10_grade": "좋음",
@@ -76,9 +76,9 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "23.1",
-        "feels_like": "26.3",
-        "min": "23.1",
+        "current": "23.7",
+        "feels_like": "26.9",
+        "min": "23.7",
         "max": "35.0"
       },
       "wind": {
@@ -101,14 +101,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "24.6",
-        "feels_like": "27.8",
+        "current": "25.8",
+        "feels_like": "28.9",
         "min": "24.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "1.1m/s"
+        "direction": "동남동풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -126,21 +126,21 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "24.7",
-        "feels_like": "27.9",
+        "current": "25.8",
+        "feels_like": "28.7",
         "min": "24.0",
         "max": "35.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "0.1m/s"
+        "direction": "서북서풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": []
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
         "pm10": "12",
         "pm10_grade": "좋음",
@@ -151,14 +151,14 @@
         "primary_station": "조치원읍"
       },
       "temperature": {
-        "current": "23.4",
-        "feels_like": "26.6",
+        "current": "24.3",
+        "feels_like": "27.6",
         "min": "23.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "0.1m/s"
+        "direction": "동북동풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -176,14 +176,14 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "25.9",
-        "feels_like": "28.7",
+        "current": "26.7",
+        "feels_like": "29.4",
         "min": "24.0",
         "max": "33.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "1.4m/s"
+        "direction": "서풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -201,13 +201,13 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "23.2",
-        "feels_like": "26.3",
+        "current": "23.7",
+        "feels_like": "26.8",
         "min": "23.0",
         "max": "32.0"
       },
       "wind": {
-        "direction": "남서풍",
+        "direction": "서풍",
         "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
