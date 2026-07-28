@@ -47,7 +47,7 @@ LOCATIONS = {
     '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도'},    # 후전삼거리
     '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도'},    # 국군복지단 충무마트
     '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도'},    # 초전면
-    '세종': {'nx': 62, 'ny': 105, 'station': '조치원읍', 'fallback_station': '아름동', 'alert_region': '세종', 'province': '세종'},      # 세종레스텔
+    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'province': '세종'},      # 세종레스텔(연서면 봉암리)
     '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도'},    # 품안마을아파트(신도안면)
     '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북'},      # 충경신병교육대
 }
