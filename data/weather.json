@@ -1,17 +1,9 @@
 {
-<<<<<<< HEAD
-  "updated_at": "2026-07-28T20:54:19+09:00",
+  "updated_at": "2026-07-28T21:02:14+09:00",
   "base_date": "20260728",
   "date_display": "07.28",
   "day_of_week": "화",
-  "time_display": "20:54",
-=======
-  "updated_at": "2026-07-28T20:32:26+09:00",
-  "base_date": "20260728",
-  "date_display": "07.28",
-  "day_of_week": "화",
-  "time_display": "20:32",
->>>>>>> 6d83bcb7513dc1e968353bcff78ed55d40980ed9
+  "time_display": "21:02",
   "locations": {
     "양평": {
       "overview": "맑음",
@@ -25,14 +17,14 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "25",
-        "feels_like": "28.4",
+        "current": "24.8",
+        "feels_like": "28.2",
         "min": "22.0",
         "max": "29.0"
       },
       "wind": {
-        "direction": "서북서풍",
-        "speed": "0.7m/s"
+        "direction": "서풍",
+        "speed": "1.0m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -56,14 +48,14 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "30.2",
+        "current": "30.1",
         "feels_like": "31.2",
         "min": "24.0",
         "max": "35.0"
       },
       "wind": {
         "direction": "서남서풍",
-        "speed": "1.5m/s"
+        "speed": "1.6m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -81,11 +73,7 @@
       ]
     },
     "사천": {
-<<<<<<< HEAD
       "overview": "구름많음",
-=======
-      "overview": "흐림",
->>>>>>> 6d83bcb7513dc1e968353bcff78ed55d40980ed9
       "dust": {
         "pm10": "8",
         "pm10_grade": "좋음",
@@ -121,7 +109,7 @@
       ]
     },
     "함안": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "17",
         "pm10_grade": "좋음",
@@ -157,7 +145,7 @@
       ]
     },
     "성주": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
         "pm10": "19",
         "pm10_grade": "좋음",
@@ -175,7 +163,7 @@
       },
       "wind": {
         "direction": "북북서풍",
-        "speed": "0.5m/s"
+        "speed": "0.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -229,7 +217,7 @@
       ]
     },
     "계룡": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "14",
         "pm10_grade": "좋음",
@@ -260,7 +248,7 @@
       ]
     },
     "임실": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
         "pm10": "6",
         "pm10_grade": "좋음",
