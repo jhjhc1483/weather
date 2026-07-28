@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-28T21:02:14+09:00",
+  "updated_at": "2026-07-28T21:05:14+09:00",
   "base_date": "20260728",
   "date_display": "07.28",
   "day_of_week": "화",
-  "time_display": "21:02",
+  "time_display": "21:05",
   "locations": {
     "양평": {
       "overview": "맑음",
@@ -73,7 +73,7 @@
       ]
     },
     "사천": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
         "pm10": "8",
         "pm10_grade": "좋음",
@@ -109,7 +109,7 @@
       ]
     },
     "함안": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
         "pm10": "17",
         "pm10_grade": "좋음",
