@@ -426,6 +426,26 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 .alert-warn    { background: rgba(245,158,11,0.18); color: #d97706; }
 .alert-danger  { background: rgba(239,68,68,0.18);  color: #dc2626; }
 
+/* 예정 특보 (점선 테두리 + 투명도) */
+.alert-scheduled {
+  opacity: 0.75;
+  border: 1.5px dashed currentColor;
+  position: relative;
+}
+.alert-scheduled:hover {
+  opacity: 1;
+}
+
+/* 발효시각 표시 */
+.alert-eff-time {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 0.1rem;
+  letter-spacing: -0.01em;
+}
+
 [data-theme="dark"] .alert-warn   { color: #fbbf24; }
 [data-theme="dark"] .alert-danger { color: #fca5a5; }
 

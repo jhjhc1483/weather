@@ -42,14 +42,14 @@ if not API_KEY:
 # alert_region: 기상특보 검색 키워드
 # ============================================================
 LOCATIONS = {
-    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평'},    # 노도성당
-    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산'},    # 제광파종기
-    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천'},    # 후전삼거리
-    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안'},    # 국군복지단 충무마트
-    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주'},    # 초전면
-    '세종': {'nx': 62, 'ny': 105, 'station': '조치원읍', 'fallback_station': '아름동', 'alert_region': '세종'},    # 세종레스텔
-    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡'},    # 품안마을아파트(신도안면)
-    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실'},    # 충경신병교육대
+    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'province': '경기도'},    # 노도성당
+    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도'},    # 제광파종기
+    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도'},    # 후전삼거리
+    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도'},    # 국군복지단 충무마트
+    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도'},    # 초전면
+    '세종': {'nx': 62, 'ny': 105, 'station': '조치원읍', 'fallback_station': '아름동', 'alert_region': '세종', 'province': '세종'},      # 세종레스텔
+    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도'},    # 품안마을아파트(신도안면)
+    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북'},      # 충경신병교육대
 }
 
 LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실']
@@ -362,7 +362,9 @@ def fetch_air(station, fallback_station=None):
 
 
 def fetch_alerts():
-    """기상특보"""
+    """기상특보 (발효 중 + 예정 특보 포함, 발효시각 첨부)"""
+    import re
+
     data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
         'pageNo': '1', 'numOfRows': '1', 'dataType': 'JSON', 'stnId': '108',
     })
@@ -379,10 +381,6 @@ def fetch_alerts():
     except (KeyError, TypeError):
         return {}
 
-    # t6 (현재 특보 발효 현황) + t2 (특보 변경 내역) + other 통합
-    full_text = f"{item_data.get('t6', '')}\n{item_data.get('t2', '')}\n{item_data.get('other', '')}"
-    full_text = full_text.replace('\r', '')
-
     alert_types = [
         '폭염중대경보', '폭염경보', '폭염주의보', '호우경보', '호우주의보',
         '열대야주의보', '강풍경보', '강풍주의보', '태풍경보', '태풍주의보',
@@ -390,19 +388,211 @@ def fetch_alerts():
         '황사경보', '황사주의보',
     ]
 
-    result = {}
-    for loc_name, cfg in LOCATIONS.items():
+    now = datetime.now(KST)
+
+    # ── 헬퍼: 특보 지역 텍스트 파싱 ──
+    def parse_region_chunks(text):
+        chunks = []
+        current = ""
+        in_paren = False
+        for char in text:
+            if char == '(':
+                in_paren = True
+                current += char
+            elif char == ')':
+                in_paren = False
+                current += char
+            elif char == ',' and not in_paren:
+                if current.strip():
+                    chunks.append(current.strip())
+                current = ""
+            else:
+                current += char
+        if current.strip():
+            chunks.append(current.strip())
+        return chunks
+
+    def match_location_to_chunk(chunk, loc_name, cfg):
         region_kw = cfg['alert_region']
-        matched = []
-        for line in full_text.split('\n'):
-            line_str = line.strip()
-            if not line_str:
-                continue
-            if region_kw in line_str:
-                for at in alert_types:
-                    if at in line_str and at not in matched:
-                        matched.append(at)
-        result[loc_name] = matched
+        province = cfg.get('province', '')
+
+        # 1. 괄호가 포함된 경우 (예: "충청남도(아산, 부여, 청양 제외)" 또는 "전북자치도(고창, 김제, 임실)")
+        m = re.match(r'^([^(]+)\(([^)]+)\)$', chunk)
+        if m:
+            prov_part = m.group(1).strip()
+            inside_part = m.group(2).strip()
+
+            prov_match = (prov_part in province or province in prov_part or 
+                          (province == '전북' and ('전북' in prov_part or '전라북도' in prov_part)))
+
+            if not prov_match:
+                return False
+
+            if '제외' in inside_part:
+                ex_index = inside_part.find('제외')
+                excluded_text = inside_part[:ex_index]
+                if region_kw in excluded_text:
+                    return False  # 제외 목록에 명시됨 -> 매칭 안 됨!
+                else:
+                    return True   # 도 전체 대상이며 제외 목록에 안 들었으므로 매칭됨!
+            else:
+                if region_kw in inside_part:
+                    return True
+                else:
+                    return False
+
+        # 2. 괄호가 없는 경우 (예: "세종", "대전", "인천")
+        chunk_clean = chunk.strip()
+        if region_kw in chunk_clean or (province and (chunk_clean == province or province == chunk_clean)):
+            return True
+
+        return False
+
+    # ── 1. t6: 현재 발효 중인 특보 파싱 ──
+    t6_text = (item_data.get('t6', '') or '').replace('\r', '')
+    t6_lines = [ln.strip() for ln in t6_text.split('\n') if ln.strip()]
+
+    # {지역명: set(특보종류)} — 발효 중
+    active_alerts = {}
+    for loc_name in LOCATIONS:
+        active_alerts[loc_name] = set()
+
+    for line in t6_lines:
+        if not line.startswith('o '):
+            continue
+        matched_type = None
+        for at in alert_types:
+            if line.startswith(f'o {at}'):
+                matched_type = at
+                break
+        if not matched_type:
+            continue
+
+        colon_idx = line.find(':')
+        region_text = line[colon_idx + 1:] if colon_idx >= 0 else line
+        chunks = parse_region_chunks(region_text)
+
+        for loc_name, cfg in LOCATIONS.items():
+            for chunk in chunks:
+                if match_location_to_chunk(chunk, loc_name, cfg):
+                    active_alerts[loc_name].add(matched_type)
+                    break
+
+    # ── 2. t2+t3: 예정 특보 파싱 (발효시각이 미래인 것만) ──
+    # t2 형식: "(1) 열대야주의보 발표 : 경기도(안산, ...)\n(2) 폭염주의보 발표 : ..."
+    # t3 형식: "(1) 열대야주의보 발표 : 2026년 07월 28일 18시 00분\n(2) 폭염주의보 발표 : ..."
+    t2_text = (item_data.get('t2', '') or '').replace('\r', '')
+    t3_text = (item_data.get('t3', '') or '').replace('\r', '')
+
+    # 번호별로 파싱: { "(1)": { action_text, regions_text } }
+    t2_entries = {}
+    for line in t2_text.split('\n'):
+        line = line.strip()
+        m = re.match(r'\((\d+)\)\s*(.+)', line)
+        if m:
+            idx_key = m.group(1)
+            rest = m.group(2).strip()
+            t2_entries[idx_key] = rest
+
+    t3_entries = {}
+    for line in t3_text.split('\n'):
+        line = line.strip()
+        m = re.match(r'\((\d+)\)\s*(.+)', line)
+        if m:
+            idx_key = m.group(1)
+            rest = m.group(2).strip()
+            t3_entries[idx_key] = rest
+
+    # 발효시각 파싱 헬퍼: "폭염주의보 발표 : 2026년 07월 28일 18시 00분" → datetime
+    def parse_effective_time(t3_val):
+        """t3 값에서 발효시각 추출"""
+        m = re.search(r'(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{1,2})시\s*(\d{2})분', t3_val)
+        if m:
+            try:
+                return datetime(
+                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                    int(m.group(4)), int(m.group(5)),
+                    tzinfo=KST
+                )
+            except (ValueError, TypeError):
+                pass
+        return None
+
+    def format_effective_time(dt_obj):
+        """datetime → 표시용 문자열 (MM.DD HH:MM)"""
+        if not dt_obj:
+            return ''
+        return dt_obj.strftime('%m.%d %H:%M')
+
+    # {지역명: [{name, status, effective_time}]} — 예정 특보
+    scheduled_alerts = {}
+    for loc_name in LOCATIONS:
+        scheduled_alerts[loc_name] = []
+
+    for idx_key, t2_val in t2_entries.items():
+        # t2_val 예: "열대야주의보 발표 : 경기도(안산, 연천, ...)"
+        # "발표"가 포함된 항목만 예정 특보로 처리 (변경/해제 제외)
+        if '발표' not in t2_val:
+            continue
+
+        # 특보 종류 추출
+        matched_type = None
+        for at in alert_types:
+            if at in t2_val:
+                matched_type = at
+                break
+        if not matched_type:
+            continue
+
+        # 발효시각 추출
+        t3_val = t3_entries.get(idx_key, '')
+        eff_dt = parse_effective_time(t3_val)
+
+        # 미래 시각인 경우만 "예정"으로 처리
+        if not eff_dt or eff_dt <= now:
+            continue
+
+        # 콜론 뒤의 지역 텍스트
+        colon_idx = t2_val.find(':')
+        region_text = t2_val[colon_idx + 1:] if colon_idx >= 0 else t2_val
+        chunks = parse_region_chunks(region_text)
+
+        eff_str = format_effective_time(eff_dt)
+        for loc_name, cfg in LOCATIONS.items():
+            for chunk in chunks:
+                if match_location_to_chunk(chunk, loc_name, cfg):
+                    # 이미 발효 중인 동일 특보가 있으면 예정에 추가하지 않음
+                    if matched_type not in active_alerts[loc_name]:
+                        scheduled_alerts[loc_name].append({
+                            'name': matched_type,
+                            'status': '예정',
+                            'effective_time': eff_str,
+                        })
+                    break
+
+    # ── 3. 결과 조합: 발효중 + 예정 ──
+    result = {}
+    for loc_name in LOCATIONS:
+        loc_alerts = []
+
+        # 발효 중인 특보 (우선순위: alert_types 순서 유지)
+        for at in alert_types:
+            if at in active_alerts[loc_name]:
+                loc_alerts.append({
+                    'name': at,
+                    'status': '발효중',
+                    'effective_time': '',
+                })
+
+        # 예정 특보 추가
+        seen_scheduled = set()
+        for sa in scheduled_alerts[loc_name]:
+            key = sa['name']
+            if key not in seen_scheduled:
+                seen_scheduled.add(key)
+                loc_alerts.append(sa)
+
+        result[loc_name] = loc_alerts
 
     return result
 
