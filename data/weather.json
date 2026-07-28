@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-07-29T04:58:25+09:00",
+  "updated_at": "2026-07-29T05:39:06+09:00",
   "base_date": "20260729",
   "date_display": "07.29",
   "day_of_week": "수",
-  "time_display": "04:58",
+  "time_display": "05:39",
   "locations": {
     "양평": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
-        "pm10": "20",
+        "pm10": "18",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "14",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
@@ -33,9 +33,9 @@
     "경산": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "17",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "9",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
@@ -56,11 +56,11 @@
       "alerts": []
     },
     "사천": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
-        "pm10": "12",
+        "pm10": "10",
         "pm10_grade": "좋음",
-        "pm25": "7",
+        "pm25": "9",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -81,11 +81,11 @@
       "alerts": []
     },
     "함안": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
-        "pm10": "14",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "10",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
@@ -106,11 +106,11 @@
       "alerts": []
     },
     "성주": {
-      "overview": "맑음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "13",
+        "pm10": "11",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "10",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
@@ -131,9 +131,9 @@
       "alerts": []
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "17",
+        "pm10": "7",
         "pm10_grade": "좋음",
         "pm25": "2",
         "pm25_grade": "좋음",
@@ -156,11 +156,11 @@
       "alerts": []
     },
     "계룡": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "10",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
@@ -181,9 +181,9 @@
       "alerts": []
     },
     "임실": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "6",
+        "pm10": "8",
         "pm10_grade": "좋음",
         "pm25": "1",
         "pm25_grade": "좋음",
