@@ -203,17 +203,20 @@
     const a = loc.alerts;
     if (!a || a.length === 0) return '-';
     return a.map(function (item) {
-      // 하위 호환: 문자열 배열도 지원
       if (typeof item === 'string') {
         return '<div class="alert-tag alert-tag-clickable ' + alertTagClass(item) + '" data-alert="' + escHtml(item) + '">' + escHtml(item) + '</div>';
       }
       var name = item.name || '';
       var status = item.status || '발효중';
       var effTime = item.effective_time || '';
+      var isNew = item.is_new || false;
       var tagClass = alertTagClass(name);
       var statusClass = status === '예정' ? 'alert-scheduled' : '';
       var html = '<div class="alert-tag alert-tag-clickable ' + tagClass + ' ' + statusClass + '" data-alert="' + escHtml(name) + '">';
       html += escHtml(name);
+      if (isNew) {
+        html += '<span class="alert-badge-new">NEW</span>';
+      }
       if (status === '예정' && effTime) {
         html += '<span class="alert-eff-time">' + escHtml(effTime) + ' 발효</span>';
       }

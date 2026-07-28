@@ -446,8 +446,40 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   letter-spacing: -0.01em;
 }
 
+/* 신규 발표 특보 NEW 뱃지 */
+.alert-badge-new {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1.5px 4px;
+  margin-left: 4px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
+  vertical-align: middle;
+  animation: pulse-new 2s infinite ease-in-out;
+}
+
+@keyframes pulse-new {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 1px 4px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.12);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.7);
+  }
+}
+
 [data-theme="dark"] .alert-warn   { color: #fbbf24; }
 [data-theme="dark"] .alert-danger { color: #fca5a5; }
+[data-theme="dark"] .alert-badge-new {
+  background: linear-gradient(135deg, #f87171, #fb923c);
+  color: #0f172a;
+}
 
 /* 강수량 */
 .rain-value { color: var(--accent); font-weight: 600; }

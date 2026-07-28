@@ -365,8 +365,13 @@ def fetch_alerts():
     """기상특보 (발효 중 + 예정 특보 포함, 발효시각 첨부)"""
     import re
 
+    now = datetime.now(KST)
+    today_str = now.strftime('%Y%m%d')
+    yesterday_str = (now - timedelta(days=2)).strftime('%Y%m%d')
+
     data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
-        'pageNo': '1', 'numOfRows': '1', 'dataType': 'JSON', 'stnId': '108',
+        'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108',
+        'fromTmFc': yesterday_str, 'toTmFc': today_str,
     })
     if not data:
         return {}
@@ -478,11 +483,14 @@ def fetch_alerts():
                     active_alerts[loc_name].add(matched_type)
                     break
 
-    # ── 2. t2+t3: 예정 특보 파싱 (발효시각이 미래인 것만) ──
+    # ── 2. t2+t3: 예정 특보 및 오늘/최근 24시간 이내 발표/변경 특보 (is_new) 파싱 ──
     # t2 형식: "(1) 열대야주의보 발표 : 경기도(안산, ...)\n(2) 폭염주의보 발표 : ..."
     # t3 형식: "(1) 열대야주의보 발표 : 2026년 07월 28일 18시 00분\n(2) 폭염주의보 발표 : ..."
     t2_text = (item_data.get('t2', '') or '').replace('\r', '')
     t3_text = (item_data.get('t3', '') or '').replace('\r', '')
+
+    # 새로 발표/변경/강화된 특보 트래킹: {(loc_name, alert_type): True}
+    newly_updated_alerts = set()
 
     # 번호별로 파싱: { "(1)": { action_text, regions_text } }
     t2_entries = {}
@@ -524,18 +532,12 @@ def fetch_alerts():
             return ''
         return dt_obj.strftime('%m.%d %H:%M')
 
-    # {지역명: [{name, status, effective_time}]} — 예정 특보
-    scheduled_alerts = {}
-    for loc_name in LOCATIONS:
-        scheduled_alerts[loc_name] = []
+    # 통보문 발표시각(tmFc) 추출 (YYYYMMDDhhmm)
+    tm_fc_str = str(item_data.get('tmFc', ''))
+    is_today_report = tm_fc_str.startswith(today_str)
 
+    # t2_entries에서 발표/변경 건 분석
     for idx_key, t2_val in t2_entries.items():
-        # t2_val 예: "열대야주의보 발표 : 경기도(안산, 연천, ...)"
-        # "발표"가 포함된 항목만 예정 특보로 처리 (변경/해제 제외)
-        if '발표' not in t2_val:
-            continue
-
-        # 특보 종류 추출
         matched_type = None
         for at in alert_types:
             if at in t2_val:
@@ -544,29 +546,56 @@ def fetch_alerts():
         if not matched_type:
             continue
 
-        # 발효시각 추출
+        colon_idx = t2_val.find(':')
+        region_text = t2_val[colon_idx + 1:] if colon_idx >= 0 else t2_val
+        chunks = parse_region_chunks(region_text)
+
+        if '발표' in t2_val or '변경' in t2_val:
+            for loc_name, cfg in LOCATIONS.items():
+                for chunk in chunks:
+                    if match_location_to_chunk(chunk, loc_name, cfg):
+                        newly_updated_alerts.add((loc_name, matched_type))
+                        break
+
+    # {지역명: [{name, status, effective_time, is_new}]} — 예정 특보
+    scheduled_alerts = {}
+    for loc_name in LOCATIONS:
+        scheduled_alerts[loc_name] = []
+
+    for idx_key, t2_val in t2_entries.items():
+        if '발표' not in t2_val:
+            continue
+
+        matched_type = None
+        for at in alert_types:
+            if at in t2_val:
+                matched_type = at
+                break
+        if not matched_type:
+            continue
+
         t3_val = t3_entries.get(idx_key, '')
         eff_dt = parse_effective_time(t3_val)
 
-        # 미래 시각인 경우만 "예정"으로 처리
         if not eff_dt or eff_dt <= now:
             continue
 
-        # 콜론 뒤의 지역 텍스트
         colon_idx = t2_val.find(':')
         region_text = t2_val[colon_idx + 1:] if colon_idx >= 0 else t2_val
         chunks = parse_region_chunks(region_text)
 
         eff_str = format_effective_time(eff_dt)
+        is_new = is_today_report or ((loc_name, matched_type) in newly_updated_alerts)
+
         for loc_name, cfg in LOCATIONS.items():
             for chunk in chunks:
                 if match_location_to_chunk(chunk, loc_name, cfg):
-                    # 이미 발효 중인 동일 특보가 있으면 예정에 추가하지 않음
                     if matched_type not in active_alerts[loc_name]:
                         scheduled_alerts[loc_name].append({
                             'name': matched_type,
                             'status': '예정',
                             'effective_time': eff_str,
+                            'is_new': is_new,
                         })
                     break
 
@@ -575,16 +604,16 @@ def fetch_alerts():
     for loc_name in LOCATIONS:
         loc_alerts = []
 
-        # 발효 중인 특보 (우선순위: alert_types 순서 유지)
         for at in alert_types:
             if at in active_alerts[loc_name]:
+                is_new = is_today_report or ((loc_name, at) in newly_updated_alerts)
                 loc_alerts.append({
                     'name': at,
                     'status': '발효중',
                     'effective_time': '',
+                    'is_new': is_new,
                 })
 
-        # 예정 특보 추가
         seen_scheduled = set()
         for sa in scheduled_alerts[loc_name]:
             key = sa['name']
