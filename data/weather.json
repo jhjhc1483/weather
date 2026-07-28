@@ -1,43 +1,37 @@
 {
-  "updated_at": "2026-07-28T23:56:43+09:00",
-  "base_date": "20260728",
-  "date_display": "07.28",
-  "day_of_week": "화",
-  "time_display": "23:56",
+  "updated_at": "2026-07-29T02:49:23+09:00",
+  "base_date": "20260729",
+  "date_display": "07.29",
+  "day_of_week": "수",
+  "time_display": "02:49",
   "locations": {
     "양평": {
-      "overview": "구름많음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "24",
+        "pm10": "30",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "24.4",
-        "feels_like": "27.8",
-        "min": "22.0",
-        "max": "29.0"
+        "current": "24.1",
+        "feels_like": "27.4",
+        "min": "23.0",
+        "max": "30.0"
       },
       "wind": {
         "direction": "서풍",
-        "speed": "0.1m/s"
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "경산": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
         "pm10": "17",
         "pm10_grade": "좋음",
@@ -48,34 +42,23 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "29.1",
-        "feels_like": "30.5",
-        "min": "24.0",
-        "max": "35.0"
+        "current": "27.7",
+        "feels_like": "29.3",
+        "min": "25.0",
+        "max": "36.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "2.2m/s"
+        "direction": "서남서풍",
+        "speed": "1.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "열대야주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "사천": {
       "overview": "흐림",
       "dust": {
-        "pm10": "11",
+        "pm10": "8",
         "pm10_grade": "좋음",
         "pm25": "7",
         "pm25_grade": "좋음",
@@ -84,142 +67,98 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "28",
-        "feels_like": "29.7",
+        "current": "25.4",
+        "feels_like": "28.7",
         "min": "24.0",
-        "max": "37.0"
+        "max": "36.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "3.1m/s"
+        "direction": "서남서풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "열대야주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "함안": {
-      "overview": "흐림",
+      "overview": "구름많음",
       "dust": {
-        "pm10": "13",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "10",
+        "pm25": "11",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "27.5",
-        "feels_like": "30.1",
+        "current": "26.4",
+        "feels_like": "29.3",
         "min": "24.0",
-        "max": "36.0"
+        "max": "37.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "1.1m/s"
+        "direction": "동남동풍",
+        "speed": "1.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "열대야주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "성주": {
-      "overview": "흐림",
+      "overview": "맑음",
       "dust": {
         "pm10": "16",
         "pm10_grade": "좋음",
-        "pm25": "12",
+        "pm25": "10",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "27.7",
-        "feels_like": "30.0",
-        "min": "24.0",
-        "max": "35.0"
+        "current": "28.3",
+        "feels_like": "29.9",
+        "min": "25.0",
+        "max": "36.0"
       },
       "wind": {
-        "direction": "남남동풍",
-        "speed": "0.4m/s"
+        "direction": "서북서풍",
+        "speed": "2.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "열대야주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "세종": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "3",
+        "pm10": "24",
         "pm10_grade": "좋음",
-        "pm25": "-",
+        "pm25": "1",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "아름동",
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "25.3",
-        "feels_like": "28.1",
-        "min": "25.0",
-        "max": "33.0"
+        "current": "24.8",
+        "feels_like": "27.8",
+        "min": "24.0",
+        "max": "34.0"
       },
       "wind": {
-        "direction": "서남서풍",
-        "speed": "0.3m/s"
+        "direction": "남서풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "폭염주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "계룡": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
-        "pm10": "9",
+        "pm10": "5",
         "pm10_grade": "좋음",
         "pm25": "3",
         "pm25_grade": "좋음",
@@ -228,65 +167,43 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "26.6",
-        "feels_like": "29.1",
+        "current": "26.1",
+        "feels_like": "28.7",
         "min": "24.0",
-        "max": "32.0"
+        "max": "34.0"
       },
       "wind": {
-        "direction": "남서풍",
-        "speed": "0.5m/s"
+        "direction": "서풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     },
     "임실": {
-      "overview": "맑음",
+      "overview": "흐림",
       "dust": {
-        "pm10": "12",
+        "pm10": "8",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "임실읍",
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "24.5",
-        "feels_like": "27.4",
+        "current": "24.2",
+        "feels_like": "27.3",
         "min": "23.0",
-        "max": "32.0"
+        "max": "33.0"
       },
       "wind": {
-        "direction": "북북서풍",
+        "direction": "서북서풍",
         "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염경보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "폭염주의보",
-          "status": "발효중",
-          "effective_time": ""
-        },
-        {
-          "name": "열대야주의보",
-          "status": "발효중",
-          "effective_time": ""
-        }
-      ]
+      "alerts": []
     }
   },
   "location_order": [
