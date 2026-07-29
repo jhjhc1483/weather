@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-07-29T19:08:27+09:00",
+  "updated_at": "2026-07-29T19:25:01+09:00",
   "base_date": "20260729",
   "date_display": "07.29",
   "day_of_week": "수",
-  "time_display": "19:08",
+  "time_display": "19:25",
   "locations": {
     "양평": {
       "overview": "흐림",
       "dust": {
-        "pm10": "9",
+        "pm10": "15",
         "pm10_grade": "좋음",
-        "pm25": "0",
+        "pm25": "1",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
@@ -84,9 +84,9 @@
     "사천": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "7",
+        "pm10": "8",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "5",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -122,9 +122,9 @@
     "함안": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "8",
+        "pm10": "7",
         "pm10_grade": "좋음",
-        "pm25": "0",
+        "pm25": "5",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
