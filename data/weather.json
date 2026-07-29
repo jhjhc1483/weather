@@ -1,14 +1,14 @@
 {
-  "updated_at": "2026-07-29T21:11:13+09:00",
+  "updated_at": "2026-07-29T21:14:55+09:00",
   "base_date": "20260729",
   "date_display": "07.29",
   "day_of_week": "수",
-  "time_display": "21:11",
+  "time_display": "21:14",
   "locations": {
     "양평": {
       "overview": "맑음",
       "dust": {
-        "pm10": "15",
+        "pm10": "10",
         "pm10_grade": "좋음",
         "pm25": "1",
         "pm25_grade": "좋음",
@@ -46,7 +46,7 @@
     "경산": {
       "overview": "맑음",
       "dust": {
-        "pm10": "9",
+        "pm10": "8",
         "pm10_grade": "좋음",
         "pm25": "6",
         "pm25_grade": "좋음",
@@ -84,9 +84,9 @@
     "사천": {
       "overview": "맑음",
       "dust": {
-        "pm10": "6",
+        "pm10": "5",
         "pm10_grade": "좋음",
-        "pm25": "5",
+        "pm25": "6",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -122,9 +122,9 @@
     "함안": {
       "overview": "맑음",
       "dust": {
-        "pm10": "8",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "7",
+        "pm25": "8",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
