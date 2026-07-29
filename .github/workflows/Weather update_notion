@@ -1,0 +1,48 @@
+name: Update Weather Data
+
+on:
+  schedule:
+    - cron: '30 */2 * * *'   # 2시간 간격 (매 2시간 30분 UTC/KST)
+  workflow_dispatch:         # 수동 트리거 (지금 갱신 버튼)
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch weather data
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: python scripts/fetch_weather.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/weather.json
+          git diff --quiet --cached || git commit -m "chore: update weather data $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M KST')"
+          git push
+
+      # Notion 동기화는 데이터 커밋 이후에 수행한다.
+      # 실패해도 weather.json 커밋은 이미 끝났으므로 워크플로 전체를 실패시키지 않는다.
+      - name: Sync to Notion
+        continue-on-error: true
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_ALIASES: ${{ secrets.NOTION_ALIASES }}
+        run: python scripts/sync_notion.py
