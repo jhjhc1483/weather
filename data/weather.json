@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-29T19:01:42+09:00",
+  "updated_at": "2026-07-29T19:08:27+09:00",
   "base_date": "20260729",
   "date_display": "07.29",
   "day_of_week": "수",
-  "time_display": "19:01",
+  "time_display": "19:08",
   "locations": {
     "양평": {
       "overview": "흐림",
@@ -82,7 +82,7 @@
       ]
     },
     "사천": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "7",
         "pm10_grade": "좋음",
@@ -120,7 +120,7 @@
       ]
     },
     "함안": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "8",
         "pm10_grade": "좋음",
@@ -160,9 +160,9 @@
     "성주": {
       "overview": "구름많음",
       "dust": {
-        "pm10": "11",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "3",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
@@ -198,7 +198,7 @@
     "세종": {
       "overview": "흐림",
       "dust": {
-        "pm10": "2",
+        "pm10": "3",
         "pm10_grade": "좋음",
         "pm25": "-",
         "pm25_grade": "-",
@@ -236,7 +236,7 @@
     "계룡": {
       "overview": "흐림",
       "dust": {
-        "pm10": "5",
+        "pm10": "4",
         "pm10_grade": "좋음",
         "pm25": "4",
         "pm25_grade": "좋음",
@@ -274,9 +274,9 @@
     "임실": {
       "overview": "흐림",
       "dust": {
-        "pm10": "10",
+        "pm10": "11",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "4",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "임실읍",
