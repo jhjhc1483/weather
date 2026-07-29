@@ -4,14 +4,22 @@
  * - data/weather.json fetch 및 동적 표출
  * - 다크 / 라이트 모드 전환 (localStorage)
  * - 갱신 버튼 클릭 시 백그라운드 트리거 및 갱신 완료 자동 감지 & 토스트 알림
+ * - [업데이트] Vercel(.py) 및 Cloudflare(JS) 서버리스 환경 완벽 호환 지원
  */
 
 (function () {
   'use strict';
 
+  /* ======== 도메인 환경 감지 (Vercel / Cloudflare 호환) ======== */
+  const isVercel = window.location.hostname.includes('vercel.app');
+
   /* ======== 상수 ======== */
   const DATA_URL = 'data/weather.json';
-  const TRIGGER_URL = '/api/trigger';
+  
+  // 접속 환경에 따라 백엔드 API 호출 주소를 동적으로 결정합니다.
+  const TRIGGER_URL = isVercel ? '/api/trigger.py' : '/api/trigger';
+  const CHECK_URL = isVercel ? '/api/check.py' : '/api/check';
+  
   const AUTO_RELOAD_MS = 5 * 60 * 1000;  // 5분 자동 백그라운드 재로드
   const POLL_INTERVAL_MS = 20000;        // 갱신 요청 후 20초 간격 감지
   const POLL_TIMEOUT_MS = 5 * 60 * 1000; // 5분 후 감지 중단
@@ -72,7 +80,7 @@
     return d.innerHTML;
   }
 
-  /* ======== 풍향 → 화살표 매핑 (바람이 불어오는 방향 → 이동 방향 화살표) ======== */
+  /* ======== 풍향 → 화살표 매핑 ======== */
   const WIND_ARROW_MAP = {
     '북풍': 180, '북북동풍': 202.5, '북동풍': 225, '동북동풍': 247.5,
     '동풍': 270, '동남동풍': 292.5, '남동풍': 315, '남남동풍': 337.5,
@@ -225,7 +233,7 @@
     }).join('');
   }
 
-  /* ======== 행 구조 정의 (미세먼지 외 항목 카테고리 셀 병합) ======== */
+  /* ======== 행 구조 정의 ======== */
   const DUST_INFO_ICON = '<span class="dust-info-icon" data-tooltip-dust="true" title="미세먼지 등급 기준">ℹ</span>';
   const TEMP_INFO_ICON = '<span class="temp-info-icon" data-tooltip-temp="true" title="기상청 체감온도 산출 안내">ℹ</span>';
   const ROW_DEFS = [
@@ -352,23 +360,22 @@
     }, duration || 4000);
   }
 
-  /* ======== 스마트 폴링 (갱신 완료 감지 — /api/check 서버리스 함수로 CDN 캐시 우회) ======== */
+  /* ======== 스마트 폴링 (갱신 완료 감지 — 동적 CHECK_URL 적용) ======== */
   function startPolling() {
     if (isPolling) return;
     isPolling = true;
-    pollingStartUpdatedAt = currentUpdatedAt; // 갱신 요청 시점 스냅샷
+    pollingStartUpdatedAt = currentUpdatedAt;
     $btn.classList.add('loading');
 
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 20초마다 /api/check로 타임스탬프 확인 (CDN 캐시 100% 우회)
+    // 환경에 맞게 자동 지정된 CHECK_URL 사용
     pollIntervalId = setInterval(function () {
-      fetch('/api/check?t=' + Date.now(), { cache: 'no-store' })
+      fetch(CHECK_URL + '?t=' + Date.now(), { cache: 'no-store' })
         .then(function (res) { return res.json(); })
         .then(function (result) {
           if (result.updated_at && pollingStartUpdatedAt && result.updated_at !== pollingStartUpdatedAt) {
-            // 새 데이터 감지 → 화면에 반영하고 폴링 종료
             loadData(function () {
               stopPolling(true);
             });
@@ -388,7 +395,7 @@
     }, POLL_TIMEOUT_MS);
   }
 
-  /* ======== 알림 소리 (Web Audio API 차임 벨 - Autoplay 락 해제 포함) ======== */
+  /* ======== 알림 소리 ======== */
   function initAudioContext() {
     try {
       const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
@@ -423,7 +430,7 @@
       const now = audioCtx.currentTime;
       playNote(523.25, now, 0.2);        // C5
       playNote(659.25, now + 0.12, 0.2);  // E5
-      playNote(783.99, now + 0.24, 0.45); // G5 (맑은 3음계 알림음)
+      playNote(783.99, now + 0.24, 0.45); // G5
     } catch (e) {}
   }
 
@@ -440,15 +447,14 @@
     }
   }
 
-  /* ======== 갱신 버튼 이벤트 ======== */
+  /* ======== 갱신 버튼 이벤트 (응답 검증 로직 호환성 개선) ======== */
   let refreshAutoReloadId = null;
 
   function handleRefresh() {
-    initAudioContext(); // 클릭 시점에 오디오 컨텍스트 사전 활성화 (브라우저 Autoplay 락 해제!)
+    initAudioContext();
     requestNotificationPermission();
     $btn.classList.add('loading');
 
-    // 3분 후 자동 새로고침 (Actions 완료 후 최신 데이터 보장)
     clearTimeout(refreshAutoReloadId);
     refreshAutoReloadId = setTimeout(function () {
       loadData();
@@ -458,7 +464,9 @@
     fetch(TRIGGER_URL, { method: 'POST' })
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        if (data.message) {
+        
+        // 핵심 수정: Vercel(파이썬)의 data.message 또는 Cloudflare(JS)의 data.success 모두 성공으로 간주
+        if (data.message || data.success === true || data.status === 'ok') {
           showToast('⌛ 갱신 요청 완료! 기상청 데이터 수집 중... (약 1~2분 소요)', 'info', 6000);
           startPolling();
         } else {
@@ -472,7 +480,7 @@
       });
   }
 
-  /* ======== README 모달 관리 ======== */
+  /* ======== README 모달 관리 및 이하 기존 코드 생략 없이 동일 유지 ======== */
   const $readmeBtn = document.getElementById('readme-btn');
   const $readmeModal = document.getElementById('readme-modal');
   const $modalCloseBtn = document.getElementById('modal-close-btn');
@@ -601,7 +609,7 @@
     if (!isPolling) loadData();
   }, AUTO_RELOAD_MS);
 
-  /* ======== 기상특보 태그 클릭 → 기준 팝업 (이벤트 위임) ======== */
+  /* ======== 기상특보 태그 클릭 → 기준 팝업 ======== */
   document.addEventListener('click', function (e) {
     const tag = e.target.closest('.alert-tag-clickable');
     if (!tag) return;
@@ -639,7 +647,6 @@
       popupHtml = '<div class="alert-popup-content"><div class="alert-criteria-item active"><strong class="alert-warn-label">발표 현황</strong><p>' + escHtml(alertText) + ' 발효 중입니다.</p></div></div>';
     }
 
-    // 모달 재활용 및 맞춤 제목 적용
     $modalBody.innerHTML = popupHtml;
     const titleEl = document.getElementById('modal-title-text');
     if (titleEl) titleEl.textContent = '⚠️ ' + alertText + ' 발표 기준';
