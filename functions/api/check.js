@@ -1,4 +1,4 @@
-export async function onRequestGet(context) {
+export async function onRequest(context) {
   const { env } = context;
   const githubRepo = 'jhjhc1483/weather';
 
