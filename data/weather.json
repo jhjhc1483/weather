@@ -1,30 +1,30 @@
 {
-  "updated_at": "2026-07-29T22:12:12+09:00",
+  "updated_at": "2026-07-29T22:40:34+09:00",
   "base_date": "20260729",
   "date_display": "07.29",
   "day_of_week": "수",
-  "time_display": "22:12",
+  "time_display": "22:40",
   "locations": {
     "양평": {
       "overview": "맑음",
       "dust": {
-        "pm10": "10",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "5",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "23.1",
-        "feels_like": "26.4",
-        "min": "23.0",
+        "current": "22.6",
+        "feels_like": "25.9",
+        "min": "22.6",
         "max": "30.0"
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "1.4m/s"
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -39,7 +39,7 @@
           "name": "폭염주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
@@ -55,14 +55,14 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "28.2",
-        "feels_like": "29.5",
+        "current": "28.3",
+        "feels_like": "29.6",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
         "direction": "서풍",
-        "speed": "1.7m/s"
+        "speed": "2.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -71,36 +71,36 @@
           "name": "폭염경보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
     "사천": {
       "overview": "맑음",
       "dust": {
-        "pm10": "5",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "6",
+        "pm25": "4",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "26.9",
+        "current": "27.2",
         "feels_like": "29.4",
         "min": "24.0",
         "max": "36.0"
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "1.6m/s"
+        "speed": "2.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -109,35 +109,35 @@
           "name": "폭염경보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
     "함안": {
       "overview": "맑음",
       "dust": {
-        "pm10": "13",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "6",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "28.5",
-        "feels_like": "30.3",
+        "current": "28.3",
+        "feels_like": "30.0",
         "min": "24.0",
         "max": "37.0"
       },
       "wind": {
-        "direction": "북북서풍",
+        "direction": "서북서풍",
         "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
@@ -147,13 +147,13 @@
           "name": "폭염경보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
@@ -169,14 +169,14 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "27.9",
-        "feels_like": "29.8",
+        "current": "27.1",
+        "feels_like": "29.2",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "남풍",
-        "speed": "0.1m/s"
+        "direction": "동남동풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -185,13 +185,13 @@
           "name": "폭염경보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
@@ -207,14 +207,14 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "25.7",
-        "feels_like": "28.3",
+        "current": "25.1",
+        "feels_like": "27.9",
         "min": "24.0",
         "max": "34.0"
       },
       "wind": {
-        "direction": "서북서풍",
-        "speed": "0.4m/s"
+        "direction": "서풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -223,13 +223,13 @@
           "name": "폭염경보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "폭염주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
@@ -245,14 +245,14 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "27.3",
-        "feels_like": "29.2",
+        "current": "26.9",
+        "feels_like": "29.0",
         "min": "24.0",
         "max": "34.0"
       },
       "wind": {
         "direction": "북서풍",
-        "speed": "1.2m/s"
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -261,13 +261,13 @@
           "name": "폭염주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         },
         {
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     },
@@ -283,14 +283,14 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "24.9",
-        "feels_like": "27.4",
+        "current": "24.5",
+        "feels_like": "27.2",
         "min": "23.0",
         "max": "33.0"
       },
       "wind": {
-        "direction": "서남서풍",
-        "speed": "0.4m/s"
+        "direction": "서풍",
+        "speed": "0.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -299,7 +299,7 @@
           "name": "열대야주의보",
           "status": "발효중",
           "effective_time": "",
-          "is_new": true
+          "is_new": false
         }
       ]
     }

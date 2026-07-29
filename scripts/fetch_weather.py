@@ -585,12 +585,12 @@ def fetch_alerts():
         chunks = parse_region_chunks(region_text)
 
         eff_str = format_effective_time(eff_dt)
-        is_new = is_today_report or ((loc_name, matched_type) in newly_updated_alerts)
 
         for loc_name, cfg in LOCATIONS.items():
             for chunk in chunks:
                 if match_location_to_chunk(chunk, loc_name, cfg):
                     if matched_type not in active_alerts[loc_name]:
+                        is_new = (loc_name, matched_type) in newly_updated_alerts
                         scheduled_alerts[loc_name].append({
                             'name': matched_type,
                             'status': '예정',
@@ -606,7 +606,7 @@ def fetch_alerts():
 
         for at in alert_types:
             if at in active_alerts[loc_name]:
-                is_new = is_today_report or ((loc_name, at) in newly_updated_alerts)
+                is_new = (loc_name, at) in newly_updated_alerts
                 loc_alerts.append({
                     'name': at,
                     'status': '발효중',
