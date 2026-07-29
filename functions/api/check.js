@@ -1,25 +1,30 @@
 export async function onRequest(context) {
-  const { env } = context;
-  const githubRepo = 'jhjhc1483/weather';
-
   try {
-    const response = await fetch(`https://api.github.com/repos/${githubRepo}/actions/runs?per_page=1`, {
+    // CDN 캐시를 완벽히 우회하기 위해 타임스탬프와 강력한 헤더를 추가하여 현재 도메인의 데이터를 가져옵니다.
+    const url = new URL(context.request.url);
+    const dataUrl = `${url.origin}/data/weather.json?t=${Date.now()}`;
+    
+    const response = await fetch(dataUrl, {
       headers: {
-        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'Cloudflare-Pages'
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
     });
     
-    const data = await response.json();
-    const latestRun = data.workflow_runs?.[0];
+    if (!response.ok) {
+      throw new Error('데이터를 불러오지 못했습니다.');
+    }
     
-    return new Response(JSON.stringify({ 
-      status: latestRun ? latestRun.status : 'unknown',
-      conclusion: latestRun ? latestRun.conclusion : null
-    }), { 
+    const data = await response.json();
+    
+    // 프론트엔드(script.js)가 애타게 기다리고 있는 { "updated_at": "..." } 형식으로 반환합니다.
+    return new Response(JSON.stringify({ updated_at: data.updated_at }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store' // 이 API 응답 자체도 브라우저에 캐시되지 않도록 설정
+      }
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), { 
