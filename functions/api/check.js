@@ -1,29 +1,28 @@
 export async function onRequest(context) {
   try {
-    // CDN 캐시를 완벽히 우회하기 위해 타임스탬프와 강력한 헤더를 추가하여 현재 도메인의 데이터를 가져옵니다.
-    const url = new URL(context.request.url);
-    const dataUrl = `${url.origin}/data/weather.json?t=${Date.now()}`;
+    // 💡 핵심 해결책: Cloudflare 내부 주소를 참조하면 '과거 스냅샷'에 갇히게 되므로,
+    // GitHub Action이 데이터를 밀어넣는 GitHub 원본(Raw) 파일을 직접 확인하여 캐시를 100% 우회합니다.
+    const githubRawUrl = `https://raw.githubusercontent.com/jhjhc1483/weather/main/data/weather.json?t=${Date.now()}`;
     
-    const response = await fetch(dataUrl, {
+    const response = await fetch(githubRawUrl, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache'
       }
     });
     
     if (!response.ok) {
-      throw new Error('데이터를 불러오지 못했습니다.');
+      throw new Error('GitHub 원본 데이터를 불러오지 못했습니다.');
     }
     
     const data = await response.json();
     
-    // 프론트엔드(script.js)가 애타게 기다리고 있는 { "updated_at": "..." } 형식으로 반환합니다.
+    // 프론트엔드가 기다리고 있는 "updated_at" 시간만 추출해서 전달합니다.
     return new Response(JSON.stringify({ updated_at: data.updated_at }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-store' // 이 API 응답 자체도 브라우저에 캐시되지 않도록 설정
+        'Cache-Control': 'no-store'
       }
     });
   } catch (error) {
