@@ -43,6 +43,6 @@ jobs:
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
           NOTION_ALIASES: ${{ secrets.NOTION_ALIASES }}
-        run: python scripts/sync_notion.py
+        run: python scripts/sync_notion_table.py
