@@ -1,4 +1,4 @@
-name: Update Weather Data
+name: Update Weather Data_notion
 
 on:
   schedule:
