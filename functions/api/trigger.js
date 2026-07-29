@@ -1,4 +1,4 @@
-export async function onRequestPost(context) {
+export async function onRequestPost(context) { 
   const { env } = context;
   const githubRepo = 'jhjhc1483/weather';
   const workflowId = 'weather-update.yml'; // 기존에 작성하신 yml 파일명
