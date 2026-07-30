@@ -91,20 +91,22 @@
 /* ---- Reset & Base ---- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+html { font-size: 15px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font);
   background: var(--bg-body);
   color: var(--text-primary);
   min-height: 100vh;
-  padding: 1.5rem 1rem 2rem;
+  padding: 1.2rem 0.8rem 2rem;
   transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
 }
 
 /* ---- Container ---- */
 .container {
   max-width: 1440px;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -251,9 +253,8 @@ body {
 }
 
 .table-wrapper {
-  overflow-x: auto;
-  overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  overflow: visible;
 }
 
 /* ========================================================
@@ -261,9 +262,10 @@ body {
    ======================================================== */
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 1.02rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* ---- Header ---- */
@@ -275,9 +277,9 @@ thead {
 thead th {
   background: var(--gradient-header);
   color: var(--text-white);
-  padding: 1.05rem 0.8rem;
+  padding: 1.15rem 0.2rem;
   font-weight: 700;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   text-align: center;
   white-space: nowrap;
   border-bottom: 2px solid var(--border-header);
@@ -285,11 +287,13 @@ thead th {
 }
 
 thead .th-cat {
-  min-width: 145px;
+  width: 14%;
+  min-width: 80px;
   text-align: center;
 }
 thead .th-loc {
-  min-width: 110px;
+  width: 10.75%;
+  min-width: 55px;
   position: relative;
   z-index: 101;
 }
@@ -403,6 +407,50 @@ html:not([data-theme="light"]) .summary-tooltip-card::after {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ---- 위치별 스마트 툴팁 정렬 (좌/우 경계 잘림 방지) ---- */
+/* 1) 오른쪽 끝 2개 열 (예: 임실, 계룡): 우측 정렬 */
+thead th.th-loc:nth-last-child(1) .summary-tooltip-card,
+thead th.th-loc:nth-last-child(2) .summary-tooltip-card {
+  left: auto;
+  right: -6px;
+  transform: translateY(6px);
+}
+
+thead th.th-loc:nth-last-child(1) .th-loc-container:hover .summary-tooltip-card,
+thead th.th-loc:nth-last-child(1) .th-loc-container.active .summary-tooltip-card,
+thead th.th-loc:nth-last-child(2) .th-loc-container:hover .summary-tooltip-card,
+thead th.th-loc:nth-last-child(2) .th-loc-container.active .summary-tooltip-card {
+  transform: translateY(0);
+}
+
+thead th.th-loc:nth-last-child(1) .summary-tooltip-card::before,
+thead th.th-loc:nth-last-child(1) .summary-tooltip-card::after,
+thead th.th-loc:nth-last-child(2) .summary-tooltip-card::before,
+thead th.th-loc:nth-last-child(2) .summary-tooltip-card::after {
+  left: auto;
+  right: 18px;
+  transform: none;
+}
+
+/* 2) 왼쪽 첫 번째 열 (예: 양평): 좌측 정렬 */
+thead th.th-loc:nth-child(3) .summary-tooltip-card {
+  left: -6px;
+  right: auto;
+  transform: translateY(6px);
+}
+
+thead th.th-loc:nth-child(3) .th-loc-container:hover .summary-tooltip-card,
+thead th.th-loc:nth-child(3) .th-loc-container.active .summary-tooltip-card {
+  transform: translateY(0);
+}
+
+thead th.th-loc:nth-child(3) .summary-tooltip-card::before,
+thead th.th-loc:nth-child(3) .summary-tooltip-card::after {
+  left: 18px;
+  right: auto;
+  transform: none;
+}
+
 /* ---- 개황 날씨 이모지 스타일 ---- */
 .overview-cell {
   display: inline-flex;
@@ -428,11 +476,13 @@ html:not([data-theme="light"]) .summary-tooltip-card::after {
 
 /* ---- Body Cells ---- */
 tbody td, tbody th {
-  padding: 0.95rem 0.75rem;
+  padding: 1.05rem 0.2rem;
   text-align: center;
   vertical-align: middle;
   border-bottom: 1px solid var(--border);
   transition: background var(--transition);
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 tbody tr:hover td {
@@ -443,20 +493,22 @@ tbody tr:hover td {
 .cat-main {
   background: var(--bg-category) !important;
   font-weight: 600;
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
   white-space: nowrap;
   text-align: center;
-  min-width: 80px;
+  width: 8%;
+  min-width: 48px;
   border-right: 1px solid var(--border);
 }
 
 .cat-sub {
   background: var(--bg-category) !important;
   font-weight: 400;
-  font-size: 0.92rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  min-width: 58px;
+  width: 6%;
+  min-width: 36px;
   text-align: center;
   border-right: 1px solid var(--border);
 }
@@ -478,11 +530,12 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 /* 미세먼지 등급 뱃지 */
 .dust-badge {
   display: inline-block;
-  padding: 0.25rem 0.7rem;
-  border-radius: 14px;
-  font-size: 0.84rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 .dust-good     { background: rgba(34,197,94,0.15);  color: var(--grade-good); }
 .dust-normal   { background: rgba(59,130,246,0.15); color: var(--grade-normal); }
@@ -549,10 +602,10 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 .alert-tag {
   display: block;
   width: fit-content;
-  margin: 0.15rem auto;
-  padding: 0.15rem 0.5rem;
+  margin: 0.1rem auto;
+  padding: 0.12rem 0.35rem;
   border-radius: 6px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -770,30 +823,29 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
     gap: 0.5rem;
   }
 
-  /* 테이블 스마트폰 가시성 강화 */
+  /* 테이블 스마트폰 가시성 강화 및 스크롤 제거 최적화 */
   .table-card {
     border-radius: var(--radius-md);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
-  table { font-size: 0.88rem; }
+  table { font-size: 0.82rem; }
 
   thead th {
-    padding: 0.75rem 0.45rem;
-    font-size: 0.88rem;
+    padding: 0.9rem 0.15rem;
+    font-size: 0.85rem;
   }
 
   tbody td, tbody th {
-    padding: 0.7rem 0.45rem;
+    padding: 0.8rem 0.15rem;
   }
 
-  /* 모바일 스크롤 시 셀 겹침 방지를 위해 표준 테이블 스크롤 유지 */
   thead .th-cat {
-    min-width: 100px;
+    min-width: 60px;
   }
 
   thead .th-loc {
-    min-width: 85px;
+    min-width: 40px;
   }
 
   /* 터치 스크롤 바 미니멀화 */
