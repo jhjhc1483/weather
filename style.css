@@ -10,6 +10,8 @@
   --bg-cell-alt: rgba(30, 41, 59, 0.25);
   --bg-cell-hover: rgba(56, 189, 248, 0.08);
   --bg-category: rgba(30, 41, 59, 0.7);
+  /* 좌측 고정(sticky) 열 전용: 반투명이면 스크롤 내용이 비쳐 보이므로 불투명 색 */
+  --bg-category-solid: #182233;
 
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
@@ -57,6 +59,7 @@
   --bg-cell-alt: #f1f5f9;
   --bg-cell-hover: rgba(37, 99, 235, 0.06);
   --bg-category: #e2e8f0;
+  --bg-category-solid: #e2e8f0;
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
@@ -254,8 +257,18 @@ body {
 
 .table-wrapper {
   width: 100%;
-  overflow: visible;
+  /* 표가 화면보다 넓어지면 페이지가 아니라 표 자체가 가로 스크롤 */
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  border-radius: inherit;
 }
+
+/* ---- 열 너비 정의 (table-layout: fixed 기준) ---- */
+col.col-cat-main { width: 8%; }
+col.col-cat-sub  { width: 6%; }
+col.col-loc      { width: 10.75%; }
 
 /* ========================================================
    Table
@@ -823,13 +836,23 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
     gap: 0.5rem;
   }
 
-  /* 테이블 스마트폰 가시성 강화 및 스크롤 제거 최적화 */
+  /* 테이블 스마트폰 최적화: 억지로 우겨넣지 말고 가로 스크롤 */
   .table-card {
     border-radius: var(--radius-md);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
-  table { font-size: 0.82rem; }
+  table {
+    font-size: 0.82rem;
+    /* 화면 폭에 맞춰 찌그러뜨리지 않고 고정 폭 확보 → 표 내부 가로 스크롤 */
+    width: 700px;
+    min-width: 100%;
+  }
+
+  /* 52 + 40 + (76 × 8) = 700px */
+  col.col-cat-main { width: 52px; }
+  col.col-cat-sub  { width: 40px; }
+  col.col-loc      { width: 76px; }
 
   thead th {
     padding: 0.9rem 0.15rem;
@@ -841,11 +864,74 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   }
 
   thead .th-cat {
-    min-width: 60px;
+    width: 92px;   /* 52 + 40, colspan=2 */
+    min-width: 0;
   }
 
   thead .th-loc {
-    min-width: 40px;
+    width: 76px;
+    min-width: 0;
+  }
+
+  /* ---- 좌측 '구분' 열 고정: 가로 스크롤 중에도 행 이름이 보이도록 ---- */
+  thead .th-cat,
+  tbody .cat-main,
+  tbody .cat-sub {
+    position: sticky;
+    left: 0;
+    z-index: 30;
+  }
+
+  /* 스크롤되는 지역 헤더가 고정 열을 덮지 않도록 쌓임 순서 정리
+     (동시에 툴팁이 고정 열 위로 뜨도록 stacking context 제거) */
+  thead .th-loc { z-index: auto; }
+
+  /* 미세먼지 행은 cat-main(52px) + cat-sub 2열 구조 */
+  tbody .cat-sub {
+    left: 52px;
+    z-index: 29;
+  }
+
+  /* sticky 셀은 불투명해야 아래 내용이 비치지 않음 */
+  tbody .cat-main,
+  tbody .cat-sub {
+    background: var(--bg-category-solid) !important;
+  }
+
+  /* border-collapse 환경에서 sticky 셀 테두리가 사라지므로 그림자로 경계 표시 */
+  thead .th-cat,
+  tbody .cat-main[colspan="2"],
+  tbody .cat-sub {
+    box-shadow: 3px 0 6px rgba(0, 0, 0, 0.10);
+  }
+
+  /* 좁은 칸에서 값이 어색하게 줄바꿈되는 문제 방지 */
+  .overview-cell,
+  .temp-value,
+  .wind-dir,
+  .wind-speed,
+  .dust-badge {
+    white-space: nowrap;
+  }
+
+  .temp-value { font-size: 0.82rem; }
+  .dust-badge { font-size: 0.72rem; padding: 0.2rem 0.3rem; }
+
+  /* '현재체감 26.1℃' → 두 줄로 분리 */
+  .temp-feels { font-size: 0.7rem; line-height: 1.35; }
+  .temp-feels .feels-num { display: block; }
+
+  /* 툴팁이 스크롤 영역 밖으로 잘리지 않도록 폭 축소 */
+  .summary-tooltip-card { width: 180px; font-size: 0.8rem; }
+
+  /* 스크롤 가능하다는 힌트 */
+  .table-card::after {
+    content: '← 좌우로 밀어서 지역 확인 →';
+    display: block;
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    padding: 0.45rem 0 0.15rem;
   }
 
   /* 터치 스크롤 바 미니멀화 */
