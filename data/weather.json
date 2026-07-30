@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-30T21:53:54+09:00",
+  "updated_at": "2026-07-30T21:58:03+09:00",
   "base_date": "20260730",
   "date_display": "07.30",
   "day_of_week": "목",
-  "time_display": "21:53",
+  "time_display": "21:58",
   "locations": {
     "양평": {
       "overview": "맑음",
@@ -23,8 +23,8 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "0.1m/s"
+        "direction": "서풍",
+        "speed": "1.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -57,13 +57,13 @@
       },
       "temperature": {
         "current": "26.9",
-        "feels_like": "28.5",
+        "feels_like": "28.6",
         "min": "25.0",
         "max": "37.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "1.4m/s"
+        "direction": "서북서풍",
+        "speed": "0.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -95,13 +95,13 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "25.3",
-        "feels_like": "28.5",
+        "current": "25.2",
+        "feels_like": "28.4",
         "min": "23.0",
         "max": "37.0"
       },
       "wind": {
-        "direction": "남서풍",
+        "direction": "북풍",
         "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
@@ -134,14 +134,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "28.5",
-        "feels_like": "30.2",
+        "current": "27.9",
+        "feels_like": "29.8",
         "min": "24.0",
         "max": "39.0"
       },
       "wind": {
         "direction": "서남서풍",
-        "speed": "0.4m/s"
+        "speed": "0.6m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -174,7 +174,7 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "0.3m/s"
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -213,7 +213,7 @@
       },
       "wind": {
         "direction": "북서풍",
-        "speed": "2.0m/s"
+        "speed": "1.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -278,7 +278,7 @@
         "max": "32.0"
       },
       "wind": {
-        "direction": "북북동풍",
+        "direction": "북풍",
         "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
