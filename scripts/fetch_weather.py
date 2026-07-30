@@ -48,12 +48,12 @@ if not API_KEY:
 WRN_STN_NATIONWIDE = '108'
 
 LOCATIONS = {
-    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'province': '경기도',   'wrn_stn': '109'},    # 노도성당
+    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'sub_region': '서부', 'province': '경기도',   'wrn_stn': '109'},    # 노도성당 (양평 서부)
     '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143'},    # 제광파종기
     '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159'},    # 후전삼거리
     '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159'},    # 국군복지단 충무마트
     '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143'},    # 초전면
-    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'province': '세종',    'wrn_stn': '133'},    # 세종레스텔(연서면 봉암리)
+    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'sub_region': '북부', 'province': '세종',    'wrn_stn': '133'},    # 세종레스텔(연서면 봉암리 - 세종 북부)
     '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133'},    # 품안마을아파트(신도안면)
     '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북',     'wrn_stn': '146'},    # 충경신병교육대
 }
@@ -418,6 +418,7 @@ def fetch_alerts():
 
     def match_location_to_chunk(chunk, cfg):
         region_kw = cfg['alert_region']
+        sub_region = cfg.get('sub_region', None)
         province = cfg.get('province', '')
 
         m = re.match(r'^([^(]+)\((.*)\)$', chunk, re.DOTALL)
@@ -437,12 +438,26 @@ def fetch_alerts():
                 return False
 
             # '제외 목록'은 마지막 항목이 '제외'로 끝날 때만 성립.
-            # 하위 괄호를 이미 벗겼으므로 '완도군(여서도 제외)'에 오판하지 않는다.
             if items[-1].endswith('제외'):
                 items[-1] = items[-1][:-len('제외')].strip()
                 return not any(region_kw in x for x in items if x)
 
-            return any(region_kw in x for x in items)
+            # 세부 구역(sub_region: 서부/동부, 북부/남부) 지정이 있는 경우
+            matched_items = [x for x in items if region_kw in x]
+            if not matched_items:
+                return False
+
+            if sub_region:
+                # 1) 정확한 세부 구역 (예: '양평(서부)', '세종(북부)')이 포함된 경우 True
+                if any(f"{region_kw}({sub_region})" in x or f"{region_kw} {sub_region}" in x or sub_region in x for x in matched_items):
+                    return True
+                # 2) 괄호 세부구역이 전혀 없는 통틀어서의 구역 (예: '양평', '세종')인 경우 True
+                if any(x == region_kw for x in matched_items):
+                    return True
+                # 3) 다른 세부 구역 (예: '양평(동부)', '세종(남부)')만 있는 경우 False
+                return False
+
+            return True
 
         chunk_clean = strip_nested(chunk)
         return bool(region_kw in chunk_clean or
@@ -595,6 +610,35 @@ def fetch_alerts():
                         'is_new': (ln, matched_type) in newly_updated,
                     })
 
+        def deduplicate_alerts(loc_alerts):
+            hierarchies = [
+                ['폭염중대경보', '폭염경보', '폭염주의보'],
+                ['호우경보', '호우주의보'],
+                ['강풍경보', '강풍주의보'],
+                ['태풍경보', '태풍주의보'],
+                ['대설경보', '대설주의보'],
+                ['한파경보', '한파주의보'],
+                ['건조경보', '건조주의보'],
+                ['황사경보', '황사주의보'],
+            ]
+            filtered = []
+            names = [a['name'] for a in loc_alerts if isinstance(a, dict)]
+
+            for alert in loc_alerts:
+                aname = alert.get('name', '')
+                drop = False
+                for h in hierarchies:
+                    if aname in h:
+                        idx = h.index(aname)
+                        higher_exists = any(h[i] in names for i in range(idx))
+                        if higher_exists:
+                            drop = True
+                            break
+                if not drop:
+                    filtered.append(alert)
+
+            return filtered
+
         # 3) 발효중 + 예정 조합
         for loc_name in loc_names:
             loc_alerts = [{
@@ -610,6 +654,7 @@ def fetch_alerts():
                     seen.add(sa['name'])
                     loc_alerts.append(sa)
 
+            loc_alerts = deduplicate_alerts(loc_alerts)
             result[loc_name] = loc_alerts
             desc = ', '.join(
                 f"{a['name']}({a['status']}"
@@ -784,7 +829,7 @@ def process_location(name, cfg, now, today_str, alerts_data):
     cur_reh = ncst.get('REH', '-')
     feels_like = calculate_feels_like(cur_temp, cur_reh, w_spd_raw, now.month)
 
-    return {
+    loc_res = {
         'overview': overview,
         'dust': air,
         'temperature': {'current': cur_temp, 'feels_like': feels_like, 'min': min_temp, 'max': max_temp},
@@ -793,6 +838,73 @@ def process_location(name, cfg, now, today_str, alerts_data):
         'rain_forecast': rain_forecast,
         'alerts': alerts_data.get(name, []),
     }
+    loc_res['forecast_summary'] = generate_forecast_summary(name, loc_res)
+    return loc_res
+
+
+def generate_forecast_summary(loc_name, data):
+    """
+    각 지역의 날씨 수치 데이터(기온, 하늘상태, 강수예보, 미세먼지, 기상특보)를 분석하여
+    날씨 이모지가 포함된 한줄 기상예보 문장을 생성합니다.
+    """
+    alerts = data.get('alerts', [])
+    dust = data.get('dust', {})
+    temp = data.get('temperature', {})
+    rain_fcst = data.get('rain_forecast', [])
+    overview = data.get('overview', '-')
+    
+    # 1순위: 기상 특보 발효 중
+    if alerts:
+        alert_names = [a.get('name', '') for a in alerts if isinstance(a, dict) and a.get('name')]
+        if alert_names:
+            alert_str = ", ".join(alert_names[:2])
+            return f"⚠️ {alert_str} 발효 중! 안전에 유의하세요."
+
+    # 2순위: 강수 예보가 있는 경우
+    if rain_fcst:
+        total_rain = sum([item.get('amount', 0) for item in rain_fcst])
+        first_time = rain_fcst[0].get('time_range', '')
+        return f"☔ {first_time} 비 예보(예상 {round(total_rain, 1)}mm)! 우산을 챙기세요."
+
+    # 3순위: 미세먼지 / 초미세먼지 나쁨 이상
+    pm10_g = dust.get('pm10_grade', '-')
+    pm25_g = dust.get('pm25_grade', '-')
+    if pm10_g in ['나쁨', '매우나쁨'] or pm25_g in ['나쁨', '매우나쁨']:
+        bad_type = "미세먼지" if pm10_g in ['나쁨', '매우나쁨'] else "초미세먼지"
+        return f"😷 {bad_type} 농도가 높아요('{pm10_g if bad_type=='미세먼지' else pm25_g}'). 마스크 착용을 권장합니다."
+
+    # 4순위: 기온 조건 (체감온도 33도 이상 폭염, 0도 이하 한파, 일교차 10도 이상)
+    cur_t = temp.get('current')
+    max_t = temp.get('max')
+    min_t = temp.get('min')
+    
+    try:
+        cur_t_num = float(cur_t)
+        if cur_t_num >= 33:
+            return f"🌡️ 현재 기온 {cur_t_num}℃로 무더워요! 수분을 자주 섭취하세요."
+        elif cur_t_num <= 0:
+            return f"🧊 현재 기온 {cur_t_num}℃ 영하권 추위입니다. 따뜻하게 입으세요!"
+    except (ValueError, TypeError):
+        pass
+
+    try:
+        max_t_num = float(max_t)
+        min_t_num = float(min_t)
+        if max_t_num - min_t_num >= 10:
+            return f"🧥 일교차가 {round(max_t_num - min_t_num, 1)}℃로 크니 겉옷을 준비하세요."
+    except (ValueError, TypeError):
+        pass
+
+    # 5순위: 개황/하늘상태 기반 기본 예보
+    if '맑' in overview:
+        return f"☀️ 구름 없이 맑은 날씨입니다 (최고 {max_t}℃)."
+    elif '구름' in overview:
+        return f"⛅ 구름이 많은 날씨입니다 (현재 {cur_t}℃)."
+    elif '흐림' in overview or '흐리고' in overview:
+        return f"☁️ 대체로 흐린 날씨입니다 (현재 {cur_t}℃)."
+    else:
+        return f"🌤️ 현재 날씨는 {overview}입니다 ({cur_t}℃)."
+
 
 
 
@@ -825,6 +937,7 @@ def main():
                 'rain_accumulated': 0,
                 'rain_forecast': [],
                 'alerts': [],
+                'forecast_summary': f"🌤️ {name} 기상 정보 수집 중입니다.",
             }
 
     result = {

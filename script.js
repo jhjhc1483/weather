@@ -139,8 +139,21 @@
   };
 
   /* ======== 데이터 표출 렌더러 ======== */
+  function getWeatherEmoji(overview) {
+    if (!overview || overview === '-') return '';
+    if (overview.includes('맑')) return '☀️';
+    if (overview.includes('구름')) return '⛅';
+    if (overview.includes('비') || overview.includes('소나기')) return '☔';
+    if (overview.includes('눈')) return '❄️';
+    if (overview.includes('흐림') || overview.includes('흐리고')) return '☁️';
+    return '🌤️';
+  }
+
   function renderOverview(loc) {
-    return `<span class="overview-text">${escHtml(loc.overview)}</span>`;
+    const text = loc.overview || '-';
+    if (text === '-') return '-';
+    const emoji = getWeatherEmoji(text);
+    return `<span class="overview-cell"><span class="weather-icon-emoji">${emoji}</span> <span class="overview-text">${escHtml(text)}</span></span>`;
   }
 
   function renderDustPM10(loc) {
@@ -335,6 +348,7 @@
 
         updateMeta(data);
         renderTable(data);
+        updateHeaderTooltips(data);
 
         if (onSuccess) onSuccess(data);
         return data;
@@ -347,6 +361,59 @@
         return null;
       });
   }
+
+  /* ======== 헤더 툴팁 렌더링 (방안 C 한줄 기상예보) ======== */
+  function updateHeaderTooltips(data) {
+    const locs = data.locations;
+    const order = data.location_order || LOCATION_ORDER;
+    const $thList = document.querySelectorAll('#weather-table thead .th-loc');
+
+    $thList.forEach(function ($th, index) {
+      const locName = order[index];
+      if (!locName || !locs[locName]) return;
+
+      const loc = locs[locName];
+      const summary = loc.forecast_summary || `${locName} 기상 정보입니다.`;
+
+      $th.innerHTML = `
+        <div class="th-loc-container">
+          <span>${escHtml(locName)}</span>
+          <button class="summary-tooltip-btn" aria-label="${escHtml(locName)} 한줄 예보 보기" title="한줄 기상예보 보기">💬</button>
+          <div class="summary-tooltip-card">
+            ${escHtml(summary)}
+          </div>
+        </div>
+      `;
+    });
+
+    // 터치 / 클릭 이벤트 등록 (모바일 및 클릭 대응)
+    document.querySelectorAll('.th-loc-container').forEach(function (container) {
+      const btn = container.querySelector('.summary-tooltip-btn');
+      if (!btn) return;
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isActive = container.classList.contains('active');
+
+        // 다른 툴팁 닫기
+        document.querySelectorAll('.th-loc-container').forEach(function (c) {
+          c.classList.remove('active');
+        });
+
+        if (!isActive) {
+          container.classList.add('active');
+        }
+      });
+    });
+  }
+
+  // 바깥 영역 클릭 시 열려있는 툴팁 닫기
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.th-loc-container').forEach(function (c) {
+      c.classList.remove('active');
+    });
+  });
+
 
   /* ======== 토스트 알림 ======== */
   let toastTimer = null;

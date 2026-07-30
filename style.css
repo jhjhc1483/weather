@@ -246,12 +246,13 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow: visible;
   transition: background var(--transition), border-color var(--transition);
 }
 
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -266,6 +267,11 @@ table {
 }
 
 /* ---- Header ---- */
+thead {
+  position: relative;
+  z-index: 100;
+}
+
 thead th {
   background: var(--gradient-header);
   color: var(--text-white);
@@ -275,6 +281,7 @@ thead th {
   text-align: center;
   white-space: nowrap;
   border-bottom: 2px solid var(--border-header);
+  position: relative;
 }
 
 thead .th-cat {
@@ -283,7 +290,130 @@ thead .th-cat {
 }
 thead .th-loc {
   min-width: 110px;
+  position: relative;
+  z-index: 101;
 }
+
+/* ========================================================
+   Tooltip (한줄 기상예보 방안 C)
+   ======================================================== */
+.th-loc-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.summary-tooltip-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.summary-tooltip-btn:hover,
+.summary-tooltip-btn:focus,
+.th-loc-container.active .summary-tooltip-btn {
+  background: #ffffff;
+  color: #2563eb;
+  transform: scale(1.18);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+/* 툴팁 카드를 헤더 아래쪽(top)으로 안전하게 표출 */
+.summary-tooltip-card {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: 220px;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35), 0 6px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  word-break: keep-all;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* 툴팁 화살표 (위 방향) */
+.summary-tooltip-card::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent var(--border) transparent;
+}
+
+.summary-tooltip-card::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent var(--bg-card) transparent;
+}
+
+/* 호버 또는 active 시 표시 */
+.th-loc-container:hover .summary-tooltip-card,
+.th-loc-container.active .summary-tooltip-card {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- 개황 날씨 이모지 스타일 ---- */
+.overview-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.weather-icon-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+
+.overview-cell:hover .weather-icon-emoji {
+  transform: scale(1.2);
+}
+
+
 
 /* ---- Body Cells ---- */
 tbody td, tbody th {
