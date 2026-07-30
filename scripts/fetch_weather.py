@@ -40,16 +40,22 @@ if not API_KEY:
 # nx, ny: 기상청 격자좌표
 # station: 에어코리아 실제 측정소명 (검증 완료)
 # alert_region: 기상특보 검색 키워드
+# wrn_stn: 특보 통보문을 발표하는 관할 관서 지점번호
+#          전국(108) 통보문은 발효 목록이 매우 길어 뒷부분(전북·경북·제주 등)이
+#          줄바꿈·절단으로 유실되기 쉽다. 관할 지방청 통보문은 해당 관할만
+#          나열하므로 짧고 안전하다. 실패 시 108로 폴백한다.
 # ============================================================
+WRN_STN_NATIONWIDE = '108'
+
 LOCATIONS = {
-    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'province': '경기도'},    # 노도성당
-    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도'},    # 제광파종기
-    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도'},    # 후전삼거리
-    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도'},    # 국군복지단 충무마트
-    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도'},    # 초전면
-    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'province': '세종'},      # 세종레스텔(연서면 봉암리)
-    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도'},    # 품안마을아파트(신도안면)
-    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북'},      # 충경신병교육대
+    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'province': '경기도',   'wrn_stn': '109'},    # 노도성당
+    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143'},    # 제광파종기
+    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159'},    # 후전삼거리
+    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159'},    # 국군복지단 충무마트
+    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143'},    # 초전면
+    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'province': '세종',    'wrn_stn': '133'},    # 세종레스텔(연서면 봉암리)
+    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133'},    # 품안마을아파트(신도안면)
+    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북',     'wrn_stn': '146'},    # 충경신병교육대
 }
 
 LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실']
@@ -362,29 +368,18 @@ def fetch_air(station, fallback_station=None):
 
 
 def fetch_alerts():
-    """기상특보 (발효 중 + 예정 특보 포함, 발효시각 첨부)"""
+    """기상특보 (발효 중 + 예정 특보 포함, 발효시각 첨부)
+
+    지역별 관할 관서(wrn_stn) 통보문을 각각 조회한다.
+    전국(108) 통보문은 발효 목록이 길어 뒷부분이 유실되기 쉬우므로,
+    관할 지방청 통보문을 우선 사용하고 실패 시 108로 폴백한다.
+    진단 내용은 stdout에 남으므로 GitHub Actions 로그에서 확인할 수 있다.
+    """
     import re
 
     now = datetime.now(KST)
     today_str = now.strftime('%Y%m%d')
-    yesterday_str = (now - timedelta(days=2)).strftime('%Y%m%d')
-
-    data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
-        'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108',
-        'fromTmFc': yesterday_str, 'toTmFc': today_str,
-    })
-    if not data:
-        return {}
-
-    try:
-        items = data['response']['body']['items']['item']
-        if isinstance(items, dict):
-            items = [items]
-        if not items:
-            return {}
-        item_data = items[0]
-    except (KeyError, TypeError):
-        return {}
+    from_str = (now - timedelta(days=2)).strftime('%Y%m%d')
 
     alert_types = [
         '폭염중대경보', '폭염경보', '폭염주의보', '호우경보', '호우주의보',
@@ -393,21 +388,21 @@ def fetch_alerts():
         '황사경보', '황사주의보',
     ]
 
-    now = datetime.now(KST)
-
-    # ── 헬퍼: 특보 지역 텍스트 파싱 ──
+    # ── 헬퍼: 지역 텍스트 파싱 ──────────────────────────────
     def parse_region_chunks(text):
+        """최상위 쉼표로만 분할. 괄호는 depth로 추적 → 중첩 괄호 안전.
+        '전라남도(완도군(여서도 제외))' 같은 표기에서 청크가 쪼개지지 않는다."""
         chunks = []
         current = ""
-        in_paren = False
+        depth = 0
         for char in text:
             if char == '(':
-                in_paren = True
+                depth += 1
                 current += char
             elif char == ')':
-                in_paren = False
+                depth = max(0, depth - 1)
                 current += char
-            elif char == ',' and not in_paren:
+            elif char == ',' and depth == 0:
                 if current.strip():
                     chunks.append(current.strip())
                 current = ""
@@ -417,215 +412,212 @@ def fetch_alerts():
             chunks.append(current.strip())
         return chunks
 
-    def match_location_to_chunk(chunk, loc_name, cfg):
+    def strip_nested(item):
+        """하위 구역의 자체 괄호 제거. '완도군(여서도 제외)' → '완도군'"""
+        return re.sub(r'\([^()]*\)', '', item).strip()
+
+    def match_location_to_chunk(chunk, cfg):
         region_kw = cfg['alert_region']
         province = cfg.get('province', '')
 
-        # 1. 괄호가 포함된 경우 (예: "충청남도(아산, 부여, 청양 제외)" 또는 "전북자치도(고창, 김제, 임실)")
-        m = re.match(r'^([^(]+)\(([^)]+)\)$', chunk)
+        m = re.match(r'^([^(]+)\((.*)\)$', chunk, re.DOTALL)
         if m:
             prov_part = m.group(1).strip()
             inside_part = m.group(2).strip()
 
-            prov_match = (prov_part in province or province in prov_part or 
-                          (province == '전북' and ('전북' in prov_part or '전라북도' in prov_part)))
-
+            prov_match = (prov_part in province or province in prov_part or
+                          (province == '전북' and
+                           ('전북' in prov_part or '전라북도' in prov_part)))
             if not prov_match:
                 return False
 
-            if '제외' in inside_part:
-                ex_index = inside_part.find('제외')
-                excluded_text = inside_part[:ex_index]
-                if region_kw in excluded_text:
-                    return False  # 제외 목록에 명시됨 -> 매칭 안 됨!
-                else:
-                    return True   # 도 전체 대상이며 제외 목록에 안 들었으므로 매칭됨!
-            else:
-                if region_kw in inside_part:
-                    return True
-                else:
-                    return False
+            items = [strip_nested(x) for x in parse_region_chunks(inside_part)]
+            items = [x for x in items if x]
+            if not items:
+                return False
 
-        # 2. 괄호가 없는 경우 (예: "세종", "대전", "인천")
-        chunk_clean = chunk.strip()
-        if region_kw in chunk_clean or (province and (chunk_clean == province or province == chunk_clean)):
-            return True
+            # '제외 목록'은 마지막 항목이 '제외'로 끝날 때만 성립.
+            # 하위 괄호를 이미 벗겼으므로 '완도군(여서도 제외)'에 오판하지 않는다.
+            if items[-1].endswith('제외'):
+                items[-1] = items[-1][:-len('제외')].strip()
+                return not any(region_kw in x for x in items if x)
 
-        return False
+            return any(region_kw in x for x in items)
 
-    # ── 1. t6: 현재 발효 중인 특보 파싱 ──
-    t6_text = (item_data.get('t6', '') or '').replace('\r', '')
-    t6_lines = [ln.strip() for ln in t6_text.split('\n') if ln.strip()]
+        chunk_clean = strip_nested(chunk)
+        return bool(region_kw in chunk_clean or
+                    (province and chunk_clean == province))
 
-    # {지역명: set(특보종류)} — 발효 중
-    active_alerts = {}
-    for loc_name in LOCATIONS:
-        active_alerts[loc_name] = set()
+    def merge_o_blocks(text):
+        """'o '로 시작하는 줄을 헤더로 보고 다음 헤더까지 병합.
+        지역 목록이 길어 줄바꿈되면 이어지는 줄은 'o '로 시작하지 않으므로,
+        줄 단위로만 보면 목록 뒷부분이 통째로 버려진다."""
+        blocks = []
+        for line in [ln.strip() for ln in text.split('\n') if ln.strip()]:
+            if line.startswith('o '):
+                blocks.append(line)
+            elif blocks:
+                sep = '' if blocks[-1].rstrip().endswith(',') else ' '
+                blocks[-1] = blocks[-1].rstrip() + sep + line
+        return blocks
 
-    for line in t6_lines:
-        if not line.startswith('o '):
-            continue
-        matched_type = None
+    def find_type(text, prefix=None):
+        """특보 종류 판별. prefix가 있으면 '접두어+종류'로 시작하는지, 없으면 포함 여부.
+        alert_types 순서상 '폭염중대경보'가 '폭염경보'보다 앞이어야 한다."""
         for at in alert_types:
-            if line.startswith(f'o {at}'):
-                matched_type = at
-                break
-        if not matched_type:
-            continue
+            if prefix is not None:
+                if text.startswith(f'{prefix}{at}'):
+                    return at
+            elif at in text:
+                return at
+        return None
 
-        colon_idx = line.find(':')
-        region_text = line[colon_idx + 1:] if colon_idx >= 0 else line
-        chunks = parse_region_chunks(region_text)
-
-        for loc_name, cfg in LOCATIONS.items():
-            for chunk in chunks:
-                if match_location_to_chunk(chunk, loc_name, cfg):
-                    active_alerts[loc_name].add(matched_type)
-                    break
-
-    # ── 2. t2+t3: 예정 특보 및 오늘/최근 24시간 이내 발표/변경 특보 (is_new) 파싱 ──
-    # t2 형식: "(1) 열대야주의보 발표 : 경기도(안산, ...)\n(2) 폭염주의보 발표 : ..."
-    # t3 형식: "(1) 열대야주의보 발표 : 2026년 07월 28일 18시 00분\n(2) 폭염주의보 발표 : ..."
-    t2_text = (item_data.get('t2', '') or '').replace('\r', '')
-    t3_text = (item_data.get('t3', '') or '').replace('\r', '')
-
-    # 새로 발표/변경/강화된 특보 트래킹: {(loc_name, alert_type): True}
-    newly_updated_alerts = set()
-
-    # 번호별로 파싱: { "(1)": { action_text, regions_text } }
-    t2_entries = {}
-    for line in t2_text.split('\n'):
-        line = line.strip()
-        m = re.match(r'\((\d+)\)\s*(.+)', line)
-        if m:
-            idx_key = m.group(1)
-            rest = m.group(2).strip()
-            t2_entries[idx_key] = rest
-
-    t3_entries = {}
-    for line in t3_text.split('\n'):
-        line = line.strip()
-        m = re.match(r'\((\d+)\)\s*(.+)', line)
-        if m:
-            idx_key = m.group(1)
-            rest = m.group(2).strip()
-            t3_entries[idx_key] = rest
-
-    # 발효시각 파싱 헬퍼: "폭염주의보 발표 : 2026년 07월 28일 18시 00분" → datetime
     def parse_effective_time(t3_val):
-        """t3 값에서 발효시각 추출"""
-        m = re.search(r'(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{1,2})시\s*(\d{2})분', t3_val)
+        m = re.search(
+            r'(\d{4})년\s*(\d{2})월\s*(\d{2})일\s*(\d{1,2})시\s*(\d{2})분', t3_val)
         if m:
             try:
-                return datetime(
-                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                    int(m.group(4)), int(m.group(5)),
-                    tzinfo=KST
-                )
+                return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                                int(m.group(4)), int(m.group(5)), tzinfo=KST)
             except (ValueError, TypeError):
                 pass
         return None
 
-    def format_effective_time(dt_obj):
-        """datetime → 표시용 문자열 (MM.DD HH:MM)"""
-        if not dt_obj:
-            return ''
-        return dt_obj.strftime('%m.%d %H:%M')
+    # ── 관서별 통보문 1건(최신 tmFc) 조회 ───────────────────
+    item_cache = {}
 
-    # 통보문 발표시각(tmFc) 추출 (YYYYMMDDhhmm)
-    tm_fc_str = str(item_data.get('tmFc', ''))
-    is_today_report = tm_fc_str.startswith(today_str)
+    def get_item(stn_id):
+        """해당 관서의 최신 통보문. 응답 정렬을 신뢰하지 않고 tmFc 최대값을 고른다."""
+        if stn_id in item_cache:
+            return item_cache[stn_id]
 
-    # t2_entries에서 발표/변경 건 분석
-    for idx_key, t2_val in t2_entries.items():
-        matched_type = None
-        for at in alert_types:
-            if at in t2_val:
-                matched_type = at
-                break
-        if not matched_type:
-            continue
+        item = None
+        data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
+            'pageNo': '1', 'numOfRows': '50', 'dataType': 'JSON',
+            'stnId': stn_id, 'fromTmFc': from_str, 'toTmFc': today_str,
+        })
+        try:
+            items = data['response']['body']['items']['item']
+            if isinstance(items, dict):
+                items = [items]
+            if items:
+                item = max(items, key=lambda it: str(it.get('tmFc', '')))
+                first = str(items[0].get('tmFc', ''))
+                chosen = str(item.get('tmFc', ''))
+                print(f"  [특보] stnId={stn_id} 수신 {len(items)}건, "
+                      f"채택 tmFc={chosen} "
+                      f"title={str(item.get('title', ''))[:40]}"
+                      + (f"  (items[0]={first} — 응답 순서가 최신이 아님)"
+                         if first != chosen else ""))
+        except (KeyError, TypeError, ValueError):
+            item = None
 
-        colon_idx = t2_val.find(':')
-        region_text = t2_val[colon_idx + 1:] if colon_idx >= 0 else t2_val
-        chunks = parse_region_chunks(region_text)
+        if item is None:
+            print(f"  [특보] stnId={stn_id} 조회 실패")
+        item_cache[stn_id] = item
+        return item
 
-        if '발표' in t2_val or '변경' in t2_val:
-            for loc_name, cfg in LOCATIONS.items():
-                for chunk in chunks:
-                    if match_location_to_chunk(chunk, loc_name, cfg):
-                        newly_updated_alerts.add((loc_name, matched_type))
-                        break
-
-    # {지역명: [{name, status, effective_time, is_new}]} — 예정 특보
-    scheduled_alerts = {}
-    for loc_name in LOCATIONS:
-        scheduled_alerts[loc_name] = []
-
-    for idx_key, t2_val in t2_entries.items():
-        if '발표' not in t2_val:
-            continue
-
-        matched_type = None
-        for at in alert_types:
-            if at in t2_val:
-                matched_type = at
-                break
-        if not matched_type:
-            continue
-
-        t3_val = t3_entries.get(idx_key, '')
-        eff_dt = parse_effective_time(t3_val)
-
-        if not eff_dt or eff_dt <= now:
-            continue
-
-        colon_idx = t2_val.find(':')
-        region_text = t2_val[colon_idx + 1:] if colon_idx >= 0 else t2_val
-        chunks = parse_region_chunks(region_text)
-
-        eff_str = format_effective_time(eff_dt)
-
-        for loc_name, cfg in LOCATIONS.items():
-            for chunk in chunks:
-                if match_location_to_chunk(chunk, loc_name, cfg):
-                    if matched_type not in active_alerts[loc_name]:
-                        is_new = (loc_name, matched_type) in newly_updated_alerts
-                        scheduled_alerts[loc_name].append({
-                            'name': matched_type,
-                            'status': '예정',
-                            'effective_time': eff_str,
-                            'is_new': is_new,
-                        })
-                    break
-
-    # ── 3. 결과 조합: 발효중 + 예정 ──
+    # ── 지역을 관할 관서별로 묶어 처리 ──────────────────────
     result = {}
-    for loc_name in LOCATIONS:
-        loc_alerts = []
+    stn_groups = {}
+    for loc_name, cfg in LOCATIONS.items():
+        stn_groups.setdefault(cfg.get('wrn_stn', WRN_STN_NATIONWIDE),
+                              []).append(loc_name)
 
-        for at in alert_types:
-            if at in active_alerts[loc_name]:
-                is_new = (loc_name, at) in newly_updated_alerts
-                loc_alerts.append({
-                    'name': at,
-                    'status': '발효중',
-                    'effective_time': '',
-                    'is_new': is_new,
-                })
+    print("[특보] 관할 관서별 통보문 조회")
 
-        seen_scheduled = set()
-        for sa in scheduled_alerts[loc_name]:
-            key = sa['name']
-            if key not in seen_scheduled:
-                seen_scheduled.add(key)
-                loc_alerts.append(sa)
+    for stn_id, loc_names in stn_groups.items():
+        item = get_item(stn_id)
+        source = stn_id
+        if item is None and stn_id != WRN_STN_NATIONWIDE:
+            print(f"  [특보] stnId={stn_id} → 전국({WRN_STN_NATIONWIDE}) 폴백")
+            item = get_item(WRN_STN_NATIONWIDE)
+            source = WRN_STN_NATIONWIDE
+        if item is None:
+            for loc_name in loc_names:
+                result[loc_name] = []
+            continue
 
-        result[loc_name] = loc_alerts
+        # 1) t6 → 현재 발효 중
+        active = {ln: set() for ln in loc_names}
+        for block in merge_o_blocks((item.get('t6', '') or '').replace('\r', '')):
+            matched_type = find_type(block, prefix='o ')
+            if not matched_type:
+                continue
+            colon = block.find(':')
+            chunks = parse_region_chunks(
+                block[colon + 1:] if colon >= 0 else block)
+            for loc_name in loc_names:
+                cfg = LOCATIONS[loc_name]
+                if any(match_location_to_chunk(c, cfg) for c in chunks):
+                    active[loc_name].add(matched_type)
+
+        # 2) t2 + t3 → 발표/변경(is_new) 및 발효 예정
+        t2_entries, t3_entries = {}, {}
+        for field, store in (('t2', t2_entries), ('t3', t3_entries)):
+            for line in (item.get(field, '') or '').replace('\r', '').split('\n'):
+                m = re.match(r'\((\d+)\)\s*(.+)', line.strip())
+                if m:
+                    store[m.group(1)] = m.group(2).strip()
+
+        newly_updated = set()
+        scheduled = {ln: [] for ln in loc_names}
+
+        for idx_key, t2_val in t2_entries.items():
+            matched_type = find_type(t2_val)
+            if not matched_type:
+                continue
+            colon = t2_val.find(':')
+            chunks = parse_region_chunks(
+                t2_val[colon + 1:] if colon >= 0 else t2_val)
+            hits = [ln for ln in loc_names
+                    if any(match_location_to_chunk(c, LOCATIONS[ln])
+                           for c in chunks)]
+            if not hits:
+                continue
+
+            if '발표' in t2_val or '변경' in t2_val:
+                for ln in hits:
+                    newly_updated.add((ln, matched_type))
+
+            if '발표' not in t2_val:
+                continue
+            eff_dt = parse_effective_time(t3_entries.get(idx_key, ''))
+            if not eff_dt or eff_dt <= now:
+                continue
+            eff_str = eff_dt.strftime('%m.%d %H:%M')
+            for ln in hits:
+                if matched_type not in active[ln]:
+                    scheduled[ln].append({
+                        'name': matched_type,
+                        'status': '예정',
+                        'effective_time': eff_str,
+                        'is_new': (ln, matched_type) in newly_updated,
+                    })
+
+        # 3) 발효중 + 예정 조합
+        for loc_name in loc_names:
+            loc_alerts = [{
+                'name': at,
+                'status': '발효중',
+                'effective_time': '',
+                'is_new': (loc_name, at) in newly_updated,
+            } for at in alert_types if at in active[loc_name]]
+
+            seen = set()
+            for sa in scheduled[loc_name]:
+                if sa['name'] not in seen:
+                    seen.add(sa['name'])
+                    loc_alerts.append(sa)
+
+            result[loc_name] = loc_alerts
+            desc = ', '.join(
+                f"{a['name']}({a['status']}"
+                + (f" {a['effective_time']}" if a['effective_time'] else '')
+                + ')' for a in loc_alerts) or '없음'
+            print(f"  [특보] {loc_name} (stnId={source}): {desc}")
 
     return result
-
-
 # ============================================================
 # 지역별 데이터 처리 및 정밀 융합
 # ============================================================
