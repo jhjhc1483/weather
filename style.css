@@ -339,14 +339,14 @@ thead .th-loc {
   left: 50%;
   transform: translateX(-50%) translateY(6px);
   width: 220px;
-  background: var(--bg-card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35), 0 6px 12px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25), 0 6px 12px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 0.85rem 0.95rem;
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.5;
   text-align: left;
   white-space: normal;
@@ -360,7 +360,14 @@ thead .th-loc {
   -webkit-backdrop-filter: blur(24px);
 }
 
-/* 툴팁 화살표 (위 방향) */
+/* 다크 모드 툴팁 글자 대비 */
+html:not([data-theme="light"]) .summary-tooltip-card {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 툴팁 화살표 (위 방향) - 라이트모드 */
 .summary-tooltip-card::before {
   content: '';
   position: absolute;
@@ -369,7 +376,7 @@ thead .th-loc {
   transform: translateX(-50%);
   border-width: 7px;
   border-style: solid;
-  border-color: transparent transparent var(--border) transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.15) transparent;
 }
 
 .summary-tooltip-card::after {
@@ -380,7 +387,11 @@ thead .th-loc {
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent transparent var(--bg-card) transparent;
+  border-color: transparent transparent #ffffff transparent;
+}
+
+html:not([data-theme="light"]) .summary-tooltip-card::after {
+  border-color: transparent transparent #1e293b transparent;
 }
 
 /* 호버 또는 active 시 표시 */
