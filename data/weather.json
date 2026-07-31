@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-01T02:53:29+09:00",
+  "updated_at": "2026-08-01T03:01:20+09:00",
   "base_date": "20260801",
   "date_display": "08.01",
   "day_of_week": "토",
-  "time_display": "02:53",
+  "time_display": "03:01",
   "locations": {
     "양평": {
       "overview": "구름많음",
@@ -56,9 +56,9 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "26.8",
-        "feels_like": "28.8",
-        "min": "26.8",
+        "current": "26.7",
+        "feels_like": "28.7",
+        "min": "26.7",
         "max": "38.0"
       },
       "wind": {
@@ -140,8 +140,8 @@
         "max": "39.0"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "0.7m/s"
+        "direction": "동남동풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -173,14 +173,14 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "24.7",
-        "feels_like": "27.7",
+        "current": "24.6",
+        "feels_like": "27.6",
         "min": "24.0",
         "max": "38.0"
       },
       "wind": {
-        "direction": "북북동풍",
-        "speed": "0.4m/s"
+        "direction": "북풍",
+        "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -201,7 +201,7 @@
       "forecast_summary": "⚠️ 폭염경보, 열대야주의보 발효 중! 안전에 유의하세요."
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
         "pm10": "24",
         "pm10_grade": "좋음",
@@ -212,14 +212,14 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "25.7",
-        "feels_like": "28.9",
-        "min": "25.7",
+        "current": "25.6",
+        "feels_like": "28.8",
+        "min": "25.6",
         "max": "35.0"
       },
       "wind": {
-        "direction": "북북서풍",
-        "speed": "1.3m/s"
+        "direction": "북서풍",
+        "speed": "1.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -251,8 +251,8 @@
         "max": "34.0"
       },
       "wind": {
-        "direction": "남남서풍",
-        "speed": "1.3m/s"
+        "direction": "남서풍",
+        "speed": "1.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -279,13 +279,13 @@
       },
       "temperature": {
         "current": "23.1",
-        "feels_like": "26.2",
+        "feels_like": "26.1",
         "min": "22.0",
         "max": "33.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "0.1m/s"
+        "direction": "북풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
