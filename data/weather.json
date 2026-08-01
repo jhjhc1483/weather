@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-08-02T06:13:41+09:00",
+  "updated_at": "2026-08-02T06:23:32+09:00",
   "base_date": "20260802",
   "date_display": "08.02",
   "day_of_week": "일",
-  "time_display": "06:13",
+  "time_display": "06:23",
   "locations": {
     "양평": {
       "overview": "맑음",
       "dust": {
-        "pm10": "32",
+        "pm10": "31",
         "pm10_grade": "좋음",
-        "pm25": "19",
+        "pm25": "17",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
