@@ -42,11 +42,12 @@ class handler(BaseHTTPRequestHandler):
             except Exception:
                 pass
 
-        # 디바운스 (15초 내 연타 방지)
-        if now - LAST_TRIGGER_TIME < 15:
+        # 2. 디바운스 (3분/180초 내 중복 트리거 방지)
+        if now - LAST_TRIGGER_TIME < 180:
+            remaining_sec = max(1, int(180 - (now - LAST_TRIGGER_TIME)))
             self._respond(
                 429,
-                {'error': '너무 잦은 갱신 요청입니다. 잠시 후 다시 시도해 주세요.'}
+                {'error': f'이미 갱신 작업이 진행 중입니다. (약 2~3분 소요, {remaining_sec}초 후 다시 시도해 주세요.)'}
             )
             return
         LAST_TRIGGER_TIME = now

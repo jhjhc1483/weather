@@ -556,6 +556,7 @@
     isPolling = false;
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
+    localStorage.removeItem('weather_refresh_started_at');
     updateButtonState();
 
     if (isSuccess) {
@@ -587,17 +588,20 @@
       .then(function (res) { return res.json(); })
       .then(function (data) {
         if (data.message || data.success === true || data.status === 'ok') {
+          localStorage.setItem('weather_refresh_started_at', String(Date.now()));
           showToast('⌛ 갱신 요청 완료! 기상청 데이터 수집 중... (약 2~3분 소요)', 'info', 6000);
           startPolling();
         } else {
           showToast('⚠️ ' + (data.error || '알 수 없는 오류'), 'error');
           isPolling = false;
+          localStorage.removeItem('weather_refresh_started_at');
           updateButtonState();
         }
       })
       .catch(function () {
         showToast('⚠️ 갱신 요청 실패', 'error');
         isPolling = false;
+        localStorage.removeItem('weather_refresh_started_at');
         updateButtonState();
       });
   }
@@ -726,7 +730,19 @@
   /* ======== 초기화 ======== */
   initTheme();
   $btn.addEventListener('click', handleRefresh);
-  loadData();
+  loadData(function () {
+    // 새로고침(F5) 시 3분 이내 요청 이력이 있다면 갱신 중 상태 및 폴링 감지 자동 복원
+    const savedRefreshTime = localStorage.getItem('weather_refresh_started_at');
+    if (savedRefreshTime) {
+      const elapsed = Date.now() - Number(savedRefreshTime);
+      if (elapsed < 3 * 60 * 1000) {
+        startPolling();
+      } else {
+        localStorage.removeItem('weather_refresh_started_at');
+      }
+    }
+  });
+
   setInterval(function () {
     if (!isPolling) loadData();
   }, AUTO_RELOAD_MS);
