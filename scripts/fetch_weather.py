@@ -69,34 +69,34 @@ BASE_ALERT = "http://apis.data.go.kr/1360000/WthrWrnInfoService"
 # ============================================================
 # API 호출 헬퍼
 # ============================================================
-def api_call(url, params, retries=2):
+def api_call(url, params, retries=3):
     encoded_key = quote(API_KEY, safe='')
     full_url = f"{url}?serviceKey={encoded_key}"
 
     for attempt in range(retries):
         try:
-            resp = requests.get(full_url, params=params, timeout=4)
+            resp = requests.get(full_url, params=params, timeout=10)
             resp.raise_for_status()
 
             try:
                 data = resp.json()
             except json.JSONDecodeError:
                 if attempt < retries - 1:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
                 return None
 
             rc = data.get('response', {}).get('header', {}).get('resultCode', '')
             if rc != '00':
                 if attempt < retries - 1:
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
                 return None
 
             return data
         except requests.RequestException:
             if attempt < retries - 1:
-                time.sleep(0.5)
+                time.sleep(1.5)
     return None
 
 
