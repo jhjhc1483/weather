@@ -20,6 +20,11 @@
       <div class="meta-row">
         <span class="badge time-badge" id="time-display">--:-- 기준</span>
         
+        <!-- API 상태 경고 배지 (초기 숨김) -->
+        <span class="badge api-status-badge" id="api-status-badge" style="display: none;" title="공공데이터 API 상태 클릭하여 상세 보기">
+          ⚠️ 기상청 API 점검 중
+        </span>
+        
         <!-- 갱신 버튼 -->
         <button class="refresh-btn" id="refresh-btn" title="지금 데이터 갱신 요청">
           <svg class="refresh-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

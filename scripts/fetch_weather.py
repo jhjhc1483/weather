@@ -67,36 +67,63 @@ BASE_ALERT = "http://apis.data.go.kr/1360000/WthrWrnInfoService"
 
 
 # ============================================================
-# API 호출 헬퍼
+# API 호출 헬퍼 & 장애 감지 (Fast-Fail 서킷 브레이커 적용)
 # ============================================================
-def api_call(url, params, retries=3):
+FAILED_SERVICES = set()
+CONSECUTIVE_FAILURES = 0
+IS_CIRCUIT_BROKEN = False
+MAX_ALLOWED_FAILURES = 5
+
+def api_call(url, params, retries=2, service_name=None):
+    global CONSECUTIVE_FAILURES, IS_CIRCUIT_BROKEN
+
+    # 1. 서킷 브레이커 발동 중이면 외부 API 추가 호출 없이 조기 종료 (Fast-Fail)
+    if IS_CIRCUIT_BROKEN:
+        if service_name:
+            FAILED_SERVICES.add(service_name)
+        return None
+
     encoded_key = quote(API_KEY, safe='')
     full_url = f"{url}?serviceKey={encoded_key}"
 
     for attempt in range(retries):
         try:
-            resp = requests.get(full_url, params=params, timeout=10)
+            resp = requests.get(full_url, params=params, timeout=5)
             resp.raise_for_status()
 
             try:
                 data = resp.json()
             except json.JSONDecodeError:
                 if attempt < retries - 1:
-                    time.sleep(1)
+                    time.sleep(0.5)
                     continue
-                return None
+                break
 
             rc = data.get('response', {}).get('header', {}).get('resultCode', '')
             if rc != '00':
                 if attempt < retries - 1:
-                    time.sleep(1)
+                    time.sleep(0.5)
                     continue
-                return None
+                break
 
+            # API 호출 성공 시 연속 실패 카운터 리셋
+            CONSECUTIVE_FAILURES = 0
             return data
         except requests.RequestException:
             if attempt < retries - 1:
-                time.sleep(1.5)
+                time.sleep(0.5)
+
+    # API 호출 실패 시
+    CONSECUTIVE_FAILURES += 1
+    if service_name:
+        FAILED_SERVICES.add(service_name)
+
+    # 연속 N회 실패 시 서킷 브레이커 발동 -> 조기 차단
+    if CONSECUTIVE_FAILURES >= MAX_ALLOWED_FAILURES:
+        if not IS_CIRCUIT_BROKEN:
+            IS_CIRCUIT_BROKEN = True
+            print(f"\n[🚨 Fast-Fail] 기상청/공공데이터 API 연속 {CONSECUTIVE_FAILURES}회 장애 감지! 서킷 브레이커 작동 (남은 요청 조기 종료)")
+
     return None
 
 
@@ -256,7 +283,7 @@ def fetch_ncst(nx, ny, now_time):
     data = api_call(f"{BASE_WEATHER}/getUltraSrtNcst", {
         'pageNo': '1', 'numOfRows': '100', 'dataType': 'JSON',
         'base_date': bd, 'base_time': bt, 'nx': str(nx), 'ny': str(ny),
-    })
+    }, service_name='기상청 실시간관측')
     if not data:
         return {}
     try:
@@ -275,7 +302,7 @@ def fetch_ultra_fcst(nx, ny, now_time):
     data = api_call(f"{BASE_WEATHER}/getUltraSrtFcst", {
         'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
         'base_date': bd, 'base_time': bt, 'nx': str(nx), 'ny': str(ny),
-    })
+    }, service_name='기상청 강수예보')
     if not data:
         return []
     try:
@@ -290,7 +317,7 @@ def fetch_vilage_fcst(nx, ny, now_time, today_str):
     data = api_call(f"{BASE_WEATHER}/getVilageFcst", {
         'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
         'base_date': bd, 'base_time': bt, 'nx': str(nx), 'ny': str(ny),
-    })
+    }, service_name='기상청 단기예보')
     items = []
     if data:
         try:
@@ -306,7 +333,7 @@ def fetch_vilage_fcst(nx, ny, now_time, today_str):
         early_data = api_call(f"{BASE_WEATHER}/getVilageFcst", {
             'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
             'base_date': today_str, 'base_time': '0200', 'nx': str(nx), 'ny': str(ny),
-        })
+        }, service_name='기상청 단기예보')
         if early_data:
             try:
                 early_items = early_data['response']['body']['items']['item']
@@ -324,7 +351,7 @@ def fetch_air(station, fallback_station=None):
         data = api_call(f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", {
             'returnType': 'json', 'stationName': st,
             'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1',
-        })
+        }, service_name='에어코리아 미세먼지')
         if not data:
             return None
         try:
@@ -510,7 +537,7 @@ def fetch_alerts():
         data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
             'pageNo': '1', 'numOfRows': '50', 'dataType': 'JSON',
             'stnId': stn_id, 'fromTmFc': from_str, 'toTmFc': today_str,
-        })
+        }, service_name='기상청 기상특보')
         try:
             items = data['response']['body']['items']['item']
             if isinstance(items, dict):
@@ -918,6 +945,19 @@ def main():
     print(f"=== 고도화 날씨 데이터 수집 ===")
     print(f"시각: {now.strftime('%Y-%m-%d %H:%M:%S KST')}")
 
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, 'weather.json')
+
+    # 기존 weather.json 읽기 (API 장애 발생 시 이전 유효 데이터 보존용)
+    existing_data = None
+    if os.path.exists(out_path):
+        try:
+            with open(out_path, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+        except Exception:
+            existing_data = None
+
     alerts = fetch_alerts()
     time.sleep(0.3)
 
@@ -925,34 +965,73 @@ def main():
     for name in LOCATION_ORDER:
         cfg = LOCATIONS[name]
         try:
-            locations_data[name] = process_location(name, cfg, now, today_str, alerts)
+            loc_res = process_location(name, cfg, now, today_str, alerts)
+            # 만약 새 수집 결과의 기온/개황이 비어있고(-), 기존 유효 데이터가 존재하면 기존 데이터 보존
+            if (loc_res.get('overview') == '-' or loc_res.get('temperature', {}).get('current') == '-') and existing_data and 'locations' in existing_data and name in existing_data['locations']:
+                prev_loc = existing_data['locations'][name]
+                if prev_loc.get('overview') != '-' or prev_loc.get('temperature', {}).get('current') != '-':
+                    loc_res = prev_loc
+            locations_data[name] = loc_res
         except Exception as e:
             print(f"  [{name}] 오류: {e}")
             traceback.print_exc()
-            locations_data[name] = {
-                'overview': '-',
-                'dust': {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'},
-                'temperature': {'current': '-', 'feels_like': '-', 'min': '-', 'max': '-'},
-                'wind': {'direction': '-', 'speed': '-'},
-                'rain_accumulated': 0,
-                'rain_forecast': [],
-                'alerts': [],
-                'forecast_summary': f"🌤️ {name} 기상 정보 수집 중입니다.",
-            }
+            if existing_data and 'locations' in existing_data and name in existing_data['locations']:
+                locations_data[name] = existing_data['locations'][name]
+            else:
+                locations_data[name] = {
+                    'overview': '-',
+                    'dust': {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'},
+                    'temperature': {'current': '-', 'feels_like': '-', 'min': '-', 'max': '-'},
+                    'wind': {'direction': '-', 'speed': '-'},
+                    'rain_accumulated': 0,
+                    'rain_forecast': [],
+                    'alerts': [],
+                    'forecast_summary': f"🌤️ {name} 기상 정보 수집 중입니다.",
+                }
+
+    if IS_CIRCUIT_BROKEN or FAILED_SERVICES:
+        fail_list = list(FAILED_SERVICES)
+        status_code = "ERROR" if IS_CIRCUIT_BROKEN else ("WARNING" if len(fail_list) < 3 else "ERROR")
+        if IS_CIRCUIT_BROKEN:
+            status_msg = "공공데이터포털(기상청/에어코리아 API) 연쇄 응답 장애로 이전 관측 데이터를 보존 표출 중입니다."
+        else:
+            status_msg = f"공공데이터포털({', '.join(fail_list)}) 응답 지연 또는 오류로 일부 데이터 수집이 원활하지 않습니다."
+
+        api_status = {
+            'code': status_code,
+            'message': status_msg,
+            'failed_services': fail_list if fail_list else ["공공데이터포털 API 전체"]
+        }
+    else:
+        api_status = {
+            'code': 'OK',
+            'message': '공공데이터포털 API 수집 정상',
+            'failed_services': []
+        }
+
+    # 장애 시 시각 표시는 기존 유효 데이터의 시각 보존
+    base_date = today_str
+    date_disp = now.strftime('%m.%d')
+    day_week = ['월', '화', '수', '목', '금', '토', '일'][now.weekday()]
+    time_disp = now.strftime('%H:%M')
+
+    if IS_CIRCUIT_BROKEN and existing_data:
+        base_date = existing_data.get('base_date', base_date)
+        date_disp = existing_data.get('date_display', date_disp)
+        day_week = existing_data.get('day_of_week', day_week)
+        time_disp = existing_data.get('time_display', time_disp)
 
     result = {
         'updated_at': now.strftime('%Y-%m-%dT%H:%M:%S+09:00'),
-        'base_date': today_str,
-        'date_display': now.strftime('%m.%d'),
-        'day_of_week': ['월', '화', '수', '목', '금', '토', '일'][now.weekday()],
-        'time_display': now.strftime('%H:%M'),
+        'base_date': base_date,
+        'date_display': date_disp,
+        'day_of_week': day_week,
+        'time_display': time_disp,
+        'api_status': api_status,
         'locations': locations_data,
         'location_order': LOCATION_ORDER,
     }
 
-    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, 'weather.json')
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 

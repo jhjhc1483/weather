@@ -30,6 +30,7 @@
   const $body = document.getElementById('weather-body');
   const $mainTitle = document.getElementById('main-title');
   const $time = document.getElementById('time-display');
+  const $apiBadge = document.getElementById('api-status-badge');
   const $btn = document.getElementById('refresh-btn');
   const $btnText = $btn ? $btn.querySelector('.btn-text') : null;
   const $toast = document.getElementById('toast');
@@ -39,6 +40,7 @@
   const COOL_DOWN_MS = 30 * 60 * 1000; // 30분 쿨다운
   let currentUpdatedAt = '';
   let lastUpdatedAtTimestamp = 0;
+  let currentApiStatus = null;
   let pollingStartUpdatedAt = '';
   let isPolling = false;
   let pollIntervalId = null;
@@ -349,13 +351,29 @@
     $body.innerHTML = html;
   }
 
-  /* ======== 메타 업데이트 ======== */
+  /* ======== 메타 업데이트 및 API 장애 배지 감지 ======== */
   function updateMeta(data) {
     if (data.date_display && data.day_of_week && $mainTitle) {
       $mainTitle.textContent = data.date_display + '.(' + data.day_of_week + ') 기상예보';
     }
     if (data.time_display && $time) {
       $time.textContent = data.time_display + ' 기준';
+    }
+
+    currentApiStatus = data.api_status || null;
+    if ($apiBadge) {
+      if (currentApiStatus && currentApiStatus.code && currentApiStatus.code !== 'OK') {
+        $apiBadge.style.display = 'inline-flex';
+        if (currentApiStatus.code === 'ERROR') {
+          $apiBadge.classList.add('error');
+          $apiBadge.textContent = '🚨 기상청 API 장애 발생';
+        } else {
+          $apiBadge.classList.remove('error');
+          $apiBadge.textContent = '⚠️ 기상청 API 점검 중';
+        }
+      } else {
+        $apiBadge.style.display = 'none';
+      }
     }
   }
 
@@ -749,6 +767,39 @@
 
   // 1초마다 버튼 쿨타임 및 진행 상태 갱신
   setInterval(updateButtonState, 1000);
+
+  /* ======== API 상태 경고 배지 클릭 → 상세 안내 팝업 ======== */
+  if ($apiBadge) {
+    $apiBadge.addEventListener('click', function () {
+      if (!currentApiStatus) return;
+      const msg = currentApiStatus.message || '공공데이터포털 API 수집 중 일부 오류가 발생했습니다.';
+      const failed = currentApiStatus.failed_services || [];
+      const failedListHtml = failed.length > 0
+        ? '<ul style="margin-top:0.4rem;padding-left:1.2rem;color:var(--text-primary);font-size:0.88rem;">' + failed.map(function(s) { return '<li style="margin-bottom:0.2rem;">' + escHtml(s) + '</li>'; }).join('') + '</ul>'
+        : '<p style="font-size:0.88rem;color:var(--text-secondary);">일부 외부 기상 API 수집 응답 지연</p>';
+
+      const popupHtml = '<div class="alert-popup-content">'
+        + '<h3>⚠️ 공공데이터포털 API 상태 안내</h3>'
+        + '<div class="alert-criteria-item active">'
+        + '<strong class="alert-warn-label">' + escHtml(currentApiStatus.code || 'WARNING') + '</strong>'
+        + '<p style="margin-top:0.5rem;font-size:0.92rem;line-height:1.5;">' + escHtml(msg) + '</p>'
+        + '</div>'
+        + '<div style="margin-top:1rem;background:rgba(0,0,0,0.03);padding:0.8rem;border-radius:8px;">'
+        + '<h4 style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:0.3rem;">🚨 응답 지연/오류 서비스:</h4>'
+        + failedListHtml
+        + '</div>'
+        + '<p style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim);line-height:1.4;">'
+        + '💡 대시보드는 이전에 성공적으로 수집된 최신 관측 데이터를 안전하게 지속 표출하고 있습니다. 공공데이터포털 서버가 정상화되면 다음 주기에 자동으로 최신화됩니다.'
+        + '</p>'
+        + '</div>';
+
+      $modalBody.innerHTML = popupHtml;
+      const titleEl = document.getElementById('modal-title-text');
+      if (titleEl) titleEl.textContent = '⚠️ 공공데이터포털 API 상태 안내';
+      readmeLoaded = false;
+      openModal(true);
+    });
+  }
 
   /* ======== 기상특보 태그 클릭 → 기준 팝업 ======== */
   document.addEventListener('click', function (e) {

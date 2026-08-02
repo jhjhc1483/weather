@@ -169,6 +169,29 @@ body {
   border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
+.api-status-badge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  animation: pulse-warn 2.5s infinite ease-in-out;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.api-status-badge:hover {
+  transform: scale(1.05);
+  background: rgba(245, 158, 11, 0.22);
+}
+.api-status-badge.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@keyframes pulse-warn {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
 /* ---- 테마 전환 버튼 (우측 상단 동그란 아이콘 버튼) ---- */
 .theme-toggle-btn {
   position: relative;
