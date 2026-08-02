@@ -31,16 +31,63 @@
   const $mainTitle = document.getElementById('main-title');
   const $time = document.getElementById('time-display');
   const $btn = document.getElementById('refresh-btn');
+  const $btnText = $btn ? $btn.querySelector('.btn-text') : null;
   const $toast = document.getElementById('toast');
   const $themeBtn = document.getElementById('theme-toggle-btn');
 
   /* ======== 상태 변수 ======== */
+  const COOL_DOWN_MS = 30 * 60 * 1000; // 30분 쿨다운
   let currentUpdatedAt = '';
+  let lastUpdatedAtTimestamp = 0;
   let pollingStartUpdatedAt = '';
   let isPolling = false;
   let pollIntervalId = null;
   let pollTimeoutId = null;
   let audioCtx = null;
+
+  /* ======== 버튼 쿨타임 및 진행 상태 관리 ======== */
+  function updateButtonState() {
+    if (!$btn) return;
+
+    // 1. Action 실행 중 (스마트 폴링 중)
+    if (isPolling) {
+      $btn.disabled = true;
+      $btn.classList.add('loading');
+      $btn.classList.remove('cooldown');
+      if ($btnText) $btnText.textContent = '갱신 중...';
+      $btn.setAttribute('title', 'GitHub Actions 갱신 진행 중입니다 (약 2~3분 소요)');
+      return;
+    }
+
+    // 2. 갱신 후 30분 쿨타임 검사
+    const now = Date.now();
+    let elapsed = 0;
+    if (lastUpdatedAtTimestamp > 0) {
+      elapsed = now - lastUpdatedAtTimestamp;
+    }
+
+    if (lastUpdatedAtTimestamp > 0 && elapsed < COOL_DOWN_MS) {
+      const remainingMs = COOL_DOWN_MS - elapsed;
+      const remainingMin = Math.max(1, Math.ceil(remainingMs / (60 * 1000)));
+
+      // 쿨타임 종료 예상 시각
+      const targetDate = new Date(lastUpdatedAtTimestamp + COOL_DOWN_MS);
+      const hours = String(targetDate.getHours()).padStart(2, '0');
+      const mins = String(targetDate.getMinutes()).padStart(2, '0');
+
+      $btn.disabled = true;
+      $btn.classList.remove('loading');
+      $btn.classList.add('cooldown');
+      if ($btnText) $btnText.textContent = `${remainingMin}분 후 가능`;
+      $btn.setAttribute('title', `최신 데이터 유지 중 (30분 쿨타임). ${hours}:${mins} 이후 갱신 가능`);
+    } else {
+      // 3. 정상 상태 (갱신 가능)
+      $btn.disabled = false;
+      $btn.classList.remove('loading', 'cooldown');
+      if ($btnText) $btnText.textContent = '지금 갱신';
+      $btn.setAttribute('title', '지금 데이터 갱신 요청 (약 2~3분 소요)');
+    }
+  }
 
   /* ======== 테마 관리 ======== */
   function initTheme() {
@@ -345,10 +392,15 @@
         }
 
         currentUpdatedAt = data.updated_at || '';
+        if (currentUpdatedAt) {
+          const parsed = new Date(currentUpdatedAt).getTime();
+          if (!isNaN(parsed)) lastUpdatedAtTimestamp = parsed;
+        }
 
         updateMeta(data);
         renderTable(data);
         updateHeaderTooltips(data);
+        updateButtonState();
 
         if (onSuccess) onSuccess(data);
         return data;
@@ -429,10 +481,9 @@
 
   /* ======== 스마트 폴링 (갱신 완료 감지 — 동적 CHECK_URL 적용) ======== */
   function startPolling() {
-    if (isPolling) return;
     isPolling = true;
     pollingStartUpdatedAt = currentUpdatedAt;
-    $btn.classList.add('loading');
+    updateButtonState();
 
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
@@ -505,7 +556,7 @@
     isPolling = false;
     clearInterval(pollIntervalId);
     clearTimeout(pollTimeoutId);
-    $btn.classList.remove('loading');
+    updateButtonState();
 
     if (isSuccess) {
       playNotificationSound();
@@ -518,9 +569,13 @@
   let refreshAutoReloadId = null;
 
   function handleRefresh() {
+    if (isPolling || ($btn && $btn.disabled)) return;
+
     initAudioContext();
     requestNotificationPermission();
-    $btn.classList.add('loading');
+
+    isPolling = true;
+    updateButtonState();
 
     clearTimeout(refreshAutoReloadId);
     refreshAutoReloadId = setTimeout(function () {
@@ -531,19 +586,19 @@
     fetch(TRIGGER_URL, { method: 'POST' })
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        
-        // 핵심 수정: Vercel(파이썬)의 data.message 또는 Cloudflare(JS)의 data.success 모두 성공으로 간주
         if (data.message || data.success === true || data.status === 'ok') {
-          showToast('⌛ 갱신 요청 완료! 기상청 데이터 수집 중... (약 1~2분 소요)', 'info', 6000);
+          showToast('⌛ 갱신 요청 완료! 기상청 데이터 수집 중... (약 2~3분 소요)', 'info', 6000);
           startPolling();
         } else {
           showToast('⚠️ ' + (data.error || '알 수 없는 오류'), 'error');
-          $btn.classList.remove('loading');
+          isPolling = false;
+          updateButtonState();
         }
       })
       .catch(function () {
         showToast('⚠️ 갱신 요청 실패', 'error');
-        $btn.classList.remove('loading');
+        isPolling = false;
+        updateButtonState();
       });
   }
 
@@ -675,6 +730,9 @@
   setInterval(function () {
     if (!isPolling) loadData();
   }, AUTO_RELOAD_MS);
+
+  // 1초마다 버튼 쿨타임 및 진행 상태 갱신
+  setInterval(updateButtonState, 1000);
 
   /* ======== 기상특보 태그 클릭 → 기준 팝업 ======== */
   document.addEventListener('click', function (e) {

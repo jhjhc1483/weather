@@ -212,27 +212,30 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition);
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), opacity var(--transition);
   box-shadow: 0 2px 12px rgba(37, 99, 235, 0.3);
 }
-.refresh-btn:hover {
+.refresh-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 20px rgba(37, 99, 235, 0.45);
 }
-.refresh-btn:active { transform: scale(0.97); }
+.refresh-btn:active:not(:disabled) { transform: scale(0.97); }
 
 .refresh-btn.loading .refresh-icon {
   animation: spin 0.8s linear infinite;
 }
-.refresh-btn.loading {
-  opacity: 0.7;
-  pointer-events: none;
+.refresh-btn:disabled {
+  cursor: not-allowed;
 }
-.refresh-btn.cooldown {
+.refresh-btn.loading {
+  opacity: 0.85;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  box-shadow: none;
+}
+.refresh-btn.cooldown, .refresh-btn:disabled:not(.loading) {
   background: #64748b;
   box-shadow: none;
-  pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.75;
 }
 
 .refresh-icon { flex-shrink: 0; }

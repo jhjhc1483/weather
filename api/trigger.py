@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler
+from datetime import datetime
 import json
 import os
 import time
@@ -15,12 +16,37 @@ class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         global LAST_TRIGGER_TIME
 
-        # 1. 쿨다운 체킹 (15초 내 잦은 연타 무차별 갱신 방지)
         now = time.time()
+
+        # 1. 쿨다운 체킹 (weather.json의 updated_at 기준 30분=1800초 이내 재요청 방지)
+        json_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'data', 'weather.json'
+        )
+
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    wdata = json.load(f)
+                updated_at_str = wdata.get('updated_at', '')
+                if updated_at_str:
+                    dt = datetime.fromisoformat(updated_at_str)
+                    updated_ts = dt.timestamp()
+                    elapsed = now - updated_ts
+                    if elapsed < 1800:
+                        remaining_min = max(1, int((1800 - elapsed) // 60) + 1)
+                        self._respond(
+                            429,
+                            {'error': f'최신 갱신 후 30분이 지나지 않았습니다. 약 {remaining_min}분 후 다시 시도해 주세요.'}
+                        )
+                        return
+            except Exception:
+                pass
+
+        # 디바운스 (15초 내 연타 방지)
         if now - LAST_TRIGGER_TIME < 15:
             self._respond(
                 429,
-                {'error': '너무 잦은 갱신 요청입니다. 15초 후 다시 시도해 주세요.'}
+                {'error': '너무 잦은 갱신 요청입니다. 잠시 후 다시 시도해 주세요.'}
             )
             return
         LAST_TRIGGER_TIME = now
@@ -49,7 +75,7 @@ class handler(BaseHTTPRequestHandler):
 
         try:
             urlopen(req, timeout=10)
-            self._respond(200, {'message': '갱신 요청 완료. 약 2분 후 데이터가 업데이트됩니다.'})
+            self._respond(200, {'message': '갱신 요청 완료. 약 2~3분 후 데이터가 업데이트됩니다.'})
         except HTTPError as e:
             error_body = e.read().decode('utf-8', errors='replace')
             self._respond(e.code, {'error': f'GitHub API 오류 ({e.code})', 'detail': error_body[:200]})
