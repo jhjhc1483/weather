@@ -1,16 +1,16 @@
 {
-  "updated_at": "2026-08-02T16:59:04+09:00",
+  "updated_at": "2026-08-02T17:29:35+09:00",
   "base_date": "20260802",
   "date_display": "08.02",
   "day_of_week": "일",
-  "time_display": "16:59",
+  "time_display": "17:29",
   "locations": {
     "양평": {
       "overview": "흐림",
       "dust": {
-        "pm10": "27",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "13",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
@@ -47,10 +47,10 @@
     "경산": {
       "overview": "맑음",
       "dust": {
-        "pm10": "20",
+        "pm10": "19",
         "pm10_grade": "좋음",
-        "pm25": "15",
-        "pm25_grade": "보통",
+        "pm25": "10",
+        "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
         "primary_station": "시지동"
@@ -86,9 +86,9 @@
     "사천": {
       "overview": "맑음",
       "dust": {
-        "pm10": "19",
+        "pm10": "22",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "15",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
@@ -125,9 +125,9 @@
     "함안": {
       "overview": "맑음",
       "dust": {
-        "pm10": "13",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "12",
+        "pm25": "9",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
@@ -164,9 +164,9 @@
     "성주": {
       "overview": "맑음",
       "dust": {
-        "pm10": "20",
+        "pm10": "14",
         "pm10_grade": "좋음",
-        "pm25": "10",
+        "pm25": "14",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
@@ -203,9 +203,9 @@
     "세종": {
       "overview": "맑음",
       "dust": {
-        "pm10": "35",
+        "pm10": "27",
         "pm10_grade": "좋음",
-        "pm25": "14",
+        "pm25": "13",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "아름동",
@@ -234,11 +234,11 @@
       "forecast_summary": "⚠️ 폭염주의보 발효 중! 안전에 유의하세요."
     },
     "계룡": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
-        "pm10": "11",
+        "pm10": "14",
         "pm10_grade": "좋음",
-        "pm25": "7",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
@@ -269,9 +269,9 @@
     "임실": {
       "overview": "맑음",
       "dust": {
-        "pm10": "24",
+        "pm10": "21",
         "pm10_grade": "좋음",
-        "pm25": "13",
+        "pm25": "9",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "임실읍",
