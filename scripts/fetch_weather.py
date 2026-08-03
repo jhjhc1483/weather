@@ -65,64 +65,124 @@ BASE_WEATHER = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
 BASE_AIR = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
 BASE_ALERT = "http://apis.data.go.kr/1360000/WthrWrnInfoService"
 
+# 특보 통보문 조회 기간(일). 넓힐수록 응답이 무거워진다.
+ALERT_LOOKBACK_DAYS = 2
+
 
 # ============================================================
-# API 호출 헬퍼 & 장애 감지 (Fast-Fail 서킷 브레이커 적용)
+# API 호출 헬퍼 & 장애 감지 (서비스 계열별 Fast-Fail 서킷 브레이커)
+#
+# 설계 원칙
+#  1) 실패는 반드시 '원인'과 함께 기록한다. 원인 로그가 없으면 기상청 장애인지,
+#     우리 쪽 타임아웃/파라미터 오류인지 사후에 구분할 방법이 없다.
+#  2) 서킷은 서비스 계열별로 분리한다. 특보(getWthrWrnMsg)는 통보문 전문을
+#     내려주어 응답이 무겁고 느리므로, 특보 지연이 단기예보·미세먼지 수집까지
+#     차단해서는 안 된다.
+#  3) resultCode 03(NO_DATA)은 장애가 아니라 '해당 조건에 자료 없음'이다.
+#     실패로 집계하지 않는다.
 # ============================================================
 FAILED_SERVICES = set()
-CONSECUTIVE_FAILURES = 0
-IS_CIRCUIT_BROKEN = False
-MAX_ALLOWED_FAILURES = 5
+MAX_ALLOWED_FAILURES = 5          # 계열별 연속 실패 허용치
 
-def api_call(url, params, retries=2, service_name=None):
-    global CONSECUTIVE_FAILURES, IS_CIRCUIT_BROKEN
+# 계열별 상태: {'failures': 연속 실패 횟수, 'broken': 서킷 개방 여부}
+CIRCUIT_STATE = {}
 
-    # 1. 서킷 브레이커 발동 중이면 외부 API 추가 호출 없이 조기 종료 (Fast-Fail)
-    if IS_CIRCUIT_BROKEN:
+# 계열별 기본 타임아웃(초). 특보는 응답 본문이 커서 넉넉히 준다.
+GROUP_TIMEOUT = {'기상특보': 20, '에어코리아': 10, '기상청예보': 10}
+
+
+def _group_of(service_name):
+    """service_name을 서킷 계열로 매핑."""
+    name = service_name or ''
+    if '특보' in name:
+        return '기상특보'
+    if '에어코리아' in name:
+        return '에어코리아'
+    return '기상청예보'
+
+
+def _circuit(group):
+    return CIRCUIT_STATE.setdefault(group, {'failures': 0, 'broken': False})
+
+
+def circuit_broken(group=None):
+    """group 지정 시 해당 계열, 미지정 시 하나라도 열려 있으면 True."""
+    if group is not None:
+        return CIRCUIT_STATE.get(group, {}).get('broken', False)
+    return any(s['broken'] for s in CIRCUIT_STATE.values())
+
+
+def api_call(url, params, retries=2, service_name=None, timeout=None):
+    group = _group_of(service_name)
+    state = _circuit(group)
+    if timeout is None:
+        timeout = GROUP_TIMEOUT.get(group, 10)
+
+    # 1. 해당 계열의 서킷이 열려 있으면 추가 호출 없이 조기 종료 (Fast-Fail)
+    if state['broken']:
         if service_name:
             FAILED_SERVICES.add(service_name)
         return None
 
     encoded_key = quote(API_KEY, safe='')
     full_url = f"{url}?serviceKey={encoded_key}"
+    label = service_name or url.rsplit('/', 1)[-1]
+    reason = '원인 미상'
 
     for attempt in range(retries):
+        started = time.monotonic()
         try:
-            resp = requests.get(full_url, params=params, timeout=5)
+            resp = requests.get(full_url, params=params, timeout=timeout)
             resp.raise_for_status()
 
             try:
                 data = resp.json()
             except json.JSONDecodeError:
+                # 공공데이터포털은 서비스 레벨 오류(키 미등록, 일일 트래픽 초과 등)일 때
+                # dataType=JSON 이어도 XML(OpenAPI_ServiceResponse)로 응답한다.
+                snippet = ' '.join(resp.text[:200].split())
+                reason = f"JSON 파싱 실패 (HTTP {resp.status_code}) 응답앞부분={snippet}"
                 if attempt < retries - 1:
                     time.sleep(0.5)
                     continue
                 break
 
-            rc = data.get('response', {}).get('header', {}).get('resultCode', '')
-            if rc != '00':
-                if attempt < retries - 1:
-                    time.sleep(0.5)
-                    continue
-                break
+            header = (data.get('response', {}) or {}).get('header', {}) or {}
+            rc = str(header.get('resultCode', ''))
+            rmsg = str(header.get('resultMsg', ''))
 
-            # API 호출 성공 시 연속 실패 카운터 리셋
-            CONSECUTIVE_FAILURES = 0
-            return data
-        except requests.RequestException:
+            if rc in ('00', '03'):
+                state['failures'] = 0        # 정상 응답 → 연속 실패 카운터 리셋
+                if rc == '03':
+                    print(f"  [API] {label} 자료 없음 (resultCode=03) — 장애 아님")
+                return data
+
+            reason = f"resultCode={rc} resultMsg={rmsg}"
+            if attempt < retries - 1:
+                time.sleep(0.5)
+                continue
+            break
+
+        except requests.Timeout:
+            reason = (f"타임아웃 {timeout}초 초과 "
+                      f"(경과 {time.monotonic() - started:.1f}s)")
+            if attempt < retries - 1:
+                time.sleep(0.5)
+        except requests.RequestException as e:
+            reason = f"{type(e).__name__}: {str(e)[:150]}"
             if attempt < retries - 1:
                 time.sleep(0.5)
 
-    # API 호출 실패 시
-    CONSECUTIVE_FAILURES += 1
+    # ── 최종 실패 ────────────────────────────────────────────
+    print(f"  [API 실패] {label} — {reason}")
+    state['failures'] += 1
     if service_name:
         FAILED_SERVICES.add(service_name)
 
-    # 연속 N회 실패 시 서킷 브레이커 발동 -> 조기 차단
-    if CONSECUTIVE_FAILURES >= MAX_ALLOWED_FAILURES:
-        if not IS_CIRCUIT_BROKEN:
-            IS_CIRCUIT_BROKEN = True
-            print(f"\n[🚨 Fast-Fail] 기상청/공공데이터 API 연속 {CONSECUTIVE_FAILURES}회 장애 감지! 서킷 브레이커 작동 (남은 요청 조기 종료)")
+    if state['failures'] >= MAX_ALLOWED_FAILURES and not state['broken']:
+        state['broken'] = True
+        print(f"\n[🚨 Fast-Fail] '{group}' 계열 연속 {state['failures']}회 장애 — "
+              f"이 계열만 조기 차단합니다 (다른 계열 수집은 계속 진행)")
 
     return None
 
@@ -406,7 +466,7 @@ def fetch_alerts():
 
     now = datetime.now(KST)
     today_str = now.strftime('%Y%m%d')
-    from_str = (now - timedelta(days=2)).strftime('%Y%m%d')
+    from_str = (now - timedelta(days=ALERT_LOOKBACK_DAYS)).strftime('%Y%m%d')
 
     alert_types = [
         '폭염중대경보', '폭염경보', '폭염주의보', '호우경보', '호우주의보',
@@ -534,8 +594,10 @@ def fetch_alerts():
             return item_cache[stn_id]
 
         item = None
+        # 통보문은 t1~t7 전문을 그대로 내려주므로 응답이 무겁다.
+        # 최신 1건만 필요하므로 numOfRows를 크게 줄여 응답 시간을 단축한다.
         data = api_call(f"{BASE_ALERT}/getWthrWrnMsg", {
-            'pageNo': '1', 'numOfRows': '50', 'dataType': 'JSON',
+            'pageNo': '1', 'numOfRows': '12', 'dataType': 'JSON',
             'stnId': stn_id, 'fromTmFc': from_str, 'toTmFc': today_str,
         }, service_name='기상청 기상특보')
         try:
@@ -555,7 +617,12 @@ def fetch_alerts():
             item = None
 
         if item is None:
-            print(f"  [특보] stnId={stn_id} 조회 실패")
+            # data가 있는데 item이 없으면 '통보문 0건'(정상), data 자체가 없으면 호출 실패.
+            # 실패 원인은 바로 앞 줄 [API 실패] 로그에 남는다.
+            if data is not None:
+                print(f"  [특보] stnId={stn_id} 최근 {ALERT_LOOKBACK_DAYS}일 통보문 0건")
+            else:
+                print(f"  [특보] stnId={stn_id} 조회 실패 (위 [API 실패] 사유 참조)")
         item_cache[stn_id] = item
         return item
 
@@ -989,11 +1056,18 @@ def main():
                     'forecast_summary': f"🌤️ {name} 기상 정보 수집 중입니다.",
                 }
 
-    if IS_CIRCUIT_BROKEN or FAILED_SERVICES:
-        fail_list = list(FAILED_SERVICES)
-        status_code = "ERROR" if IS_CIRCUIT_BROKEN else ("WARNING" if len(fail_list) < 3 else "ERROR")
-        if IS_CIRCUIT_BROKEN:
+    # 핵심 계열(단기·초단기예보)이 끊긴 경우에만 '이전 데이터 보존' 상태로 본다.
+    # 특보나 미세먼지만 실패한 경우는 부분 결손이므로 WARNING에 그친다.
+    core_broken = circuit_broken('기상청예보')
+
+    if circuit_broken() or FAILED_SERVICES:
+        fail_list = sorted(FAILED_SERVICES)
+        broken_groups = [g for g, s in CIRCUIT_STATE.items() if s['broken']]
+        status_code = "ERROR" if core_broken else ("WARNING" if len(fail_list) < 3 else "ERROR")
+        if core_broken:
             status_msg = "공공데이터포털(기상청/에어코리아 API) 연쇄 응답 장애로 이전 관측 데이터를 보존 표출 중입니다."
+        elif broken_groups:
+            status_msg = f"공공데이터포털 {', '.join(broken_groups)} 계열 응답 장애로 해당 항목만 수집이 중단되었습니다."
         else:
             status_msg = f"공공데이터포털({', '.join(fail_list)}) 응답 지연 또는 오류로 일부 데이터 수집이 원활하지 않습니다."
 
@@ -1015,7 +1089,7 @@ def main():
     day_week = ['월', '화', '수', '목', '금', '토', '일'][now.weekday()]
     time_disp = now.strftime('%H:%M')
 
-    if IS_CIRCUIT_BROKEN and existing_data:
+    if core_broken and existing_data:
         base_date = existing_data.get('base_date', base_date)
         date_disp = existing_data.get('date_display', date_disp)
         day_week = existing_data.get('day_of_week', day_week)
@@ -1035,7 +1109,23 @@ def main():
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"\n=== 성공적으로 완료: {out_path} ===")
+    # ── 실행 결과 요약 ──────────────────────────────────────
+    # 이전에는 API가 전부 끊겨도 "성공적으로 완료"를 찍고 exit 0으로 끝나
+    # Actions가 초록불이 되는 silent failure가 있었다. 상태를 명시하고
+    # GitHub Actions 어노테이션으로 올려 로그에 묻히지 않게 한다.
+    if api_status['code'] == 'OK':
+        print(f"\n=== 수집 완료 (정상): {out_path} ===")
+    else:
+        print(f"\n=== 수집 완료 ({api_status['code']}): {out_path} ===")
+        print(f"    사유: {api_status['message']}")
+        print(f"    실패 서비스: {', '.join(api_status['failed_services'])}")
+        level = 'error' if api_status['code'] == 'ERROR' else 'warning'
+        print(f"::{level} title=날씨 수집 이상::{api_status['message']}")
+
+    # 커밋 단계를 막지 않도록 기본은 exit 0. 워크플로를 실제로 실패시키려면
+    # env FAIL_ON_CIRCUIT_BREAK=1 을 주고, 커밋 스텝에 if: always() 를 붙일 것.
+    if core_broken and os.environ.get('FAIL_ON_CIRCUIT_BREAK') == '1':
+        sys.exit(1)
 
 
 if __name__ == '__main__':
