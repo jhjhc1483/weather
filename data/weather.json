@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-04T06:00:43+09:00",
+  "updated_at": "2026-08-04T06:38:21+09:00",
   "base_date": "20260804",
   "date_display": "08.04",
   "day_of_week": "화",
-  "time_display": "06:00",
+  "time_display": "06:38",
   "api_status": {
     "code": "WARNING",
     "message": "공공데이터포털 에어코리아 계열 응답 장애로 해당 항목만 수집이 중단되었습니다.",
@@ -46,7 +46,7 @@
       "forecast_summary": "⚠️ 폭염경보 발효 중! 안전에 유의하세요."
     },
     "경산": {
-      "overview": "맑음",
+      "overview": "흐림",
       "dust": {
         "pm10": "-",
         "pm10_grade": "-",
@@ -163,7 +163,7 @@
       "forecast_summary": "⚠️ 폭염경보, 열대야주의보 발효 중! 안전에 유의하세요."
     },
     "성주": {
-      "overview": "맑음",
+      "overview": "구름많음",
       "dust": {
         "pm10": "-",
         "pm10_grade": "-",
