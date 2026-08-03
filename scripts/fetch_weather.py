@@ -61,9 +61,21 @@ LOCATIONS = {
 LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실']
 KST = timezone(timedelta(hours=9))
 
-BASE_WEATHER = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
-BASE_AIR = "http://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
-BASE_ALERT = "http://apis.data.go.kr/1360000/WthrWrnInfoService"
+# ============================================================
+# 공공데이터포털 엔드포인트
+#
+# 반드시 https(443) 로 호출할 것.
+# 2026-08-03, http(80) 보안 조치로 포털 오픈API 호출이 응답 없이 매달리는
+# 장애가 발생했다(공공데이터활용지원센터 회신). 증상은 연결 지연 → 클라이언트
+# 타임아웃으로 나타나 마치 기상청 장애처럼 보이므로, http로 되돌리지 말 것.
+# ============================================================
+BASE_WEATHER = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
+BASE_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
+BASE_ALERT = "https://apis.data.go.kr/1360000/WthrWrnInfoService"
+
+for _name, _url in (('BASE_WEATHER', BASE_WEATHER), ('BASE_AIR', BASE_AIR),
+                    ('BASE_ALERT', BASE_ALERT)):
+    assert _url.startswith('https://'), f"{_name}은(는) https로 호출해야 합니다: {_url}"
 
 # 특보 통보문 조회 기간(일). 넓힐수록 응답이 무거워진다.
 ALERT_LOOKBACK_DAYS = 2
