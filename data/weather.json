@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-04T03:15:15+09:00",
+  "updated_at": "2026-08-04T04:41:37+09:00",
   "base_date": "20260804",
   "date_display": "08.04",
   "day_of_week": "화",
-  "time_display": "03:15",
+  "time_display": "04:41",
   "api_status": {
     "code": "WARNING",
     "message": "공공데이터포털 에어코리아 계열 응답 장애로 해당 항목만 수집이 중단되었습니다.",
@@ -24,14 +24,14 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "24.6",
-        "feels_like": "28.0",
+        "current": "23.8",
+        "feels_like": "27.1",
         "min": "23.0",
         "max": "34.0"
       },
       "wind": {
-        "direction": "북풍",
-        "speed": "0.1m/s"
+        "direction": "서북서풍",
+        "speed": "0.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -46,7 +46,7 @@
       "forecast_summary": "⚠️ 폭염경보 발효 중! 안전에 유의하세요."
     },
     "경산": {
-      "overview": "맑음",
+      "overview": "흐림",
       "dust": {
         "pm10": "-",
         "pm10_grade": "-",
@@ -57,14 +57,14 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "27.4",
+        "current": "27.3",
         "feels_like": "29.7",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
         "direction": "북풍",
-        "speed": "1.6m/s"
+        "speed": "0.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -96,14 +96,14 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "24",
-        "feels_like": "27.2",
-        "min": "24.0",
+        "current": "23.7",
+        "feels_like": "26.9",
+        "min": "23.7",
         "max": "35.0"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "1.0m/s"
+        "direction": "남풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -135,14 +135,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "25.5",
-        "feels_like": "28.2",
+        "current": "25",
+        "feels_like": "27.8",
         "min": "25.0",
         "max": "35.0"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "0.2m/s"
+        "direction": "남남동풍",
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -174,14 +174,14 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "27.6",
-        "feels_like": "30.0",
+        "current": "26.5",
+        "feels_like": "29.2",
         "min": "26.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "북북동풍",
-        "speed": "1.0m/s"
+        "direction": "남풍",
+        "speed": "0.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -213,14 +213,14 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "26.5",
-        "feels_like": "29.4",
+        "current": "26.1",
+        "feels_like": "29.2",
         "min": "25.0",
         "max": "37.0"
       },
       "wind": {
-        "direction": "남남서풍",
-        "speed": "0.7m/s"
+        "direction": "남동풍",
+        "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [
@@ -255,14 +255,14 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "27.8",
-        "feels_like": "30.4",
+        "current": "27.7",
+        "feels_like": "30.3",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "북북서풍",
-        "speed": "0.4m/s"
+        "direction": "동남동풍",
+        "speed": "1.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [
@@ -293,13 +293,13 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "25.2",
-        "feels_like": "28.2",
+        "current": "24.8",
+        "feels_like": "27.8",
         "min": "23.0",
         "max": "35.0"
       },
       "wind": {
-        "direction": "서풍",
+        "direction": "북서풍",
         "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
