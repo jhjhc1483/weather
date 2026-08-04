@@ -381,17 +381,18 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.3rem 0.6rem;
-  width: 92%;
-  max-width: 95px;
+  gap: 0.2rem;
+  padding: 0.25rem 0.45rem;
+  width: auto;
+  min-width: 54px;
+  max-width: 68px;
   margin: 0 auto;
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #0284c7, #2563eb);
   color: var(--text-white);
   font-family: var(--font);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
@@ -408,45 +409,98 @@ body {
 /* ---- Yangpyeong Weekly Forecast Modal & Table ---- */
 .yp-weekly-modal-content {
   max-width: 760px;
+  width: 95vw;
+}
+.yp-weekly-scroll-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
 }
 .yp-weekly-table-wrapper {
   overflow-x: auto;
-  margin-top: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 0.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.03);
 }
 .yp-weekly-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 580px;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 .yp-weekly-table th, .yp-weekly-table td {
-  padding: 0.75rem 0.6rem;
+  padding: 0.7rem 0.4rem;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
 }
 .yp-weekly-table th {
   background: var(--bg-hover);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  border-right: 1px solid var(--border);
+}
+.yp-weekly-table th:last-child,
+.yp-weekly-table td:last-child {
+  border-right: none;
+}
+.yp-weekly-table td {
+  border-right: 1px solid var(--border);
 }
 .yp-weekly-table td.temp-cell {
   font-weight: 600;
 }
 .yp-weekly-table td .temp-min {
   color: #2563eb;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .yp-weekly-table td .temp-max {
   color: #dc2626;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.yp-weekly-table td .wind-dir {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.yp-weekly-table td .wind-speed {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
-/* 피벗(가로-세로 전환) 스타일 */
+/* 피벗(가로-세로 전환) 및 좌측 카테고리열 Sticky 고정 스타일 */
 .yp-weekly-table-pivoted .yp-th-cat,
 .yp-weekly-table-pivoted .yp-td-cat {
-  background: var(--bg-hover);
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--bg-card);
   font-weight: 700;
   color: var(--text-primary);
-  width: 95px;
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
   white-space: nowrap;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08);
+  border-right: 2px solid var(--border);
+}
+.yp-weekly-table-pivoted thead .yp-th-cat {
+  background: var(--bg-hover);
+  z-index: 4;
 }
 .yp-cell-overview {
   display: flex;
