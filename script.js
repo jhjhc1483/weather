@@ -832,6 +832,114 @@
     });
   }
 
+  /* ======== 양평 주간 예보 모달 & 로직 ======== */
+  const $ypWeeklyBtn = document.getElementById('yp-weekly-btn');
+  const $ypWeeklyModal = document.getElementById('yp-weekly-modal');
+  const $ypWeeklyModalCloseBtn = document.getElementById('yp-weekly-modal-close-btn');
+  const $ypWeeklyModalBody = document.getElementById('yp-weekly-modal-body');
+
+  function openYpWeeklyModal() {
+    if (!$ypWeeklyModal) return;
+    $ypWeeklyModal.classList.add('show');
+    $ypWeeklyModal.removeAttribute('aria-hidden');
+    document.body.style.overflow = 'hidden';
+    loadYpWeeklyData();
+  }
+
+  function closeYpWeeklyModal() {
+    if (!$ypWeeklyModal) return;
+    $ypWeeklyModal.classList.remove('show');
+    $ypWeeklyModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function loadYpWeeklyData() {
+    if (!$ypWeeklyModalBody) return;
+
+    $ypWeeklyModalBody.innerHTML = `
+      <div class="loading-cell">
+        <div class="loading-spinner"></div>
+        <span>양평 주간 기상 데이터를 수신하는 중입니다...</span>
+      </div>
+    `;
+
+    fetch('/data/weather_yangpyeong_weekly.json?t=' + Date.now())
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data || !data.weekly_forecast) {
+          $ypWeeklyModalBody.innerHTML = '<p style="text-align:center; padding:1.5rem; color:var(--text-muted);">주간 예보 데이터 형식이 올바르지 않습니다.</p>';
+          return;
+        }
+
+        let html = `
+          <div class="yp-weekly-table-wrapper">
+            <table class="yp-weekly-table">
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>날짜</th>
+                  <th>개황</th>
+                  <th>최저 기온</th>
+                  <th>최고 기온</th>
+                  <th>풍향 / 풍속</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        data.weekly_forecast.forEach(function (item) {
+          const overviewEmoji = getOverviewEmoji(item.overview);
+          html += `
+            <tr>
+              <td><strong>${item.label}</strong></td>
+              <td>${item.date_display}</td>
+              <td>${overviewEmoji} ${item.overview}</td>
+              <td class="temp-cell"><span class="temp-min">${item.temperature.min}℃</span></td>
+              <td class="temp-cell"><span class="temp-max">${item.temperature.max}℃</span></td>
+              <td>${item.wind.direction} ${item.wind.speed}</td>
+            </tr>
+          `;
+        });
+
+        html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+        $ypWeeklyModalBody.innerHTML = html;
+      })
+      .catch(function (err) {
+        $ypWeeklyModalBody.innerHTML = `
+          <div style="text-align:center; padding:1.5rem 1rem;">
+            <p style="color:#ef4444; font-weight:600; margin-bottom:0.5rem;">⚠️ 양평 주간 예보 데이터를 불러올 수 없습니다.</p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">${err.message || err}</p>
+          </div>
+        `;
+      });
+  }
+
+  function getOverviewEmoji(overview) {
+    if (!overview) return '🌤️';
+    if (overview.includes('비')) return '☔';
+    if (overview.includes('눈')) return '❄️';
+    if (overview.includes('소나기')) return '🌦️';
+    if (overview.includes('맑')) return '☀️';
+    if (overview.includes('구름')) return '⛅';
+    if (overview.includes('흐림')) return '☁️';
+    return '🌤️';
+  }
+
+  if ($ypWeeklyBtn && $ypWeeklyModal) {
+    $ypWeeklyBtn.addEventListener('click', openYpWeeklyModal);
+    if ($ypWeeklyModalCloseBtn) $ypWeeklyModalCloseBtn.addEventListener('click', closeYpWeeklyModal);
+    $ypWeeklyModal.addEventListener('click', function (e) {
+      if (e.target === $ypWeeklyModal) closeYpWeeklyModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && $ypWeeklyModal.classList.contains('show')) closeYpWeeklyModal();
+    });
+  }
+
   /* ======== 초기화 ======== */
   initTheme();
   $btn.addEventListener('click', handleRefresh);

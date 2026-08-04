@@ -359,6 +359,76 @@ body {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
+/* ---- Table Footer Actions & Yangpyeong Weekly Button ---- */
+.table-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.75rem 1.2rem;
+  background: var(--bg-hover);
+  border-top: 1px solid var(--border);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.yp-weekly-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.1rem;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: var(--text-white);
+  font-family: var(--font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(2, 132, 199, 0.3);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.yp-weekly-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(2, 132, 199, 0.45);
+}
+.yp-weekly-btn:active {
+  transform: scale(0.97);
+}
+
+/* ---- Yangpyeong Weekly Forecast Modal & Table ---- */
+.yp-weekly-modal-content {
+  max-width: 760px;
+}
+.yp-weekly-table-wrapper {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+.yp-weekly-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.yp-weekly-table th, .yp-weekly-table td {
+  padding: 0.75rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+.yp-weekly-table th {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.yp-weekly-table td.temp-cell {
+  font-weight: 600;
+}
+.yp-weekly-table td .temp-min {
+  color: #2563eb;
+}
+.yp-weekly-table td .temp-max {
+  color: #dc2626;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

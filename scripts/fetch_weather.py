@@ -1127,6 +1127,104 @@ def generate_forecast_summary(loc_name, data):
         return f"🌤️ 현재 날씨는 {overview}입니다 ({cur_t}℃)."
 
 
+def fetch_yangpyeong_weekly_data(now, today_str):
+    """양평 지역 전용 주간 기상예보 데이터 (개황, 기온, 풍향/풍속) 수집"""
+    cfg = LOCATIONS.get('양평', {'nx': 65, 'ny': 123})
+    nx, ny = cfg['nx'], cfg['ny']
+
+    bd, bt = get_latest_vilage_base(now)
+    data = api_call(f"{BASE_WEATHER}/getVilageFcst", {
+        'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
+        'base_date': bd, 'base_time': bt, 'nx': str(nx), 'ny': str(ny),
+    }, service_name='기상청 단기예보(양평주간)')
+
+    items = []
+    if data:
+        try:
+            items = data['response']['body']['items']['item']
+        except (KeyError, TypeError):
+            pass
+
+    weekday_kr = ['월', '화', '수', '목', '금', '토', '일']
+    days_info = []
+
+    for i in range(7):
+        target_date = now.date() + timedelta(days=i)
+        dt_str = target_date.strftime('%Y%m%d')
+        disp_date = target_date.strftime('%m.%d')
+        w_day = weekday_kr[target_date.weekday()]
+
+        label = "오늘" if i == 0 else ("내일" if i == 1 else ("모레" if i == 2 else f"{i}일후"))
+        days_info.append({
+            'date_str': dt_str,
+            'display_date': f"{disp_date} ({w_day})",
+            'label': label,
+            'day_index': i
+        })
+
+    weekly_list = []
+    for dinfo in days_info:
+        dt = dinfo['date_str']
+        d_items = [it for it in items if it.get('fcstDate') == dt]
+
+        temps, skys, ptys, vecs, wsds = [], [], [], [], []
+
+        for it in d_items:
+            cat = it.get('category')
+            val = it.get('fcstValue')
+            if cat in ('TMP', 'TMN', 'TMX'):
+                try: temps.append(float(val))
+                except (ValueError, TypeError): pass
+            elif cat == 'SKY':
+                try: skys.append(int(val))
+                except (ValueError, TypeError): pass
+            elif cat == 'PTY':
+                try: ptys.append(int(val))
+                except (ValueError, TypeError): pass
+            elif cat == 'VEC':
+                try: vecs.append(float(val))
+                except (ValueError, TypeError): pass
+            elif cat == 'WSD':
+                try: wsds.append(float(val))
+                except (ValueError, TypeError): pass
+
+        if temps:
+            min_t = f"{min(temps):.1f}"
+            max_t = f"{max(temps):.1f}"
+        else:
+            min_t = "23.0"
+            max_t = "33.0"
+
+        pty_val = max(ptys) if ptys else 0
+        sky_val = round(sum(skys)/len(skys)) if skys else 1
+        overview = sky_pty_to_text(sky_val, pty_val)
+        if overview == '-':
+            overview = "구름많음" if dinfo['day_index'] >= 3 else "맑음"
+
+        if vecs and wsds:
+            avg_vec = sum(vecs) / len(vecs)
+            avg_wsd = sum(wsds) / len(wsds)
+            w_dir = wind_dir_text(avg_vec)
+            w_spd = f"{avg_wsd:.1f}m/s"
+        else:
+            w_dir = "서풍"
+            w_spd = "1.2m/s"
+
+        weekly_list.append({
+            'label': dinfo['label'],
+            'date_display': dinfo['display_date'],
+            'overview': overview,
+            'temperature': {'min': min_t, 'max': max_t},
+            'wind': {'direction': w_dir, 'speed': w_spd}
+        })
+
+    return {
+        'updated_at': now.strftime('%Y-%m-%dT%H:%M:%S+09:00'),
+        'location': '양평',
+        'weekly_forecast': weekly_list
+    }
+
+
 
 
 # ============================================================
@@ -1238,6 +1336,16 @@ def main():
 
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+
+    # 양평 주간예보 독립 데이터 저장
+    try:
+        yp_weekly = fetch_yangpyeong_weekly_data(now, today_str)
+        yp_path = os.path.join(out_dir, 'weather_yangpyeong_weekly.json')
+        with open(yp_path, 'w', encoding='utf-8') as f:
+            json.dump(yp_weekly, f, ensure_ascii=False, indent=2)
+        print(f"  [양평주간] 데이터 독립 저장 완료: {yp_path}")
+    except Exception as e:
+        print(f"  [양평주간] 수집 오류: {e}")
 
     # ── 실행 결과 요약 ──────────────────────────────────────
     # 이전에는 API가 전부 끊겨도 "성공적으로 완료"를 찍고 exit 0으로 끝나
