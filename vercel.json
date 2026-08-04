@@ -2,6 +2,12 @@
   "framework": null,
   "buildCommand": "",
   "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/api/diag",
+      "destination": "/api/diag.py"
+    }
+  ],
   "headers": [
     {
       "source": "/data/(.*)",
