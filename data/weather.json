@@ -1,13 +1,19 @@
 {
-  "updated_at": "2026-08-05T03:30:45+09:00",
+  "updated_at": "2026-08-05T04:12:22+09:00",
   "base_date": "20260805",
   "date_display": "08.05",
   "day_of_week": "수",
   "time_display": "03:30",
   "api_status": {
-    "code": "OK",
-    "message": "공공데이터포털 API 수집 정상",
-    "failed_services": []
+    "code": "ERROR",
+    "message": "공공데이터포털(기상청/에어코리아 API) 연쇄 응답 장애로 이전 관측 데이터를 보존 표출 중입니다.",
+    "failed_services": [
+      "기상청 강수예보",
+      "기상청 기상특보",
+      "기상청 단기예보",
+      "기상청 실시간관측",
+      "에어코리아 미세먼지"
+    ]
   },
   "locations": {
     "양평": {
