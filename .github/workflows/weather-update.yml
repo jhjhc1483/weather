@@ -2,7 +2,7 @@ name: Update Weather Data
 
 on:
   schedule:
-    - cron: '30 */2 * * *'   # 2시간 간격 (매 2시간 30분 UTC/KST)
+    - cron: '15,45 * * * *'   # 30분 간격 (매시 15분, 45분)
   workflow_dispatch:         # 수동 트리거 (지금 갱신 버튼)
 
 permissions:
