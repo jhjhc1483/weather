@@ -1,36 +1,36 @@
 {
-  "updated_at": "2026-08-05T04:27:53+09:00",
-  "timestamp": "2026-08-05 04:27:53 KST",
+  "updated_at": "2026-08-05T05:20:33+09:00",
+  "timestamp": "2026-08-05 05:20:33 KST",
   "all_ok": false,
   "results": [
     {
       "name": "기상청 기상특보 API",
       "ok": false,
-      "elapsed": 10.414254227000015,
+      "elapsed": 10.273984864999989,
       "message": "타임아웃 초과"
     },
     {
       "name": "기상청 초단기실황 API",
       "ok": false,
-      "elapsed": 10.017294160000006,
+      "elapsed": 10.279355849000012,
       "message": "타임아웃 초과"
     },
     {
       "name": "기상청 초단기예보 API",
       "ok": false,
-      "elapsed": 10.150482729000032,
+      "elapsed": 10.27322871399997,
       "message": "타임아웃 초과"
     },
     {
       "name": "기상청 단기예보 API",
       "ok": false,
-      "elapsed": 10.148227456999962,
+      "elapsed": 10.016566054999998,
       "message": "타임아웃 초과"
     },
     {
       "name": "에어코리아 미세먼지 API",
       "ok": false,
-      "elapsed": 10.410021750000055,
+      "elapsed": 10.276982375999978,
       "message": "타임아웃 초과"
     }
   ]
