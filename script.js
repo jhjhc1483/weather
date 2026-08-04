@@ -790,14 +790,8 @@
       </div>
     `;
 
-    fetch('/api/diag?t=' + Date.now())
-      .then(function (res) {
-        if (!res.ok) throw new Error('Vercel Static Fallback');
-        return res.json();
-      })
-      .catch(function () {
-        return fetch('/data/api_diag_result.json?t=' + Date.now()).then(function (r) { return r.json(); });
-      })
+    fetch('/data/api_diag_result.json?t=' + Date.now())
+      .then(function (res) { return res.json(); })
       .then(function (data) {
         if ($diagBtn) $diagBtn.classList.remove('loading');
         if (!data || !data.results) {
