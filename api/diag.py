@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 KST = timezone(timedelta(hours=9))
 
@@ -14,28 +15,27 @@ BASE_ALERT = "https://apis.data.go.kr/1360000/WthrWrnInfoService"
 BASE_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
 
 
-def test_endpoint(url, params_dict, api_key, timeout=10.0):
+def test_endpoint(url, params_dict, api_key, timeout=5.0):
     encoded_key = quote(api_key, safe='')
     param_str = "&".join([f"{k}={quote(str(v), safe='')}" for k, v in params_dict.items()])
     full_url = f"{url}?serviceKey={encoded_key}&{param_str}"
-    
+
     req = Request(full_url, headers={
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     })
-    
+
     started = time.monotonic()
     try:
         with urlopen(req, timeout=timeout) as response:
             elapsed = round(time.monotonic() - started, 2)
             content = response.read().decode('utf-8', errors='replace')
-            
+
             try:
                 data = json.loads(content)
                 header = (data.get('response', {}) or {}).get('header', {}) or {}
                 rc = str(header.get('resultCode', '00'))
                 rmsg = str(header.get('resultMsg', 'NORMAL_SERVICE'))
-                
-                # 에어코리아 호환
+
                 if not header and 'response' in data:
                     rc = '00'
                     rmsg = 'NORMAL_SERVICE'
@@ -61,7 +61,13 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         api_key = os.environ.get('DATA_GO_KR_KEY', '')
         if not api_key:
-            self._respond(500, {'error': 'DATA_GO_KR_KEY 환경변수가 설정되어 있지 않습니다.'})
+            self._respond(200, {
+                'timestamp': datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S KST'),
+                'all_ok': False,
+                'results': [
+                    {'name': 'Vercel 환경변수(DATA_GO_KR_KEY)', 'ok': False, 'elapsed': 0.0, 'message': 'Vercel 대시보드에 DATA_GO_KR_KEY 키 추가 필요'}
+                ]
+            })
             return
 
         now = datetime.now(KST)
@@ -71,26 +77,27 @@ class handler(BaseHTTPRequestHandler):
         bt = check_time.strftime('%H') + '00'
 
         tests = [
-            {'name': '기상청 기상특보 API', 'url': f"{BASE_ALERT}/getWthrWrnMsg", 'params': {'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108', 'fromTmFc': today_str, 'toTmFc': today_str}},
-            {'name': '기상청 초단기실황 API', 'url': f"{BASE_WEATHER}/getUltraSrtNcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
-            {'name': '기상청 초단기예보 API', 'url': f"{BASE_WEATHER}/getUltraSrtFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
-            {'name': '기상청 단기예보 API', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': '65', 'ny': '123'}},
-            {'name': '에어코리아 미세먼지 API', 'url': f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", 'params': {'returnType': 'json', 'stationName': '양평읍', 'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1'}},
+            {'id': 0, 'name': '기상청 기상특보 API', 'url': f"{BASE_ALERT}/getWthrWrnMsg", 'params': {'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108', 'fromTmFc': today_str, 'toTmFc': today_str}},
+            {'id': 1, 'name': '기상청 초단기실황 API', 'url': f"{BASE_WEATHER}/getUltraSrtNcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
+            {'id': 2, 'name': '기상청 초단기예보 API', 'url': f"{BASE_WEATHER}/getUltraSrtFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
+            {'id': 3, 'name': '기상청 단기예보 API', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': '65', 'ny': '123'}},
+            {'id': 4, 'name': '에어코리아 미세먼지 API', 'url': f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", 'params': {'returnType': 'json', 'stationName': '양평읍', 'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1'}},
         ]
 
-        results = []
+        results = [None] * len(tests)
         all_ok = True
 
-        for t in tests:
-            ok, elapsed, msg = test_endpoint(t['url'], t['params'], api_key, timeout=12.0)
-            if not ok:
-                all_ok = False
-            results.append({
-                'name': t['name'],
-                'ok': ok,
-                'elapsed': elapsed,
-                'message': msg
-            })
+        def worker(t):
+            ok, elapsed, msg = test_endpoint(t['url'], t['params'], api_key, timeout=5.0)
+            return t['id'], {'name': t['name'], 'ok': ok, 'elapsed': elapsed, 'message': msg}
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(worker, t) for t in tests]
+            for future in as_completed(futures):
+                idx, res = future.result()
+                results[idx] = res
+                if not res['ok']:
+                    all_ok = False
 
         self._respond(200, {
             'timestamp': now.strftime('%Y-%m-%d %H:%M:%S KST'),

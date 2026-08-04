@@ -457,6 +457,55 @@ body {
   font-size: 0.88rem;
 }
 
+/* ---- 미세먼지 점검중 커스텀 모던 툴팁 ---- */
+.dust-na-badge {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  transition: background var(--transition);
+}
+.dust-na-badge:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--text-primary);
+}
+.dust-na-badge:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  color: #f8fafc;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.dust-na-badge:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(15, 23, 42, 0.94) transparent transparent transparent;
+  z-index: 100;
+  pointer-events: none;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

@@ -210,9 +210,9 @@
     const val = loc.dust.pm10;
     if (val === '-') {
       const info = loc.dust && loc.dust.primary_station
-        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중 (수집 일시 중단)`
+        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중`
         : '에어코리아 측정소 점검·교정 중 (수집 일시 중단)';
-      return `<span class="dust-na-val" title="${escHtml(info)}" data-tooltip="${escHtml(info)}" style="cursor:help; text-decoration:underline dotted; color:var(--text-muted);">-</span>`;
+      return `<span class="dust-na-badge" data-tooltip="${escHtml(info)}">-</span>`;
     }
     const cls = dustBadgeClass(g);
     const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;
@@ -229,9 +229,9 @@
     const val = loc.dust.pm25;
     if (val === '-') {
       const info = loc.dust && loc.dust.primary_station
-        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중 (수집 일시 중단)`
+        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중`
         : '에어코리아 측정소 점검·교정 중 (수집 일시 중단)';
-      return `<span class="dust-na-val" title="${escHtml(info)}" data-tooltip="${escHtml(info)}" style="cursor:help; text-decoration:underline dotted; color:var(--text-muted);">-</span>`;
+      return `<span class="dust-na-badge" data-tooltip="${escHtml(info)}">-</span>`;
     }
     const cls = dustBadgeClass(g);
     const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;

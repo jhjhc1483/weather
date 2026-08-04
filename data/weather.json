@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-04T22:13:10+09:00",
+  "updated_at": "2026-08-04T22:22:03+09:00",
   "base_date": "20260804",
   "date_display": "08.04",
   "day_of_week": "화",
-  "time_display": "22:13",
+  "time_display": "22:22",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상",
@@ -13,9 +13,9 @@
     "양평": {
       "overview": "흐림",
       "dust": {
-        "pm10": "12",
+        "pm10": "17",
         "pm10_grade": "좋음",
-        "pm25": "0",
+        "pm25": "7",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
@@ -53,9 +53,9 @@
     "경산": {
       "overview": "맑음",
       "dust": {
-        "pm10": "9",
+        "pm10": "12",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "5",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
@@ -95,7 +95,7 @@
       "dust": {
         "pm10": "19",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "14",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
