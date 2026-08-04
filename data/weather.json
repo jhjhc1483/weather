@@ -1,15 +1,13 @@
 {
-  "updated_at": "2026-08-04T21:36:10+09:00",
+  "updated_at": "2026-08-04T21:37:49+09:00",
   "base_date": "20260804",
   "date_display": "08.04",
   "day_of_week": "화",
-  "time_display": "21:36",
+  "time_display": "21:37",
   "api_status": {
-    "code": "WARNING",
-    "message": "공공데이터포털(에어코리아 미세먼지) 응답 지연 또는 오류로 일부 데이터 수집이 원활하지 않습니다.",
-    "failed_services": [
-      "에어코리아 미세먼지"
-    ]
+    "code": "OK",
+    "message": "공공데이터포털 API 수집 정상",
+    "failed_services": []
   },
   "locations": {
     "양평": {
@@ -270,12 +268,12 @@
     "임실": {
       "overview": "소나기",
       "dust": {
-        "pm10": "14",
+        "pm10": "24",
         "pm10_grade": "좋음",
-        "pm25": "10",
+        "pm25": "7",
         "pm25_grade": "좋음",
-        "is_fallback": true,
-        "station_used": "삼천동",
+        "is_fallback": false,
+        "station_used": "임실읍",
         "primary_station": "임실읍"
       },
       "temperature": {
