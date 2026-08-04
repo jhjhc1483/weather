@@ -213,5 +213,55 @@ def main():
     print("=" * 72)
 
 
+def run_and_save_diag(out_dir=None):
+    """5개 API 전체 진단을 수행하고 결과를 JSON 객체로 반환 및 data/api_diag_result.json 에 저장"""
+    key = os.environ.get('DATA_GO_KR_KEY', '').strip()
+    if not key:
+        return {'all_ok': False, 'message': 'DATA_GO_KR_KEY 환경변수가 설정되어 있지 않습니다.', 'results': []}
+
+    now = datetime.now(KST)
+    today_str = now.strftime('%Y%m%d')
+    check_time = (now - timedelta(minutes=45))
+    bd = check_time.strftime('%Y%m%d')
+    bt = check_time.strftime('%H') + '00'
+
+    services = [
+        {'name': '기상청 기상특보 API', 'url': f"{BASE_ALERT}/getWthrWrnMsg", 'params': {'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108', 'fromTmFc': today_str, 'toTmFc': today_str}},
+        {'name': '기상청 초단기실황 API', 'url': f"{BASE_WEATHER}/getUltraSrtNcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
+        {'name': '기상청 초단기예보 API', 'url': f"{BASE_WEATHER}/getUltraSrtFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
+        {'name': '기상청 단기예보 API', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': '65', 'ny': '123'}},
+        {'name': '에어코리아 미세먼지 API', 'url': f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", 'params': {'returnType': 'json', 'stationName': '양평읍', 'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1'}},
+    ]
+
+    diag_results = []
+    all_ok = True
+
+    for s in services:
+        ok, elapsed, msg, _ = test_api_call(s['url'], s['params'], key, timeout=10.0)
+        if not ok:
+            all_ok = False
+        diag_results.append({
+            'name': s['name'],
+            'ok': ok,
+            'elapsed': elapsed,
+            'message': msg
+        })
+
+    res = {
+        'updated_at': now.strftime('%Y-%m-%dT%H:%M:%S+09:00'),
+        'timestamp': now.strftime('%Y-%m-%d %H:%M:%S KST'),
+        'all_ok': all_ok,
+        'results': diag_results
+    }
+
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+        filepath = os.path.join(out_dir, 'api_diag_result.json')
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(res, f, ensure_ascii=False, indent=2)
+
+    return res
+
+
 if __name__ == '__main__':
     main()

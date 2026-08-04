@@ -771,6 +771,9 @@
 
   function closeDiagModal() {
     if (!$diagModal) return;
+    if (document.activeElement && $diagModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     $diagModal.classList.remove('show');
     $diagModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -789,11 +792,11 @@
 
     fetch('/api/diag?t=' + Date.now())
       .then(function (res) {
-        const contentType = res.headers.get('content-type') || '';
-        if (!res.ok || !contentType.includes('application/json')) {
-          throw new Error('서버리스 API 배포 반영 중이거나 서버 응답을 처리할 수 없습니다.');
-        }
+        if (!res.ok) throw new Error('Vercel Static Fallback');
         return res.json();
+      })
+      .catch(function () {
+        return fetch('/data/api_diag_result.json?t=' + Date.now()).then(function (r) { return r.json(); });
       })
       .then(function (data) {
         if ($diagBtn) $diagBtn.classList.remove('loading');
@@ -864,6 +867,9 @@
 
   function closeYpWeeklyModal() {
     if (!$ypWeeklyModal) return;
+    if (document.activeElement && $ypWeeklyModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     $ypWeeklyModal.classList.remove('show');
     $ypWeeklyModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';

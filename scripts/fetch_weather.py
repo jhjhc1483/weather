@@ -1360,6 +1360,14 @@ def main():
     except Exception as e:
         print(f"  [양평주간] 수집 오류: {e}")
 
+    # 5대 공공데이터 API 실시간 진단 수행 및 독립 데이터 저장
+    try:
+        from diag_all_api import run_and_save_diag
+        run_and_save_diag(out_dir)
+        print(f"  [API진단] 5대 API 실시간 진단 결과 저장 완료: {os.path.join(out_dir, 'api_diag_result.json')}")
+    except Exception as e:
+        print(f"  [API진단] 진단 결과 저장 중 오류: {e}")
+
     # ── 실행 결과 요약 ──────────────────────────────────────
     # 이전에는 API가 전부 끊겨도 "성공적으로 완료"를 찍고 exit 0으로 끝나
     # Actions가 초록불이 되는 silent failure가 있었다. 상태를 명시하고
