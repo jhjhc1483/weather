@@ -745,6 +745,93 @@
     });
   }
 
+  /* ======== 데이터 진단 모달 & 로직 ======== */
+  const $diagBtn = document.getElementById('diag-btn');
+  const $diagModal = document.getElementById('diag-modal');
+  const $diagModalCloseBtn = document.getElementById('diag-modal-close-btn');
+  const $diagModalBody = document.getElementById('diag-modal-body');
+
+  function openDiagModal() {
+    if (!$diagModal) return;
+    $diagModal.classList.add('show');
+    $diagModal.removeAttribute('aria-hidden');
+    document.body.style.overflow = 'hidden';
+    runDiagnosis();
+  }
+
+  function closeDiagModal() {
+    if (!$diagModal) return;
+    $diagModal.classList.remove('show');
+    $diagModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function runDiagnosis() {
+    if (!$diagModalBody) return;
+    if ($diagBtn) $diagBtn.classList.add('loading');
+
+    $diagModalBody.innerHTML = `
+      <div class="loading-cell">
+        <div class="loading-spinner"></div>
+        <span>공공데이터 5개 API 실시간 상태를 측정하는 중입니다...</span>
+      </div>
+    `;
+
+    fetch('/api/diag?t=' + Date.now())
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if ($diagBtn) $diagBtn.classList.remove('loading');
+        if (!data || !data.results) {
+          $diagModalBody.innerHTML = '<p style="text-align:center; padding:1rem; color:var(--text-muted);">진단 데이터 응답 형식이 올바르지 않습니다.</p>';
+          return;
+        }
+
+        let html = '<div class="diag-list">';
+        data.results.forEach(function (item) {
+          const badgeClass = item.ok ? 'ok' : 'fail';
+          const badgeText = item.ok ? '✓ 정상' : '✗ 지연/오류';
+          html += `
+            <div class="diag-item">
+              <span class="diag-item-name">${item.name}</span>
+              <div class="diag-item-meta">
+                <span class="diag-elapsed">${Number(item.elapsed).toFixed(2)}s</span>
+                <span class="diag-badge ${badgeClass}">${badgeText}</span>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+
+        const summaryClass = data.all_ok ? 'ok' : 'warn';
+        const summaryText = data.all_ok
+          ? '✅ [ALL OK] 모든 공공데이터 API 서비스가 정상 응답을 반환했습니다.'
+          : '⚠️ 일부 API 서비스 응답 지연 또는 장애가 발생했습니다.';
+
+        html += `<div class="diag-summary-box ${summaryClass}">${summaryText}</div>`;
+        $diagModalBody.innerHTML = html;
+      })
+      .catch(function (err) {
+        if ($diagBtn) $diagBtn.classList.remove('loading');
+        $diagModalBody.innerHTML = `
+          <div style="text-align:center; padding:1.5rem 1rem;">
+            <p style="color:#ef4444; font-weight:600; margin-bottom:0.5rem;">⚠️ API 진단 호출에 실패했습니다.</p>
+            <p style="font-size:0.85rem; color:var(--text-muted);">${err.message || err}</p>
+          </div>
+        `;
+      });
+  }
+
+  if ($diagBtn && $diagModal) {
+    $diagBtn.addEventListener('click', openDiagModal);
+    if ($diagModalCloseBtn) $diagModalCloseBtn.addEventListener('click', closeDiagModal);
+    $diagModal.addEventListener('click', function (e) {
+      if (e.target === $diagModal) closeDiagModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && $diagModal.classList.contains('show')) closeDiagModal();
+    });
+  }
+
   /* ======== 초기화 ======== */
   initTheme();
   $btn.addEventListener('click', handleRefresh);

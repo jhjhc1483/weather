@@ -35,6 +35,14 @@
           <span class="btn-text">지금 갱신</span>
         </button>
 
+        <!-- 데이터 진단 버튼 -->
+        <button class="diag-btn" id="diag-btn" title="공공데이터 5개 API 실시간 상태 진단">
+          <svg class="diag-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+          <span class="btn-text">데이터 진단</span>
+        </button>
+
         <!-- 테마 전환 버튼 (우측 상단 동그란 아이콘 버튼) -->
         <button class="theme-toggle-btn" id="theme-toggle-btn" title="다크 / 라이트 모드 전환" aria-label="테마 전환">
           <svg class="theme-icon sun-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -116,6 +124,22 @@
         <div class="loading-cell">
           <div class="loading-spinner"></div>
           <span>README를 불러오는 중...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 데이터 진단 모달 팝업 -->
+  <div id="diag-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-content diag-modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">🩺 공공데이터 API 실시간 진단</h2>
+        <button id="diag-modal-close-btn" class="modal-close-btn" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body" id="diag-modal-body">
+        <div class="loading-cell">
+          <div class="loading-spinner"></div>
+          <span>공공데이터 API 상태를 진단하는 중입니다...</span>
         </div>
       </div>
     </div>
