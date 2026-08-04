@@ -315,7 +315,7 @@
     { cat: '기온(℃)', catHtml: '기온(℃) ' + TEMP_INFO_ICON, colspan: 2, sub: null, render: renderTemp, alertRow: false },
     { cat: '풍향/풍속', colspan: 2, sub: null, render: renderWind, alertRow: false },
     { cat: '일일 누적 강수량', colspan: 2, sub: null, render: renderRainAcc, alertRow: false },
-    { cat: '일일 예상 강수량', colspan: 2, sub: null, render: renderRainFcst, alertRow: false },
+    { cat: '일일 예상 강수량 (다음날 9시까지)', catHtml: '일일 예상 강수량<br><span style="font-size:0.73rem; color:var(--text-muted); font-weight:normal;">(다음날 9시까지)</span>', colspan: 2, sub: null, render: renderRainFcst, alertRow: false },
     { cat: '기상특보', colspan: 2, sub: null, render: renderAlerts, alertRow: true },
   ];
 
