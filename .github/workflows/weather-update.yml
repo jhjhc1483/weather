@@ -33,6 +33,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weather.json
-          git diff --quiet --cached || git commit -m "chore: update weather data $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M KST')"
+          git add data/weather.json \
+                  data/weather_yangpyeong_weekly.json \
+                  data/api_diag_result.json
+          git diff --quiet --cached || \
+            git commit -m "chore: update weather data $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M KST')"
+          git pull --rebase --autostash
           git push
