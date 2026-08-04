@@ -1145,6 +1145,19 @@ def fetch_yangpyeong_weekly_data(now, today_str):
         except (KeyError, TypeError):
             pass
 
+    # 만약 최신 예보 시각이 0200시가 아니면 새벽 0200시 예보도 추가 수집하여 오늘 24시간 전체 TMN/TMX 기온 반영
+    if bt != '0200':
+        early_data = api_call(f"{BASE_WEATHER}/getVilageFcst", {
+            'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
+            'base_date': today_str, 'base_time': '0200', 'nx': str(nx), 'ny': str(ny),
+        }, service_name='기상청 단기예보(양평새벽)')
+        if early_data:
+            try:
+                early_items = early_data['response']['body']['items']['item']
+                items.extend(early_items)
+            except (KeyError, TypeError):
+                pass
+
     weekday_kr = ['월', '화', '수', '목', '금', '토', '일']
     days_info = []
 

@@ -208,7 +208,12 @@
   function renderDustPM10(loc) {
     const g = loc.dust.pm10_grade;
     const val = loc.dust.pm10;
-    if (val === '-') return '-';
+    if (val === '-') {
+      const info = loc.dust && loc.dust.primary_station
+        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중 (수집 일시 중단)`
+        : '에어코리아 측정소 점검·교정 중 (수집 일시 중단)';
+      return `<span class="dust-na-val" title="${escHtml(info)}" data-tooltip="${escHtml(info)}" style="cursor:help; text-decoration:underline dotted; color:var(--text-muted);">-</span>`;
+    }
     const cls = dustBadgeClass(g);
     const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;
     let html = `<span class="dust-badge ${cls}">${text}</span>`;
@@ -222,7 +227,12 @@
   function renderDustPM25(loc) {
     const g = loc.dust.pm25_grade;
     const val = loc.dust.pm25;
-    if (val === '-') return '-';
+    if (val === '-') {
+      const info = loc.dust && loc.dust.primary_station
+        ? `에어코리아 측정소(${loc.dust.primary_station} 및 인근 백업) 점검·교정 중 (수집 일시 중단)`
+        : '에어코리아 측정소 점검·교정 중 (수집 일시 중단)';
+      return `<span class="dust-na-val" title="${escHtml(info)}" data-tooltip="${escHtml(info)}" style="cursor:help; text-decoration:underline dotted; color:var(--text-muted);">-</span>`;
+    }
     const cls = dustBadgeClass(g);
     const text = (g && g !== '-') ? `${escHtml(g)} (${val})` : `${val} ㎍/㎥`;
     let html = `<span class="dust-badge ${cls}">${text}</span>`;
@@ -778,7 +788,13 @@
     `;
 
     fetch('/api/diag?t=' + Date.now())
-      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        const contentType = res.headers.get('content-type') || '';
+        if (!res.ok || !contentType.includes('application/json')) {
+          throw new Error('서버리스 API 배포 반영 중이거나 서버 응답을 처리할 수 없습니다.');
+        }
+        return res.json();
+      })
       .then(function (data) {
         if ($diagBtn) $diagBtn.classList.remove('loading');
         if (!data || !data.results) {
@@ -871,37 +887,61 @@
           return;
         }
 
+        const forecast = data.weekly_forecast;
+
         let html = `
           <div class="yp-weekly-table-wrapper">
-            <table class="yp-weekly-table">
+            <table class="yp-weekly-table yp-weekly-table-pivoted">
               <thead>
                 <tr>
-                  <th>구분</th>
-                  <th>날짜</th>
-                  <th>개황</th>
-                  <th>최저 기온</th>
-                  <th>최고 기온</th>
-                  <th>풍향 / 풍속</th>
-                </tr>
-              </thead>
-              <tbody>
+                  <th class="yp-th-cat">항목</th>
         `;
 
-        data.weekly_forecast.forEach(function (item) {
-          const overviewEmoji = getOverviewEmoji(item.overview);
-          html += `
-            <tr>
-              <td><strong>${item.label}</strong></td>
-              <td>${item.date_display}</td>
-              <td>${overviewEmoji} ${item.overview}</td>
-              <td class="temp-cell"><span class="temp-min">${item.temperature.min}℃</span></td>
-              <td class="temp-cell"><span class="temp-max">${item.temperature.max}℃</span></td>
-              <td>${item.wind.direction} ${item.wind.speed}</td>
-            </tr>
-          `;
+        forecast.forEach(function (item) {
+          html += `<th>${item.date_display}</th>`;
         });
 
         html += `
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="yp-td-cat">개황</td>
+        `;
+        forecast.forEach(function (item) {
+          const emoji = getOverviewEmoji(item.overview);
+          html += `<td><div class="yp-cell-overview">${emoji}<br><span>${item.overview}</span></div></td>`;
+        });
+        html += `</tr>`;
+
+        html += `
+                <tr>
+                  <td class="yp-td-cat">최저 기온</td>
+        `;
+        forecast.forEach(function (item) {
+          html += `<td class="temp-cell"><span class="temp-min">${item.temperature.min}℃</span></td>`;
+        });
+        html += `</tr>`;
+
+        html += `
+                <tr>
+                  <td class="yp-td-cat">최고 기온</td>
+        `;
+        forecast.forEach(function (item) {
+          html += `<td class="temp-cell"><span class="temp-max">${item.temperature.max}℃</span></td>`;
+        });
+        html += `</tr>`;
+
+        html += `
+                <tr>
+                  <td class="yp-td-cat">풍향 / 풍속</td>
+        `;
+        forecast.forEach(function (item) {
+          html += `<td><span class="wind-dir">${item.wind.direction}</span><br><span class="wind-speed">${item.wind.speed}</span></td>`;
+        });
+
+        html += `
+                </tr>
               </tbody>
             </table>
           </div>

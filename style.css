@@ -359,40 +359,50 @@ body {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-/* ---- Table Footer Actions & Yangpyeong Weekly Button ---- */
-.table-footer-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0.75rem 1.2rem;
-  background: var(--bg-hover);
+/* ---- Table Footer Row & Column-aligned Button ---- */
+.tfoot-row td {
+  padding: 0.55rem 0.3rem;
   border-top: 1px solid var(--border);
-  border-bottom-left-radius: inherit;
-  border-bottom-right-radius: inherit;
+  background: var(--bg-hover);
+  text-align: center;
+  vertical-align: middle;
+}
+.tfoot-label {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+.tfoot-loc-cell {
+  padding: 0.4rem 0.2rem !important;
 }
 
 .yp-weekly-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 1.1rem;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.6rem;
+  width: 92%;
+  max-width: 95px;
+  margin: 0 auto;
   border: none;
-  border-radius: 20px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #0284c7, #2563eb);
   color: var(--text-white);
   font-family: var(--font);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 3px 12px rgba(2, 132, 199, 0.3);
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
   transition: transform var(--transition), box-shadow var(--transition);
 }
 .yp-weekly-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 18px rgba(2, 132, 199, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
 }
 .yp-weekly-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 
 /* ---- Yangpyeong Weekly Forecast Modal & Table ---- */
@@ -427,6 +437,24 @@ body {
 }
 .yp-weekly-table td .temp-max {
   color: #dc2626;
+}
+
+/* 피벗(가로-세로 전환) 스타일 */
+.yp-weekly-table-pivoted .yp-th-cat,
+.yp-weekly-table-pivoted .yp-td-cat {
+  background: var(--bg-hover);
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 95px;
+  white-space: nowrap;
+}
+.yp-cell-overview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-weight: 500;
+  font-size: 0.88rem;
 }
 
 @keyframes spin {
