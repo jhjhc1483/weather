@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-05T01:00:12+09:00",
+  "updated_at": "2026-08-05T01:02:45+09:00",
   "base_date": "20260805",
   "date_display": "08.05",
   "day_of_week": "수",
-  "time_display": "01:00",
+  "time_display": "01:02",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상",
@@ -205,7 +205,7 @@
       "forecast_summary": "⚠️ 폭염경보, 열대야주의보 발효 중! 안전에 유의하세요."
     },
     "세종": {
-      "overview": "구름많음",
+      "overview": "맑음",
       "dust": {
         "pm10": "17",
         "pm10_grade": "좋음",
