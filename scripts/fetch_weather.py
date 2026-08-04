@@ -211,6 +211,7 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
     full_url = f"{url}?serviceKey={encoded_key}"
     label = service_name or url.rsplit('/', 1)[-1]
     reason = '원인 미상'
+    permanent = False
 
     for attempt in range(retries):
         started = time.monotonic()
@@ -224,6 +225,7 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
                 code, msg = portal_error(resp.text)
                 if code in PERMANENT_ERROR_CODES:
                     # 영구 오류 → 재시도 없이 즉시 중단
+                    permanent = True
                     reason = (f"코드 {code} ({msg}) → {PERMANENT_ERROR_CODES[code]}")
                     break
                 body = ' '.join(resp.text[:300].split())
@@ -257,6 +259,7 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
 
             reason = f"resultCode={rc} resultMsg={rmsg}"
             if rc in PERMANENT_ERROR_CODES:
+                permanent = True
                 reason = f"코드 {rc} ({rmsg}) → {PERMANENT_ERROR_CODES[rc]}"
                 break
             if attempt < retries - 1:
@@ -280,7 +283,13 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
     if service_name:
         FAILED_SERVICES.add(service_name)
 
-    if state['failures'] >= MAX_ALLOWED_FAILURES and not state['broken']:
+    # 키 미등록·기한만료 등은 이번 실행 내내 절대 회복되지 않는다.
+    # 5회를 채울 때까지 기다릴 이유가 없으므로 즉시 차단한다.
+    if permanent and not state['broken']:
+        state['broken'] = True
+        print(f"[🚨 Fast-Fail] '{group}' 계열 인증 오류 — 이번 실행에서는 "
+              f"회복 불가하므로 즉시 차단합니다 (다른 계열 수집은 계속 진행)")
+    elif state['failures'] >= MAX_ALLOWED_FAILURES and not state['broken']:
         state['broken'] = True
         print(f"\n[🚨 Fast-Fail] '{group}' 계열 연속 {state['failures']}회 장애 — "
               f"이 계열만 조기 차단합니다 (다른 계열 수집은 계속 진행)")
