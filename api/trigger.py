@@ -75,7 +75,7 @@ class handler(BaseHTTPRequestHandler):
         req.add_header('User-Agent', 'weather-dashboard')
 
         try:
-            urlopen(req, timeout=10)
+            urlopen(req, timeout=20)
             self._respond(200, {'message': '갱신 요청 완료. 약 2~3분 후 데이터가 업데이트됩니다.'})
         except HTTPError as e:
             error_body = e.read().decode('utf-8', errors='replace')

@@ -171,7 +171,7 @@ MAX_ALLOWED_FAILURES = 5          # 계열별 연속 실패 허용치
 CIRCUIT_STATE = {}
 
 # 계열별 기본 타임아웃(초). 특보는 응답 본문이 커서 넉넉히 준다.
-GROUP_TIMEOUT = {'기상특보': 20, '에어코리아': 10, '기상청예보': 10}
+GROUP_TIMEOUT = {'기상특보': 20, '에어코리아': 20, '기상청예보': 20}
 
 
 def _group_of(service_name):
@@ -195,11 +195,11 @@ def circuit_broken(group=None):
     return any(s['broken'] for s in CIRCUIT_STATE.values())
 
 
-def api_call(url, params, retries=2, service_name=None, timeout=None):
+def api_call(url, params, retries=3, service_name=None, timeout=None):
     group = _group_of(service_name)
     state = _circuit(group)
     if timeout is None:
-        timeout = GROUP_TIMEOUT.get(group, 10)
+        timeout = GROUP_TIMEOUT.get(group, 20)
 
     # 1. 해당 계열의 서킷이 열려 있으면 추가 호출 없이 조기 종료 (Fast-Fail)
     if state['broken']:
