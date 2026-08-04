@@ -870,7 +870,7 @@ def fetch_alerts():
 # ============================================================
 # 지역별 데이터 처리 및 정밀 융합
 # ============================================================
-def process_location(name, cfg, now, today_str, alerts_data):
+def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, existing_base_date=None):
     print(f"[{name}] 데이터 수집 시작...")
     nx, ny = cfg['nx'], cfg['ny']
 
@@ -952,11 +952,27 @@ def process_location(name, cfg, now, today_str, alerts_data):
     except (ValueError, TypeError):
         w_spd_text = '-'
 
-    # 일일 누적 강수량 (00시 ~ 현재 시각까지)
-    acc_rain = 0.0
-    # 초단기실황 RN1 또는 단기예보 이전시간 누적
+    # 일일 누적 강수량 (00시 ~ 24시 당일 시간별 강수량 합산 보존)
+    hourly_rn1 = {}
+    if existing_loc and existing_base_date == today_str:
+        raw_hrn1 = existing_loc.get('hourly_rn1')
+        if isinstance(raw_hrn1, dict):
+            hourly_rn1 = dict(raw_hrn1)
+
     curr_rn1 = parse_rain_val(ncst.get('RN1', 0))
-    acc_rain += curr_rn1
+    hour_key = now.strftime('%H')
+    if curr_rn1 > 0:
+        hourly_rn1[hour_key] = max(hourly_rn1.get(hour_key, 0.0), curr_rn1)
+
+    acc_rain = sum(hourly_rn1.values())
+
+    # 이전 누적 강수량이 존재하는 경우 보존
+    if existing_loc and existing_base_date == today_str:
+        try:
+            prev_acc = float(existing_loc.get('rain_accumulated', 0.0) or 0.0)
+            acc_rain = max(acc_rain, prev_acc)
+        except (ValueError, TypeError):
+            pass
 
     tomorrow_str = (now.date() + timedelta(days=1)).strftime('%Y%m%d')
 
@@ -1041,6 +1057,7 @@ def process_location(name, cfg, now, today_str, alerts_data):
         'rain_accumulated': round(acc_rain, 1),
         'rain_forecast': rain_forecast,
         'alerts': alerts_data.get(name, []),
+        'hourly_rn1': hourly_rn1,
     }
     loc_res['forecast_summary'] = generate_forecast_summary(name, loc_res)
     return loc_res
@@ -1139,11 +1156,13 @@ def main():
     alerts = fetch_alerts()
     time.sleep(0.3)
 
+    existing_base_date = existing_data.get('base_date') if existing_data else None
     locations_data = {}
     for name in LOCATION_ORDER:
         cfg = LOCATIONS[name]
+        existing_loc = existing_data.get('locations', {}).get(name) if existing_data else None
         try:
-            loc_res = process_location(name, cfg, now, today_str, alerts)
+            loc_res = process_location(name, cfg, now, today_str, alerts, existing_loc, existing_base_date)
             # 만약 새 수집 결과의 기온/개황이 비어있고(-), 기존 유효 데이터가 존재하면 기존 데이터 보존
             if (loc_res.get('overview') == '-' or loc_res.get('temperature', {}).get('current') == '-') and existing_data and 'locations' in existing_data and name in existing_data['locations']:
                 prev_loc = existing_data['locations'][name]
