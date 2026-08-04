@@ -13,6 +13,7 @@
 import json
 import math
 import os
+import re
 import sys
 import time
 import traceback
@@ -30,7 +31,7 @@ try:
 except ImportError:
     pass
 
-API_KEY = os.environ.get('DATA_GO_KR_KEY', '')
+API_KEY = os.environ.get('DATA_GO_KR_KEY', '').strip()
 if not API_KEY:
     print("ERROR: DATA_GO_KR_KEY 환경변수가 설정되지 않았습니다.")
     sys.exit(1)
@@ -79,6 +80,76 @@ for _name, _url in (('BASE_WEATHER', BASE_WEATHER), ('BASE_AIR', BASE_AIR),
 
 # 특보 통보문 조회 기간(일). 넓힐수록 응답이 무거워진다.
 ALERT_LOOKBACK_DAYS = 2
+
+
+# ============================================================
+# 로그 마스킹
+#
+# GitHub Actions는 Secret의 '원본' 문자열만 ***로 가린다. quote()로 퍼센트
+# 인코딩된 형태(예: / -> %2F)는 패턴이 달라 마스킹을 통과해 평문 노출된다.
+# 예외 메시지·응답 본문에는 요청 URL이 그대로 실리므로 반드시 직접 가린다.
+# ============================================================
+_SECRET_FORMS = [s for s in {API_KEY, quote(API_KEY, safe='')} if s]
+
+
+def redact(text):
+    """서비스키(원본/인코딩/절단 조각)를 마스킹한다."""
+    s = str(text)
+    for secret in _SECRET_FORMS:
+        s = s.replace(secret, '***')
+    # 잘린 키 조각까지 방어: serviceKey= 뒤는 통째로 가린다.
+    return re.sub(r'(serviceKey=)[^&\s\'"]*', r'\1***', s)
+
+
+# 일부 제공기관 WAF는 기본 python-requests UA를 차단한다.
+REQUEST_HEADERS = {
+    'User-Agent': 'weather-dashboard/1.0 (+github-actions)',
+    'Accept': 'application/json, text/plain, */*',
+}
+
+
+def key_sanity_report():
+    """서비스키의 '모양'만 점검한다. 키 내용은 절대 출력하지 않는다."""
+    raw = os.environ.get('DATA_GO_KR_KEY', '')
+    notes = []
+    if raw != raw.strip():
+        notes.append('앞뒤 공백/개행 있음(자동 제거함)')
+    if re.search(r'%[0-9A-Fa-f]{2}', API_KEY):
+        notes.append('이미 퍼센트 인코딩된 형태 — Encoding키가 아니라 '
+                     'Decoding키를 넣어야 합니다')
+    if len(API_KEY) not in range(80, 110):
+        notes.append(f'길이 {len(API_KEY)}자 — 일반 인증키는 통상 80~100자')
+    print(f"[키] 길이 {len(API_KEY)}자"
+          + (f" | 주의: {'; '.join(notes)}" if notes else " | 형식 정상"))
+
+
+# 포털 공통 오류코드 중 '재시도해도 결과가 같은' 영구 오류.
+# 이런 응답에 재시도를 거는 것은 호출 쿼터만 소모한다.
+PERMANENT_ERROR_CODES = {
+    '30': '해당 API에 활용신청이 되어 있지 않습니다. 마이페이지 > 오픈API > '
+          '활용신청 현황에서 해당 서비스의 승인 여부를 확인하세요.',
+    '31': '서비스키 활용기간이 만료되었습니다. 연장신청이 필요합니다.',
+    '32': '등록되지 않은 IP입니다. 활용신청 시 등록한 IP와 호출 IP가 다릅니다.',
+    '22': '일일 트래픽 제한을 초과했습니다. 익일 자동 해제되거나 증량신청이 필요합니다.',
+}
+
+
+def portal_error(text):
+    """포털 공통 오류 응답(JSON/XML 양쪽)에서 (코드, 메시지)를 추출."""
+    code = msg = None
+    try:
+        header = (json.loads(text).get('OpenAPI_ServiceResponse', {})
+                  or {}).get('cmmMsgHeader', {}) or {}
+        code = str(header.get('returnReasonCode', '') or '') or None
+        msg = header.get('returnAuthMsg') or header.get('errMsg')
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        m = re.search(r'<returnReasonCode>\s*(\d+)\s*</returnReasonCode>', text)
+        if m:
+            code = m.group(1)
+        m = re.search(r'<returnAuthMsg>\s*([^<]+)</returnAuthMsg>', text)
+        if m:
+            msg = m.group(1).strip()
+    return code, msg
 
 
 # ============================================================
@@ -144,16 +215,31 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
     for attempt in range(retries):
         started = time.monotonic()
         try:
-            resp = requests.get(full_url, params=params, timeout=timeout)
-            resp.raise_for_status()
+            resp = requests.get(full_url, params=params, timeout=timeout,
+                                headers=REQUEST_HEADERS)
+
+            # raise_for_status()를 먼저 부르면 본문을 못 읽고 예외로 빠진다.
+            # 4xx/5xx의 진짜 사유는 대부분 본문(WAF 차단 안내, returnAuthMsg 등)에 있다.
+            if resp.status_code >= 400:
+                code, msg = portal_error(resp.text)
+                if code in PERMANENT_ERROR_CODES:
+                    # 영구 오류 → 재시도 없이 즉시 중단
+                    reason = (f"코드 {code} ({msg}) → {PERMANENT_ERROR_CODES[code]}")
+                    break
+                body = ' '.join(resp.text[:300].split())
+                reason = redact(f"HTTP {resp.status_code} 응답본문={body}")
+                if attempt < retries - 1:
+                    time.sleep(0.5)
+                    continue
+                break
 
             try:
                 data = resp.json()
             except json.JSONDecodeError:
                 # 공공데이터포털은 서비스 레벨 오류(키 미등록, 일일 트래픽 초과 등)일 때
                 # dataType=JSON 이어도 XML(OpenAPI_ServiceResponse)로 응답한다.
-                snippet = ' '.join(resp.text[:200].split())
-                reason = f"JSON 파싱 실패 (HTTP {resp.status_code}) 응답앞부분={snippet}"
+                snippet = ' '.join(resp.text[:300].split())
+                reason = redact(f"JSON 파싱 실패 (HTTP {resp.status_code}) 응답앞부분={snippet}")
                 if attempt < retries - 1:
                     time.sleep(0.5)
                     continue
@@ -170,6 +256,9 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
                 return data
 
             reason = f"resultCode={rc} resultMsg={rmsg}"
+            if rc in PERMANENT_ERROR_CODES:
+                reason = f"코드 {rc} ({rmsg}) → {PERMANENT_ERROR_CODES[rc]}"
+                break
             if attempt < retries - 1:
                 time.sleep(0.5)
                 continue
@@ -181,12 +270,12 @@ def api_call(url, params, retries=2, service_name=None, timeout=None):
             if attempt < retries - 1:
                 time.sleep(0.5)
         except requests.RequestException as e:
-            reason = f"{type(e).__name__}: {str(e)[:150]}"
+            reason = redact(f"{type(e).__name__}: {str(e)[:200]}")
             if attempt < retries - 1:
                 time.sleep(0.5)
 
     # ── 최종 실패 ────────────────────────────────────────────
-    print(f"  [API 실패] {label} — {reason}")
+    print(f"  [API 실패] {label} — {redact(reason)}")
     state['failures'] += 1
     if service_name:
         FAILED_SERVICES.add(service_name)
@@ -1023,6 +1112,7 @@ def main():
 
     print(f"=== 고도화 날씨 데이터 수집 ===")
     print(f"시각: {now.strftime('%Y-%m-%d %H:%M:%S KST')}")
+    key_sanity_report()
 
     out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
     os.makedirs(out_dir, exist_ok=True)
