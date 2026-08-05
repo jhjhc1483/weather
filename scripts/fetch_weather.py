@@ -202,7 +202,7 @@ def degraded_services():
 CIRCUIT_STATE = {}
 
 # 계열별 기본 타임아웃(초). 특보는 응답 본문이 커서 넉넉히 준다.
-GROUP_TIMEOUT = {'기상특보': 20, '에어코리아': 20, '기상청예보': 20}
+GROUP_TIMEOUT = {'기상특보': 30, '에어코리아': 30, '기상청예보': 30}
 
 
 def _group_of(service_name):
@@ -261,7 +261,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
                 body = ' '.join(resp.text[:300].split())
                 reason = redact(f"HTTP {resp.status_code} 응답본문={body}")
                 if attempt < retries - 1:
-                    time.sleep(0.5)
+                    time.sleep(min(1 ** attempt, 8))
                     continue
                 break
 
@@ -273,7 +273,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
                 snippet = ' '.join(resp.text[:300].split())
                 reason = redact(f"JSON 파싱 실패 (HTTP {resp.status_code}) 응답앞부분={snippet}")
                 if attempt < retries - 1:
-                    time.sleep(0.5)
+                    time.sleep(min(1 ** attempt, 8))
                     continue
                 break
 
@@ -294,7 +294,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
                 reason = f"코드 {rc} ({rmsg}) → {PERMANENT_ERROR_CODES[rc]}"
                 break
             if attempt < retries - 1:
-                time.sleep(0.5)
+                time.sleep(min(1 ** attempt, 8))
                 continue
             break
 
@@ -306,7 +306,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
         except requests.RequestException as e:
             reason = redact(f"{type(e).__name__}: {str(e)[:200]}")
             if attempt < retries - 1:
-                time.sleep(0.5)
+                time.sleep(min(1 ** attempt, 8))
 
     # ── 최종 실패 ────────────────────────────────────────────
     print(f"  [API 실패] {label} — {redact(reason)}")
