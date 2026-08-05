@@ -1,36 +1,36 @@
 {
-  "updated_at": "2026-08-05T10:12:48+09:00",
-  "timestamp": "2026-08-05 10:12:48 KST",
+  "updated_at": "2026-08-05T11:02:05+09:00",
+  "timestamp": "2026-08-05 11:02:05 KST",
   "all_ok": true,
   "results": [
     {
       "name": "기상청 기상특보 API",
       "ok": true,
-      "elapsed": 0.4567398749999825,
+      "elapsed": 0.5033272860000011,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 초단기실황 API",
       "ok": true,
-      "elapsed": 0.4937564030000203,
+      "elapsed": 0.4420827060000079,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 초단기예보 API",
       "ok": true,
-      "elapsed": 0.49070045099998083,
+      "elapsed": 0.45552588900000046,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 단기예보 API",
       "ok": true,
-      "elapsed": 0.5088693339999963,
+      "elapsed": 0.4504663030000131,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "에어코리아 미세먼지 API",
       "ok": true,
-      "elapsed": 0.4795249289999788,
+      "elapsed": 0.4464369889999773,
       "message": "rc=00 (NORMAL_CODE)"
     }
   ]
