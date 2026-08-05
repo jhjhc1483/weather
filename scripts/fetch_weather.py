@@ -36,27 +36,29 @@ if not API_KEY:
     print("ERROR: DATA_GO_KR_KEY 환경변수가 설정되지 않았습니다.")
     sys.exit(1)
 
+KMA_API_HUB_KEY = os.environ.get('KMA_API_HUB_KEY', '').strip()
+if KMA_API_HUB_KEY:
+    print("INFO: KMA_API_HUB_KEY 확인됨 - 기상청 API 허브 실시간 강수 관측 연동 활성화")
+
 # ============================================================
 # 8개 지역 설정
 # nx, ny: 기상청 격자좌표
 # station: 에어코리아 실제 측정소명 (검증 완료)
 # alert_region: 기상특보 검색 키워드
 # wrn_stn: 특보 통보문을 발표하는 관할 관서 지점번호
-#          전국(108) 통보문은 발효 목록이 매우 길어 뒷부분(전북·경북·제주 등)이
-#          줄바꿈·절단으로 유실되기 쉽다. 관할 지방청 통보문은 해당 관할만
-#          나열하므로 짧고 안전하다. 실패 시 108로 폴백한다.
+# kma_stn: 기상청 API 허브 관측소 지점번호
 # ============================================================
 WRN_STN_NATIONWIDE = '108'
 
 LOCATIONS = {
-    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'sub_region': '서부', 'province': '경기도',   'wrn_stn': '109'},    # 노도성당 (양평 서부)
-    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143'},    # 제광파종기
-    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159'},    # 후전삼거리
-    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159'},    # 국군복지단 충무마트
-    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143'},    # 초전면
-    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'sub_region': '북부', 'province': '세종',    'wrn_stn': '133'},    # 세종레스텔(연서면 봉암리 - 세종 북부)
-    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133'},    # 품안마을아파트(신도안면)
-    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북',     'wrn_stn': '146'},    # 충경신병교육대
+    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'sub_region': '서부', 'province': '경기도',   'wrn_stn': '109', 'kma_stn': '212'},    # 노도성당 (양평 서부)
+    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '830'},    # 제광파종기
+    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '893'},    # 후전삼거리
+    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '877'},    # 국군복지단 충무마트
+    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '847'},    # 초전면
+    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'sub_region': '북부', 'province': '세종',    'wrn_stn': '133', 'kma_stn': '637'},    # 세종레스텔(연서면 봉암리 - 세종 북부)
+    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133', 'kma_stn': '640'},    # 품안마을아파트(신도안면)
+    '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북',     'wrn_stn': '146', 'kma_stn': '244'},    # 충경신병교육대
 }
 
 LOCATION_ORDER = ['양평', '경산', '사천', '함안', '성주', '세종', '계룡', '임실']
@@ -115,10 +117,10 @@ def key_sanity_report():
     if raw != raw.strip():
         notes.append('앞뒤 공백/개행 있음(자동 제거함)')
     if re.search(r'%[0-9A-Fa-f]{2}', API_KEY):
-        notes.append('이미 퍼센트 인코딩된 형태 — Encoding키가 아니라 '
+        notes.append('이미 퍼센트 인코딩된 형태 - Encoding키가 아니라 '
                      'Decoding키를 넣어야 합니다')
     if len(API_KEY) not in range(80, 110):
-        notes.append(f'길이 {len(API_KEY)}자 — 일반 인증키는 통상 80~100자')
+        notes.append(f'길이 {len(API_KEY)}자 - 일반 인증키는 통상 80~100자')
     print(f"[키] 길이 {len(API_KEY)}자"
           + (f" | 주의: {'; '.join(notes)}" if notes else " | 형식 정상"))
 
@@ -308,8 +310,8 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
             if attempt < retries - 1:
                 time.sleep(min(1 ** attempt, 8))
 
-    # ── 최종 실패 ────────────────────────────────────────────
-    print(f"  [API 실패] {label} — {redact(reason)}")
+    # -- 최종 실패 --------------------------------------------
+    print(f"  [API 실패] {label} - {redact(reason)}")
     state['failures'] += 1
     record_fail(service_name)
 
@@ -317,11 +319,11 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
     # 5회를 채울 때까지 기다릴 이유가 없으므로 즉시 차단한다.
     if permanent and not state['broken']:
         state['broken'] = True
-        print(f"[🚨 Fast-Fail] '{group}' 계열 인증 오류 — 이번 실행에서는 "
+        print(f"[Fast-Fail] '{group}' 계열 인증 오류 - 이번 실행에서는 "
               f"회복 불가하므로 즉시 차단합니다 (다른 계열 수집은 계속 진행)")
     elif state['failures'] >= MAX_ALLOWED_FAILURES and not state['broken']:
         state['broken'] = True
-        print(f"\n[🚨 Fast-Fail] '{group}' 계열 연속 {state['failures']}회 장애 — "
+        print(f"\n[Fast-Fail] '{group}' 계열 연속 {state['failures']}회 장애 - "
               f"이 계열만 조기 차단합니다 (다른 계열 수집은 계속 진행)")
 
     return None
@@ -592,6 +594,91 @@ def fetch_air(station, fallback_station=None):
         'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-',
         'is_fallback': False, 'station_used': station, 'primary_station': station
     }
+
+
+def fetch_kma_hub_obs(stn_id):
+    """기상청 API 허브(apihub.kma.go.kr) 실시간 관측 데이터 (기온, 풍향, 풍속, 일누적강수량) 정밀 수집"""
+    if not KMA_API_HUB_KEY or not stn_id:
+        return None
+    url = "https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-aws2_min"
+    try:
+        resp = requests.get(url, params={'stn': str(stn_id), 'disp': '1', 'help': '0', 'authKey': KMA_API_HUB_KEY},
+                            timeout=10, headers=REQUEST_HEADERS)
+        if resp.status_code == 200:
+            lines = [line.strip() for line in resp.text.splitlines() if line.strip() and not line.startswith('#')]
+            if lines:
+                parts = [p.strip() for p in lines[-1].split(',')]
+                # 컬럼: 0:tm, 1:stn, 2:wd1, 3:ws1, 4:wds, 5:wss, 6:wd10, 7:ws10, 8:ta, 9:re, 10:rn-15m, 11:rn-60m, 12:rn-12h, 13:rn-day
+                if len(parts) >= 14:
+                    def _to_float(v):
+                        try:
+                            f = float(v)
+                            return f if f > -50 else None
+                        except (ValueError, TypeError):
+                            return None
+
+                    return {
+                        'temp': _to_float(parts[8]),
+                        'wind_deg': _to_float(parts[6]),
+                        'wind_speed': _to_float(parts[7]),
+                        'rn_day': _to_float(parts[13])
+                    }
+    except Exception as e:
+        print(f"  [API 허브 관측 실패] stn={stn_id}: {e}")
+    return None
+
+
+def fetch_dust_alerts():
+    """에어코리아 미세먼지/초미세먼지 주의보 및 경보 발효 현황 수집"""
+    alerts_by_loc = {ln: [] for ln in LOCATIONS}
+    data = api_call("https://apis.data.go.kr/B552584/UlfptcaAlarmInqireSvc/getUlfptcaAlarmInfo", {
+        'returnType': 'json',
+        'year': str(datetime.now(KST).year),
+        'numOfRows': '100',
+        'pageNo': '1'
+    }, service_name='에어코리아 미세먼지 경보')
+
+    if not data:
+        return alerts_by_loc
+
+    try:
+        items = data.get('response', {}).get('body', {}).get('items', [])
+        if not items:
+            return alerts_by_loc
+
+        for item in items:
+            clear_date = str(item.get('clearDate', '') or '').strip()
+            # 해제 날짜가 명시된 경보는 종료된 경보이므로 제외
+            if clear_date and clear_date not in ('None', '-'):
+                continue
+
+            dist = str(item.get('districtName', '') or '').strip()
+            move = str(item.get('moveName', '') or '').strip()
+            code = str(item.get('itemCode', '') or '').strip()  # PM10, PM25
+            gbn = str(item.get('issueGbn', '') or '').strip()   # 주의보, 경보
+            issue_val = str(item.get('issueVal', '') or '').strip()
+
+            alert_name = f"{code} {gbn}" if code and gbn else "미세먼지 경보"
+
+            for loc_name, cfg in LOCATIONS.items():
+                prov = cfg.get('province', '')
+                region = cfg.get('alert_region', '')
+
+                prov_match = (prov in dist or dist in prov or (prov == '전북' and '전북' in dist))
+                region_match = (region in move or move in region or dist in region or region in dist)
+
+                if prov_match and region_match:
+                    alerts_by_loc[loc_name].append({
+                        'name': alert_name,
+                        'status': '발효중',
+                        'effective_time': '',
+                        'is_new': False,
+                        'value': issue_val
+                    })
+    except Exception as e:
+        print(f"  [미세먼지 경보 파싱 오류]: {e}")
+
+    return alerts_by_loc
 
 
 def fetch_alerts():
@@ -944,8 +1031,14 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
 
     overview = sky_pty_to_text(sky, pty)
 
-    # 기온 (현재 T1H, 최저 TMN, 최고 TMX, 시간별 TMP 통합 비교)
+    # 0. 기상청 API 허브 실시간 관측 데이터 (기온, 풍향, 풍속, 강수량) 수집
+    kma_obs = fetch_kma_hub_obs(cfg.get('kma_stn'))
+
+    # 기온 (1순위: 기상청 API 허브 실시간 관측 TA, 2순위: 초단기실황 T1H)
     cur_temp = ncst.get('T1H', '-')
+    if kma_obs and kma_obs.get('temp') is not None:
+        cur_temp = f"{kma_obs['temp']:.1f}"
+
     all_today_temps = []
 
     # 현재 실황 기온 추가
@@ -974,15 +1067,23 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
         min_temp = '-'
         max_temp = '-'
 
-    # 풍향/풍속
-    w_dir = wind_dir_text(ncst.get('VEC', '-'))
-    w_spd_raw = ncst.get('WSD', '-')
-    try:
-        w_spd_text = f"{float(w_spd_raw):.1f}m/s"
-    except (ValueError, TypeError):
-        w_spd_text = '-'
+    # 풍향/풍속 (1순위: 기상청 API 허브 실시간 관측 WD10/WS10, 2순위: 초단기실황 VEC/WSD)
+    w_spd_raw = kma_obs.get('wind_speed') if (kma_obs and kma_obs.get('wind_speed') is not None) else ncst.get('WSD', '-')
+    if kma_obs and kma_obs.get('wind_deg') is not None and kma_obs.get('wind_speed') is not None:
+        w_dir = wind_dir_text(kma_obs['wind_deg'])
+        w_spd_text = f"{kma_obs['wind_speed']:.1f}m/s"
+    else:
+        w_dir = wind_dir_text(ncst.get('VEC', '-'))
+        try:
+            w_spd_text = f"{float(w_spd_raw):.1f}m/s"
+        except (ValueError, TypeError):
+            w_spd_text = '-'
 
-    # 일일 누적 강수량 (00시 ~ 24시 당일 시간별 강수량 합산 보존)
+    # 일일 누적 강수량 수집
+    # 1순위: 기상청 API 허브 실시간 당일 관측 누적(RN-DAY) 100% 정밀 실측치
+    hub_rain = kma_obs.get('rn_day') if kma_obs else None
+
+    # 2순위: 초단기실황(RN1) 시간별 누적 및 초단기예보 과거시간 역보완
     hourly_rn1 = {}
     if existing_loc and existing_base_date == today_str:
         raw_hrn1 = existing_loc.get('hourly_rn1')
@@ -994,15 +1095,29 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
     if curr_rn1 > 0:
         hourly_rn1[hour_key] = max(hourly_rn1.get(hour_key, 0.0), curr_rn1)
 
-    acc_rain = sum(hourly_rn1.values())
+    # 초단기예보에서 당일 지나간 시간의 강수량도 채움 (Actions 지연/누락 보완)
+    for it in u_items:
+        if it.get('category') == 'RN1' and it.get('fcstDate') == today_str:
+            try:
+                fh = int(it['fcstTime'][:2])
+                if fh <= current_hour:
+                    hk = f"{fh:02d}"
+                    v = parse_rain_val(it['fcstValue'])
+                    if v > 0 and hk not in hourly_rn1:
+                        hourly_rn1[hk] = v
+            except (ValueError, TypeError):
+                pass
 
-    # 이전 누적 강수량이 존재하는 경우 보존
-    if existing_loc and existing_base_date == today_str:
-        try:
-            prev_acc = float(existing_loc.get('rain_accumulated', 0.0) or 0.0)
-            acc_rain = max(acc_rain, prev_acc)
-        except (ValueError, TypeError):
-            pass
+    if hub_rain is not None:
+        acc_rain = hub_rain
+    else:
+        acc_rain = sum(hourly_rn1.values())
+        if existing_loc and existing_base_date == today_str:
+            try:
+                prev_acc = float(existing_loc.get('rain_accumulated', 0.0) or 0.0)
+                acc_rain = max(acc_rain, prev_acc)
+            except (ValueError, TypeError):
+                pass
 
     tomorrow_str = (now.date() + timedelta(days=1)).strftime('%Y%m%d')
 
@@ -1109,6 +1224,8 @@ def generate_forecast_summary(loc_name, data):
         alert_names = [a.get('name', '') for a in alerts if isinstance(a, dict) and a.get('name')]
         if alert_names:
             alert_str = ", ".join(alert_names[:2])
+            if any('PM' in a for a in alert_names):
+                return f"😷 {alert_str} 발효 중! 마스크를 꼭 착용하세요."
             return f"⚠️ {alert_str} 발효 중! 안전에 유의하세요."
 
     # 2순위: 강수 예보가 있는 경우
@@ -1295,7 +1412,17 @@ def main():
             existing_data = None
 
     alerts = fetch_alerts()
+    dust_alerts = fetch_dust_alerts()
     time.sleep(0.3)
+
+    combined_alerts = {}
+    for name in LOCATION_ORDER:
+        loc_a = list(alerts.get(name, []))
+        loc_da = dust_alerts.get(name, [])
+        for da in loc_da:
+            if not any(isinstance(a, dict) and a.get('name') == da.get('name') for a in loc_a):
+                loc_a.append(da)
+        combined_alerts[name] = loc_a
 
     existing_base_date = existing_data.get('base_date') if existing_data else None
     locations_data = {}
@@ -1303,7 +1430,7 @@ def main():
         cfg = LOCATIONS[name]
         existing_loc = existing_data.get('locations', {}).get(name) if existing_data else None
         try:
-            loc_res = process_location(name, cfg, now, today_str, alerts, existing_loc, existing_base_date)
+            loc_res = process_location(name, cfg, now, today_str, combined_alerts, existing_loc, existing_base_date)
             # 만약 새 수집 결과의 기온/개황이 비어있고(-), 기존 유효 데이터가 존재하면 기존 데이터 보존
             if (loc_res.get('overview') == '-' or loc_res.get('temperature', {}).get('current') == '-') and existing_data and 'locations' in existing_data and name in existing_data['locations']:
                 prev_loc = existing_data['locations'][name]
@@ -1337,7 +1464,7 @@ def main():
     # 재시도·보조 측정소로 회복된 건은 로그로만 남기고 사용자에겐 알리지 않는다.
     for n in degraded:
         st = SERVICE_STATS[n]
-        print(f"  [회복] {n} — {st['fail']}회 실패했으나 {st['ok']}회 성공, "
+        print(f"  [회복] {n} - {st['fail']}회 실패했으나 {st['ok']}회 성공, "
               f"데이터 확보 완료 (경고 미표시)")
 
     if circuit_broken() or fail_list:
