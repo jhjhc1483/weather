@@ -374,12 +374,19 @@
     if ($apiBadge) {
       if (currentApiStatus && currentApiStatus.code && currentApiStatus.code !== 'OK') {
         $apiBadge.style.display = 'inline-flex';
+        // 실패한 서비스가 에어코리아인데 '기상청'이라고 표기하던 문제 수정
+        const failedSvc = currentApiStatus.failed_services || [];
+        const svcLabel = failedSvc.length === 0
+          ? '공공데이터포털 API'
+          : (failedSvc.length === 1
+              ? failedSvc[0]
+              : failedSvc[0] + ' 외 ' + (failedSvc.length - 1) + '건');
         if (currentApiStatus.code === 'ERROR') {
           $apiBadge.classList.add('error');
-          $apiBadge.textContent = '🚨 기상청 API 장애 발생';
+          $apiBadge.textContent = '🚨 ' + svcLabel + ' 장애 발생';
         } else {
           $apiBadge.classList.remove('error');
-          $apiBadge.textContent = '⚠️ 기상청 API 점검 중';
+          $apiBadge.textContent = '⚠️ ' + svcLabel + ' 응답 지연';
         }
       } else {
         $apiBadge.style.display = 'none';
@@ -1024,7 +1031,9 @@
         + failedListHtml
         + '</div>'
         + '<p style="margin-top:1rem;font-size:0.8rem;color:var(--text-dim);line-height:1.4;">'
-        + '💡 대시보드는 이전에 성공적으로 수집된 최신 관측 데이터를 안전하게 지속 표출하고 있습니다. 공공데이터포털 서버가 정상화되면 다음 주기에 자동으로 최신화됩니다.'
+        + (currentApiStatus.code === 'ERROR'
+            ? '💡 대시보드는 이전에 성공적으로 수집된 최신 관측 데이터를 안전하게 지속 표출하고 있습니다. 공공데이터포털 서버가 정상화되면 다음 주기에 자동으로 최신화됩니다.'
+            : '💡 해당 항목만 수집이 지연되었으며, 나머지 관측 데이터는 이번 주기에 정상 수집되었습니다. 다음 주기에 자동으로 재시도됩니다.')
         + '</p>'
         + '</div>';
 
