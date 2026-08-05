@@ -116,16 +116,28 @@ body {
 /* ========================================================
    Header
    ======================================================== */
+/* 제목은 화면 정중앙에 두되, 우측 컨트롤이 제목 위로 겹치지 않도록
+   1fr | auto | 1fr 그리드로 좌우 균형을 잡는다.
+   (기존 position:absolute 방식은 배지 문구가 길어지면 제목을 덮었다) */
 .header {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
+  column-gap: 1rem;
   min-height: 42px;
   margin-bottom: 0.7rem;
 }
 
+/* 좌측 균형용 스페이서 — 우측 컨트롤 폭만큼 좌측에도 여백을 확보 */
+.header::before {
+  content: "";
+  display: block;
+}
+
 .title {
+  grid-column: 2;
+  min-width: 0;
+  word-break: keep-all;
   text-align: center;
   font-size: 1.85rem;
   font-weight: 700;
@@ -139,12 +151,12 @@ body {
 }
 
 .meta-row {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
+  grid-column: 3;
+  justify-self: end;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.6rem;
 }
 
@@ -1131,16 +1143,37 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
 /* ========================================================
    Responsive & Smartphone Mode (스마트폰 최고 가시성 최적화)
    ======================================================== */
+/* 가로 폭이 줄면 제목과 컨트롤을 2줄로 분리한다.
+   배지 문구 길이(예: '에어코리아 미세먼지 응답 지연')가 늘어나도
+   제목을 침범하지 않도록 겹침 지점보다 넉넉히 앞서 스택으로 전환한다. */
+@media (max-width: 1024px) {
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: auto;
+    gap: 0.45rem;
+  }
+
+  .header::before { display: none; }
+
+  .title { grid-column: auto; }
+
+  .meta-row {
+    grid-column: auto;
+    justify-self: auto;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   html { font-size: 14px; }
   body { padding: 0.8rem 0.4rem 1.5rem; }
 
   /* 스마트폰 헤더 정렬 */
   .header {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: auto;
     margin-bottom: 0.6rem;
     gap: 0.4rem;
   }
@@ -1152,10 +1185,6 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   }
 
   .meta-row {
-    position: static;
-    transform: none;
-    justify-content: center;
-    width: 100%;
     gap: 0.5rem;
   }
 
