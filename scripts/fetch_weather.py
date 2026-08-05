@@ -12,6 +12,7 @@
 
 import json
 import math
+import multiprocessing
 import os
 import re
 import sys
@@ -1556,5 +1557,45 @@ def main():
         sys.exit(1)
 
 
+def run_main_with_timeout(timeout_seconds=300, max_retries=2):
+    """
+    main() 함수를 타임아웃(기본 5분=300초)을 두고 실행합니다.
+    5분 이상 소요되면 강제 종료 후 처음부터 다시 재시도하며,
+    2번째 시도에서도 5분을 초과하면 실행을 아예 종료합니다.
+    """
+    for attempt in range(1, max_retries + 1):
+        print(f"\n==================================================")
+        print(f" [시도 {attempt}/{max_retries}] fetch_weather 수집 시작 (타임아웃: {timeout_seconds}초)")
+        print(f"==================================================\n")
+
+        p = multiprocessing.Process(target=main)
+        p.start()
+        p.join(timeout_seconds)
+
+        if p.is_alive():
+            print(f"\n[타임아웃 경고] {attempt}차 시도가 {timeout_seconds}초(5분)를 초과하여 강제 종료합니다.")
+            p.terminate()
+            p.join(timeout=5)
+            if p.is_alive():
+                p.kill()
+                p.join()
+
+            if attempt < max_retries:
+                print("[재시도] 처음부터 스크립트를 다시 실행합니다...\n")
+                time.sleep(2)
+            else:
+                print("[오류] 2차 시도도 5분을 초과하였습니다. 스크립트 실행을 아예 종료합니다.")
+                sys.exit(1)
+        else:
+            if p.exitcode != 0:
+                print(f"\n[오류] main() 실행 중 오류 발생 (exit code: {p.exitcode})")
+                sys.exit(p.exitcode if p.exitcode is not None else 1)
+            print(f"\n[성공] {attempt}차 시도 완료.")
+            break
+
+
+
 if __name__ == '__main__':
-    main()
+    multiprocessing.freeze_support()
+    run_main_with_timeout(timeout_seconds=300, max_retries=2)
+

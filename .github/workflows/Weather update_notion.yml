@@ -27,6 +27,7 @@ jobs:
       - name: Fetch weather data
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          KMA_API_HUB_KEY: ${{ secrets.KMA_API_HUB_KEY }}
         run: python scripts/fetch_weather.py
 
       - name: Commit and push
