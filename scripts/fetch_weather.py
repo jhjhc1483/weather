@@ -603,7 +603,7 @@ def fetch_kma_hub_obs(stn_id):
     url = "https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-aws2_min"
     try:
         resp = requests.get(url, params={'stn': str(stn_id), 'disp': '1', 'help': '0', 'authKey': KMA_API_HUB_KEY},
-                            timeout=10, headers=REQUEST_HEADERS)
+                            timeout=15, headers=REQUEST_HEADERS)
         if resp.status_code == 200:
             lines = [line.strip() for line in resp.text.splitlines() if line.strip() and not line.startswith('#')]
             if lines:

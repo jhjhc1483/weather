@@ -263,6 +263,11 @@ def main():
     
     print("=" * 72)
 
+    # data/api_diag_result.json 자동 최신화 저장
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
+    run_and_save_diag(out_dir)
+    print(f"\n  [진단 결과 저장 완료] {os.path.join(out_dir, 'api_diag_result.json')}")
+
 
 def run_and_save_diag(out_dir=None):
     """7개 API 전체 진단을 수행하고 결과를 JSON 객체로 반환 및 data/api_diag_result.json 에 저장"""
