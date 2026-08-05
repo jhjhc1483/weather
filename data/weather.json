@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-05T22:19:40+09:00",
+  "updated_at": "2026-08-05T22:35:07+09:00",
   "base_date": "20260805",
   "date_display": "08.05",
   "day_of_week": "수",
-  "time_display": "22:19",
+  "time_display": "22:35",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상",
@@ -23,14 +23,14 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "28.5",
-        "feels_like": "31.8",
+        "current": "28.4",
+        "feels_like": "31.7",
         "min": "23.0",
         "max": "35.0"
       },
       "wind": {
         "direction": "남동풍",
-        "speed": "0.9m/s"
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -63,14 +63,14 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "27.3",
-        "feels_like": "29.2",
+        "current": "27.4",
+        "feels_like": "29.3",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
         "direction": "남동풍",
-        "speed": "1.4m/s"
+        "speed": "0.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -103,14 +103,14 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "26.1",
-        "feels_like": "29.4",
+        "current": "26.2",
+        "feels_like": "29.5",
         "min": "24.0",
         "max": "34.0"
       },
       "wind": {
         "direction": "동북동풍",
-        "speed": "3.3m/s"
+        "speed": "3.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -149,7 +149,7 @@
         "max": "35.0"
       },
       "wind": {
-        "direction": "북북서풍",
+        "direction": "북북동풍",
         "speed": "2.3m/s"
       },
       "rain_accumulated": 0.0,
@@ -183,14 +183,14 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "26.5",
-        "feels_like": "28.0",
+        "current": "26.8",
+        "feels_like": "28.4",
         "min": "25.0",
         "max": "36.0"
       },
       "wind": {
-        "direction": "서남서풍",
-        "speed": "0.6m/s"
+        "direction": "남서풍",
+        "speed": "0.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -223,14 +223,14 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "28.4",
-        "feels_like": "30.4",
+        "current": "28.1",
+        "feels_like": "30.1",
         "min": "25.0",
         "max": "37.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "1.4m/s"
+        "direction": "서풍",
+        "speed": "0.9m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -298,7 +298,7 @@
       },
       "wind": {
         "direction": "서풍",
-        "speed": "0.5m/s"
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],

@@ -801,7 +801,7 @@
     $diagModalBody.innerHTML = `
       <div class="loading-cell">
         <div class="loading-spinner"></div>
-        <span>공공데이터 5개 API 실시간 상태를 측정하는 중입니다...</span>
+        <span>공공데이터 7개 API 실시간 상태를 측정하는 중입니다...</span>
       </div>
     `;
 
