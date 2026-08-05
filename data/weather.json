@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-05T21:16:40+09:00",
+  "updated_at": "2026-08-05T21:27:36+09:00",
   "base_date": "20260805",
   "date_display": "08.05",
   "day_of_week": "수",
-  "time_display": "21:16",
+  "time_display": "21:27",
   "api_status": {
     "code": "WARNING",
     "message": "공공데이터포털 에어코리아 계열 응답 장애로 해당 항목만 수집이 중단되었습니다.",
