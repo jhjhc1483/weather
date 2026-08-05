@@ -164,8 +164,39 @@ def portal_error(text):
 #  3) resultCode 03(NO_DATA)은 장애가 아니라 '해당 조건에 자료 없음'이다.
 #     실패로 집계하지 않는다.
 # ============================================================
-FAILED_SERVICES = set()
+#  4) 실패는 '누적 집계'가 아니라 '성공 대비 비율'로 판정한다.
+#     에어코리아는 8개 지역 × (주·보조 측정소)로 최대 16회 호출된다.
+#     set 하나에 add만 하면 16회 중 1회 실패가 영구 경고로 굳어져,
+#     이후 15회가 성공하고 fallback으로 데이터를 다 확보해도 회복이
+#     반영되지 않는다. 서비스별 ok/fail을 따로 센다.
+SERVICE_STATS = {}
 MAX_ALLOWED_FAILURES = 5          # 계열별 연속 실패 허용치
+
+
+def _stat(service_name):
+    return SERVICE_STATS.setdefault(service_name or '미상', {'ok': 0, 'fail': 0})
+
+
+def record_ok(service_name):
+    if service_name:
+        _stat(service_name)['ok'] += 1
+
+
+def record_fail(service_name):
+    if service_name:
+        _stat(service_name)['fail'] += 1
+
+
+def hard_failed_services():
+    """단 한 번도 성공하지 못한 서비스 = 실제 장애. 경고 대상."""
+    return sorted(n for n, s in SERVICE_STATS.items()
+                  if s['fail'] > 0 and s['ok'] == 0)
+
+
+def degraded_services():
+    """실패했으나 다른 호출에서 성공한 서비스 = 일시 지연. 경고 대상 아님."""
+    return sorted(n for n, s in SERVICE_STATS.items()
+                  if s['fail'] > 0 and s['ok'] > 0)
 
 # 계열별 상태: {'failures': 연속 실패 횟수, 'broken': 서킷 개방 여부}
 CIRCUIT_STATE = {}
@@ -203,8 +234,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
 
     # 1. 해당 계열의 서킷이 열려 있으면 추가 호출 없이 조기 종료 (Fast-Fail)
     if state['broken']:
-        if service_name:
-            FAILED_SERVICES.add(service_name)
+        record_fail(service_name)
         return None
 
     encoded_key = quote(API_KEY, safe='')
@@ -253,6 +283,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
 
             if rc in ('00', '03'):
                 state['failures'] = 0        # 정상 응답 → 연속 실패 카운터 리셋
+                record_ok(service_name)      # 성공 집계 → 이전 실패 회복 반영
                 if rc == '03':
                     print(f"  [API] {label} 자료 없음 (resultCode=03) — 장애 아님")
                 return data
@@ -280,8 +311,7 @@ def api_call(url, params, retries=3, service_name=None, timeout=None):
     # ── 최종 실패 ────────────────────────────────────────────
     print(f"  [API 실패] {label} — {redact(reason)}")
     state['failures'] += 1
-    if service_name:
-        FAILED_SERVICES.add(service_name)
+    record_fail(service_name)
 
     # 키 미등록·기한만료 등은 이번 실행 내내 절대 회복되지 않는다.
     # 5회를 채울 때까지 기다릴 이유가 없으므로 즉시 차단한다.
@@ -1301,8 +1331,16 @@ def main():
     # 특보나 미세먼지만 실패한 경우는 부분 결손이므로 WARNING에 그친다.
     core_broken = circuit_broken('기상청예보')
 
-    if circuit_broken() or FAILED_SERVICES:
-        fail_list = sorted(FAILED_SERVICES)
+    fail_list = hard_failed_services()
+    degraded = degraded_services()
+
+    # 재시도·보조 측정소로 회복된 건은 로그로만 남기고 사용자에겐 알리지 않는다.
+    for n in degraded:
+        st = SERVICE_STATS[n]
+        print(f"  [회복] {n} — {st['fail']}회 실패했으나 {st['ok']}회 성공, "
+              f"데이터 확보 완료 (경고 미표시)")
+
+    if circuit_broken() or fail_list:
         broken_groups = [g for g, s in CIRCUIT_STATE.items() if s['broken']]
         status_code = "ERROR" if core_broken else ("WARNING" if len(fail_list) < 3 else "ERROR")
         if core_broken:
@@ -1315,13 +1353,17 @@ def main():
         api_status = {
             'code': status_code,
             'message': status_msg,
-            'failed_services': fail_list if fail_list else ["공공데이터포털 API 전체"]
+            'failed_services': fail_list if fail_list else ["공공데이터포털 API 전체"],
+            'degraded_services': degraded,
         }
     else:
         api_status = {
             'code': 'OK',
-            'message': '공공데이터포털 API 수집 정상',
-            'failed_services': []
+            'message': ('공공데이터포털 API 수집 정상' if not degraded else
+                        f"공공데이터포털({', '.join(degraded)}) 일시 지연이 있었으나 "
+                        f"재시도·보조 측정소 전환으로 정상 수집 완료"),
+            'failed_services': [],
+            'degraded_services': degraded,
         }
 
     # 장애 시 시각 표시는 기존 유효 데이터의 시각 보존
