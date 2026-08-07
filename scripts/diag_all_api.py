@@ -297,9 +297,9 @@ def run_and_save_diag(out_dir=None):
 
     for s in services:
         if s['type'] == 'kma_hub':
-            ok, elapsed, msg, _ = test_kma_hub_call(s['stn'], kma_key, timeout=15.0)
+            ok, elapsed, msg, _ = test_kma_hub_call(s['stn'], kma_key, timeout=8.0)
         else:
-            ok, elapsed, msg, _ = test_api_call(s['url'], s['params'], key, timeout=15.0)
+            ok, elapsed, msg, _ = test_api_call(s['url'], s['params'], key, timeout=8.0)
 
         if not ok:
             all_ok = False

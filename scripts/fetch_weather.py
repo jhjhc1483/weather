@@ -173,7 +173,7 @@ def portal_error(text):
 #     이후 15회가 성공하고 fallback으로 데이터를 다 확보해도 회복이
 #     반영되지 않는다. 서비스별 ok/fail을 따로 센다.
 SERVICE_STATS = {}
-MAX_ALLOWED_FAILURES = 5          # 계열별 연속 실패 허용치
+MAX_ALLOWED_FAILURES = 3          # 계열별 연속 실패 허용치 (Fast-Fail 강화)
 
 
 def _stat(service_name):
@@ -204,8 +204,8 @@ def degraded_services():
 # 계열별 상태: {'failures': 연속 실패 횟수, 'broken': 서킷 개방 여부}
 CIRCUIT_STATE = {}
 
-# 계열별 기본 타임아웃(초). 특보는 응답 본문이 커서 넉넉히 준다.
-GROUP_TIMEOUT = {'기상특보': 30, '에어코리아': 30, '기상청예보': 30}
+# 계열별 기본 타임아웃(초). 최적화 적용 (기존 30초 -> 12~15초)
+GROUP_TIMEOUT = {'기상특보': 15, '에어코리아': 12, '기상청예보': 12}
 
 
 def _group_of(service_name):
@@ -229,11 +229,11 @@ def circuit_broken(group=None):
     return any(s['broken'] for s in CIRCUIT_STATE.values())
 
 
-def api_call(url, params, retries=3, service_name=None, timeout=None):
+def api_call(url, params, retries=2, service_name=None, timeout=None):
     group = _group_of(service_name)
     state = _circuit(group)
     if timeout is None:
-        timeout = GROUP_TIMEOUT.get(group, 20)
+        timeout = GROUP_TIMEOUT.get(group, 12)
 
     # 1. 해당 계열의 서킷이 열려 있으면 추가 호출 없이 조기 종료 (Fast-Fail)
     if state['broken']:
@@ -401,6 +401,101 @@ def sky_pty_to_text(sky, pty):
     except (ValueError, TypeError):
         return '-'
     return {1: '맑음', 3: '구름많음', 4: '흐림'}.get(sky, '-')
+
+
+def get_period_overviews(now_time, today_str, ncst, u_items, v_items):
+    """
+    현재 시각에 따라 2개 시간대 개황을 산출합니다.
+    - 오전 (00:00~11:59): [금일 오전, 금일 오후]
+    - 오후 (12:00~23:59): [금일 오후, 다음날 오전]
+    """
+    current_hour = now_time.hour
+    is_morning = current_hour < 12
+    tomorrow_str = (now_time.date() + timedelta(days=1)).strftime('%Y%m%d')
+
+    def _parse_hour(val):
+        try:
+            return int(str(val).strip()[:2])
+        except (ValueError, TypeError, IndexError):
+            return -1
+
+    def _extract_overview(target_date, start_hour, end_hour, allow_realtime=False):
+        pty = '0'
+        sky = '-'
+
+        # 1. 실시간/초단기예보 우선 (오늘 현재 시간대 부근인 경우)
+        if allow_realtime and target_date == today_str and isinstance(ncst, dict):
+            pty = str(ncst.get('PTY', '0'))
+            next_hour_str = f"{(current_hour + 1) % 24:02d}00"
+            if isinstance(u_items, list):
+                for it in u_items:
+                    if isinstance(it, dict) and it.get('fcstTime') == next_hour_str:
+                        if it.get('category') == 'SKY':
+                            sky = it.get('fcstValue', '-')
+                        elif it.get('category') == 'PTY' and pty == '0':
+                            pty = it.get('fcstValue', '0')
+
+        # 2. 단기예보(v_items) 범위 수집
+        period_items = []
+        if isinstance(v_items, list):
+            for i in v_items:
+                if isinstance(i, dict) and i.get('fcstDate') == target_date:
+                    h = _parse_hour(i.get('fcstTime'))
+                    if start_hour <= h <= end_hour:
+                        period_items.append(i)
+
+        # 강수형태(PTY) 최우선 확인
+        for i in period_items:
+            if i.get('category') == 'PTY' and str(i.get('fcstValue', '0')) not in ('0', '-'):
+                pty = str(i.get('fcstValue'))
+                break
+
+        # SKY(하늘상태) 확인 (낮 대표시각 우선)
+        if sky == '-':
+            preferred_hours = ['1500', '1200', '0900', '1800'] if start_hour >= 12 else ['0900', '1200', '0600']
+            for ph in preferred_hours:
+                for i in period_items:
+                    if i.get('fcstTime') == ph and i.get('category') == 'SKY':
+                        sky = i.get('fcstValue', '-')
+                        break
+                if sky != '-':
+                    break
+
+        if sky == '-':
+            for i in period_items:
+                if i.get('category') == 'SKY' and str(i.get('fcstValue', '-')) != '-':
+                    sky = i.get('fcstValue')
+                    break
+
+        return sky_pty_to_text(sky, pty)
+
+    try:
+        if is_morning:
+            slot = 'AM'
+            labels = ['금일 오전', '금일 오후']
+            ov1 = _extract_overview(today_str, 0, 12, allow_realtime=True)
+            ov2 = _extract_overview(today_str, 12, 23, allow_realtime=False)
+        else:
+            slot = 'PM'
+            labels = ['금일 오후', '다음날 오전']
+            ov1 = _extract_overview(today_str, 12, 23, allow_realtime=True)
+            ov2 = _extract_overview(tomorrow_str, 0, 12, allow_realtime=False)
+
+        if ov1 == '-': ov1 = '맑음'
+        if ov2 == '-': ov2 = '맑음'
+    except Exception as e:
+        slot = 'AM' if is_morning else 'PM'
+        labels = ['금일 오전', '금일 오후'] if is_morning else ['금일 오후', '다음날 오전']
+        ov1 = '맑음'
+        ov2 = '맑음'
+
+    return {
+        'overview_slot': slot,
+        'overview_labels': labels,
+        'overview_1': ov1,
+        'overview_2': ov2,
+        'overview': f"{ov1} / {ov2}"
+    }
 
 
 def calc_pm10_grade(val_str, grade_str):
@@ -1011,26 +1106,13 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
     current_hour = int(now.strftime('%H'))
     next_hour_str = f"{(current_hour + 1) % 24:02d}00"
 
-    # 개황 (하늘상태 + 강수형태)
-    # 초단기예보 > 단기예보 순으로 최신 상태 파악
-    sky = '-'
-    pty = ncst.get('PTY', '0')
-
-    # 초단기예보에서 가장 가까운 시각의 SKY, PTY 파악
-    for it in u_items:
-        if it.get('fcstTime') == next_hour_str:
-            if it['category'] == 'SKY':
-                sky = it['fcstValue']
-            elif it['category'] == 'PTY' and pty == '0':
-                pty = it['fcstValue']
-
-    if sky == '-':
-        for it in v_items:
-            if int(it.get('fcstTime', '0')[:2]) >= current_hour and it['category'] == 'SKY':
-                sky = it['fcstValue']
-                break
-
-    overview = sky_pty_to_text(sky, pty)
+    # 시간대별 2단계 개황 (금일 오전/오후 또는 금일 오후/다음날 오전)
+    ov_data = get_period_overviews(now, today_str, ncst, u_items, v_items)
+    overview = ov_data['overview']
+    overview_1 = ov_data['overview_1']
+    overview_2 = ov_data['overview_2']
+    overview_labels = ov_data['overview_labels']
+    overview_slot = ov_data['overview_slot']
 
     # 0. 기상청 API 허브 실시간 관측 데이터 (기온, 풍향, 풍속, 강수량) 수집
     kma_obs = fetch_kma_hub_obs(cfg.get('kma_stn'))
@@ -1197,6 +1279,10 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
 
     loc_res = {
         'overview': overview,
+        'overview_1': overview_1,
+        'overview_2': overview_2,
+        'overview_labels': overview_labels,
+        'overview_slot': overview_slot,
         'dust': air,
         'temperature': {'current': cur_temp, 'feels_like': feels_like, 'min': min_temp, 'max': max_temp},
         'wind': {'direction': w_dir, 'speed': w_spd_text},
@@ -1432,11 +1518,13 @@ def main():
         existing_loc = existing_data.get('locations', {}).get(name) if existing_data else None
         try:
             loc_res = process_location(name, cfg, now, today_str, combined_alerts, existing_loc, existing_base_date)
-            # 만약 새 수집 결과의 기온/개황이 비어있고(-), 기존 유효 데이터가 존재하면 기존 데이터 보존
-            if (loc_res.get('overview') == '-' or loc_res.get('temperature', {}).get('current') == '-') and existing_data and 'locations' in existing_data and name in existing_data['locations']:
+            # 만약 새 수집 결과의 기온/개황이 비어있고(-), 기존 유효 데이터가 존재하면 기존 항목 보존
+            if existing_data and 'locations' in existing_data and name in existing_data['locations']:
                 prev_loc = existing_data['locations'][name]
-                if prev_loc.get('overview') != '-' or prev_loc.get('temperature', {}).get('current') != '-':
-                    loc_res = prev_loc
+                if loc_res.get('overview') == '-' and prev_loc.get('overview') not in ('-', None):
+                    loc_res['overview'] = prev_loc['overview']
+                if loc_res.get('temperature', {}).get('current') == '-' and prev_loc.get('temperature', {}).get('current') not in ('-', None):
+                    loc_res['temperature']['current'] = prev_loc['temperature']['current']
             locations_data[name] = loc_res
         except Exception as e:
             print(f"  [{name}] 오류: {e}")
@@ -1517,8 +1605,10 @@ def main():
         'location_order': LOCATION_ORDER,
     }
 
+    print(f"DEBUG: out_path = {os.path.abspath(out_path)}")
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+    print(f"DEBUG: 저장 성공 완료 ({os.path.getsize(out_path)} bytes)")
 
     # 양평 주간예보 독립 데이터 저장
     try:
@@ -1534,7 +1624,7 @@ def main():
     try:
         from diag_all_api import run_and_save_diag
         run_and_save_diag(out_dir)
-        print(f"  [API진단] 5대 API 실시간 진단 결과 저장 완료: {os.path.join(out_dir, 'api_diag_result.json')}")
+        print(f"  [API진단] 7대 API 실시간 진단 결과 저장 완료: {os.path.join(out_dir, 'api_diag_result.json')}")
     except Exception as e:
         print(f"  [API진단] 진단 결과 저장 중 오류: {e}")
 

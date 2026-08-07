@@ -206,8 +206,15 @@
     return '🌤️';
   }
 
-  function renderOverview(loc) {
-    const text = loc.overview || '-';
+  function renderOverview1(loc) {
+    const text = loc.overview_1 || loc.overview || '-';
+    if (text === '-') return '-';
+    const emoji = getWeatherEmoji(text);
+    return `<span class="overview-cell"><span class="weather-icon-emoji">${emoji}</span> <span class="overview-text">${escHtml(text)}</span></span>`;
+  }
+
+  function renderOverview2(loc) {
+    const text = loc.overview_2 || loc.overview || '-';
     if (text === '-') return '-';
     const emoji = getWeatherEmoji(text);
     return `<span class="overview-cell"><span class="weather-icon-emoji">${emoji}</span> <span class="overview-text">${escHtml(text)}</span></span>`;
@@ -317,7 +324,8 @@
   const DUST_INFO_ICON = '<span class="dust-info-icon" data-tooltip-dust="true" title="미세먼지 등급 기준">ℹ</span>';
   const TEMP_INFO_ICON = '<span class="temp-info-icon" data-tooltip-temp="true" title="기상청 체감온도 산출 안내">ℹ</span>';
   const ROW_DEFS = [
-    { cat: '개황', colspan: 2, sub: null, render: renderOverview, alertRow: false },
+    { cat: '개황', rowspan: 2, sub: 'slot_1', render: renderOverview1, alertRow: false },
+    { cat: null, sub: 'slot_2', render: renderOverview2, alertRow: false },
     { cat: '미세먼지', catHtml: '미세먼지 ' + DUST_INFO_ICON, rowspan: 2, sub: '미세', render: renderDustPM10, alertRow: false },
     { cat: null, sub: '초미세', render: renderDustPM25, alertRow: false },
     { cat: '기온(℃)', catHtml: '기온(℃) ' + TEMP_INFO_ICON, colspan: 2, sub: null, render: renderTemp, alertRow: false },
@@ -345,7 +353,14 @@
       }
 
       if (def.sub !== null) {
-        html += `<td class="cat-sub">${escHtml(def.sub)}</td>`;
+        let subText = def.sub;
+        if (def.sub === 'slot_1' || def.sub === 'slot_2') {
+          const firstLocName = order[0] || LOCATION_ORDER[0];
+          const firstLoc = (locs && locs[firstLocName]) ? locs[firstLocName] : {};
+          const labels = firstLoc.overview_labels || (firstLoc.overview_slot === 'PM' ? ['금일 오후', '다음날 오전'] : ['금일 오전', '금일 오후']);
+          subText = (def.sub === 'slot_1') ? labels[0] : labels[1];
+        }
+        html += `<td class="cat-sub">${escHtml(subText)}</td>`;
       }
 
       order.forEach(function (locName) {
