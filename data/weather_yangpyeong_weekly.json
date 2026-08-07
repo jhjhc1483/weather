@@ -1,22 +1,9 @@
 {
-  "updated_at": "2026-08-07T22:38:17+09:00",
+  "updated_at": "2026-08-08T02:06:43+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
-      "date_display": "08.07 (금)",
-      "overview": "맑음",
-      "temperature": {
-        "min": "22.0",
-        "max": "35.0"
-      },
-      "wind": {
-        "direction": "동북동풍",
-        "speed": "0.6m/s"
-      }
-    },
-    {
-      "label": "내일",
       "date_display": "08.08 (토)",
       "overview": "소나기",
       "temperature": {
@@ -25,11 +12,11 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "2.8m/s"
+        "speed": "3.2m/s"
       }
     },
     {
-      "label": "모레",
+      "label": "내일",
       "date_display": "08.09 (일)",
       "overview": "맑음",
       "temperature": {
@@ -38,11 +25,11 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "3.6m/s"
+        "speed": "3.7m/s"
       }
     },
     {
-      "label": "3일후",
+      "label": "모레",
       "date_display": "08.10 (월)",
       "overview": "구름많음",
       "temperature": {
@@ -51,13 +38,13 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "2.5m/s"
+        "speed": "2.8m/s"
       }
     },
     {
-      "label": "4일후",
+      "label": "3일후",
       "date_display": "08.11 (화)",
-      "overview": "구름많음",
+      "overview": "맑음",
       "temperature": {
         "min": "18.0",
         "max": "29.0"
@@ -68,8 +55,21 @@
       }
     },
     {
-      "label": "5일후",
+      "label": "4일후",
       "date_display": "08.12 (수)",
+      "overview": "맑음",
+      "temperature": {
+        "min": "19.0",
+        "max": "19.0"
+      },
+      "wind": {
+        "direction": "북동풍",
+        "speed": "1.0m/s"
+      }
+    },
+    {
+      "label": "5일후",
+      "date_display": "08.13 (목)",
       "overview": "맑음",
       "temperature": {
         "min": "23.0",
@@ -82,7 +82,7 @@
     },
     {
       "label": "6일후",
-      "date_display": "08.13 (목)",
+      "date_display": "08.14 (금)",
       "overview": "맑음",
       "temperature": {
         "min": "23.0",
