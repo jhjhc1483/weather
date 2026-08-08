@@ -270,7 +270,9 @@ def main():
 
 
 def run_and_save_diag(out_dir=None):
-    """7개 API 전체 진단을 수행하고 결과를 JSON 객체로 반환 및 data/api_diag_result.json 에 저장"""
+    """7개 API 전체 진단을 수행하고 결과를 JSON 객체로 반환 및 data/api_diag_result.json 에 저장 (병렬 처리)"""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     key = os.environ.get('DATA_GO_KR_KEY', '').strip()
     kma_key = os.environ.get('KMA_API_HUB_KEY', '').strip()
     if not key:
@@ -292,23 +294,42 @@ def run_and_save_diag(out_dir=None):
         {'name': '기상청 API 허브 강수관측', 'type': 'kma_hub', 'stn': '212'},
     ]
 
-    diag_results = []
-    all_ok = True
-
-    for s in services:
+    def _diag_single(s):
         if s['type'] == 'kma_hub':
-            ok, elapsed, msg, _ = test_kma_hub_call(s['stn'], kma_key, timeout=8.0)
+            ok, elapsed, msg, _ = test_kma_hub_call(s['stn'], kma_key, timeout=5.0)
         else:
-            ok, elapsed, msg, _ = test_api_call(s['url'], s['params'], key, timeout=8.0)
-
-        if not ok:
-            all_ok = False
-        diag_results.append({
+            ok, elapsed, msg, _ = test_api_call(s['url'], s['params'], key, timeout=5.0)
+        return {
             'name': s['name'],
             'ok': ok,
             'elapsed': elapsed,
             'message': msg
-        })
+        }
+
+    diag_results = []
+    all_ok = True
+
+    with ThreadPoolExecutor(max_workers=len(services)) as executor:
+        future_to_srv = {executor.submit(_diag_single, s): s for s in services}
+        for future in as_completed(future_to_srv):
+            try:
+                res_item = future.result()
+                diag_results.append(res_item)
+                if not res_item['ok']:
+                    all_ok = False
+            except Exception as e:
+                all_ok = False
+                srv = future_to_srv[future]
+                diag_results.append({
+                    'name': srv['name'],
+                    'ok': False,
+                    'elapsed': 0.0,
+                    'message': f"오류: {type(e).__name__}"
+                })
+
+    # 원래 순서 유지
+    order_map = {s['name']: i for i, s in enumerate(services)}
+    diag_results.sort(key=lambda x: order_map.get(x['name'], 99))
 
     res = {
         'updated_at': now.strftime('%Y-%m-%dT%H:%M:%S+09:00'),

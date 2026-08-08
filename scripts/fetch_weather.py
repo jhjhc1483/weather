@@ -173,7 +173,7 @@ def portal_error(text):
 #     이후 15회가 성공하고 fallback으로 데이터를 다 확보해도 회복이
 #     반영되지 않는다. 서비스별 ok/fail을 따로 센다.
 SERVICE_STATS = {}
-MAX_ALLOWED_FAILURES = 3          # 계열별 연속 실패 허용치 (Fast-Fail 강화)
+MAX_ALLOWED_FAILURES = 2          # 계열별 연속 실패 허용치 (Fast-Fail 강화: 2회로 단축)
 
 
 def _stat(service_name):
@@ -204,8 +204,8 @@ def degraded_services():
 # 계열별 상태: {'failures': 연속 실패 횟수, 'broken': 서킷 개방 여부}
 CIRCUIT_STATE = {}
 
-# 계열별 기본 타임아웃(초). 최적화 적용 (기존 30초 -> 12~15초)
-GROUP_TIMEOUT = {'기상특보': 15, '에어코리아': 12, '기상청예보': 12}
+# 계열별 기본 타임아웃(초). 최적화 적용 (기존 12~15초 -> 6~8초)
+GROUP_TIMEOUT = {'기상특보': 8, '에어코리아': 6, '기상청예보': 6}
 
 
 def _group_of(service_name):
@@ -949,26 +949,30 @@ def fetch_alerts():
         item_cache[stn_id] = item
         return item
 
-    # ── 지역을 관할 관서별로 묶어 처리 ──────────────────────
+    # ── 지역을 관할 관서별로 묶어 처리 (병렬화) ──────────────────────
     result = {}
     stn_groups = {}
     for loc_name, cfg in LOCATIONS.items():
         stn_groups.setdefault(cfg.get('wrn_stn', WRN_STN_NATIONWIDE),
                               []).append(loc_name)
 
-    print("[특보] 관할 관서별 통보문 조회")
+    print("[특보] 관할 관서별 통보문 병렬 조회")
 
-    for stn_id, loc_names in stn_groups.items():
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _process_stn_group(stn_id, loc_names):
         item = get_item(stn_id)
         source = stn_id
         if item is None and stn_id != WRN_STN_NATIONWIDE:
             print(f"  [특보] stnId={stn_id} → 전국({WRN_STN_NATIONWIDE}) 폴백")
             item = get_item(WRN_STN_NATIONWIDE)
             source = WRN_STN_NATIONWIDE
+
+        group_res = {}
         if item is None:
             for loc_name in loc_names:
-                result[loc_name] = []
-            continue
+                group_res[loc_name] = []
+            return group_res
 
         # 1) t6 → 현재 발효 중
         active = {ln: set() for ln in loc_names}
@@ -1072,12 +1076,23 @@ def fetch_alerts():
                     loc_alerts.append(sa)
 
             loc_alerts = deduplicate_alerts(loc_alerts)
-            result[loc_name] = loc_alerts
+            group_res[loc_name] = loc_alerts
             desc = ', '.join(
                 f"{a['name']}({a['status']}"
                 + (f" {a['effective_time']}" if a['effective_time'] else '')
                 + ')' for a in loc_alerts) or '없음'
             print(f"  [특보] {loc_name} (stnId={source}): {desc}")
+
+        return group_res
+
+    with ThreadPoolExecutor(max_workers=len(stn_groups)) as executor:
+        futures = [executor.submit(_process_stn_group, stn_id, loc_names)
+                   for stn_id, loc_names in stn_groups.items()]
+        for future in as_completed(futures):
+            try:
+                result.update(future.result())
+            except Exception as e:
+                print(f"  [특보 조율 오류]: {e}")
 
     return result
 # ============================================================
@@ -1498,9 +1513,14 @@ def main():
         except Exception:
             existing_data = None
 
-    alerts = fetch_alerts()
-    dust_alerts = fetch_dust_alerts()
-    time.sleep(0.3)
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    # 특보 및 미세먼지 경보 병렬 수집
+    with ThreadPoolExecutor(max_workers=2) as alert_exec:
+        f_alerts = alert_exec.submit(fetch_alerts)
+        f_dust = alert_exec.submit(fetch_dust_alerts)
+        alerts = f_alerts.result()
+        dust_alerts = f_dust.result()
 
     combined_alerts = {}
     for name in LOCATION_ORDER:
@@ -1513,7 +1533,8 @@ def main():
 
     existing_base_date = existing_data.get('base_date') if existing_data else None
     locations_data = {}
-    for name in LOCATION_ORDER:
+
+    def _fetch_single_location(name):
         cfg = LOCATIONS[name]
         existing_loc = existing_data.get('locations', {}).get(name) if existing_data else None
         try:
@@ -1525,14 +1546,14 @@ def main():
                     loc_res['overview'] = prev_loc['overview']
                 if loc_res.get('temperature', {}).get('current') == '-' and prev_loc.get('temperature', {}).get('current') not in ('-', None):
                     loc_res['temperature']['current'] = prev_loc['temperature']['current']
-            locations_data[name] = loc_res
+            return name, loc_res
         except Exception as e:
             print(f"  [{name}] 오류: {e}")
             traceback.print_exc()
             if existing_data and 'locations' in existing_data and name in existing_data['locations']:
-                locations_data[name] = existing_data['locations'][name]
+                return name, existing_data['locations'][name]
             else:
-                locations_data[name] = {
+                return name, {
                     'overview': '-',
                     'dust': {'pm10': '-', 'pm10_grade': '-', 'pm25': '-', 'pm25_grade': '-'},
                     'temperature': {'current': '-', 'feels_like': '-', 'min': '-', 'max': '-'},
@@ -1542,6 +1563,16 @@ def main():
                     'alerts': [],
                     'forecast_summary': f"🌤️ {name} 기상 정보 수집 중입니다.",
                 }
+
+    print("\n[병렬 수집] 8개 지역 날씨 데이터 동시 수집 시작...")
+    with ThreadPoolExecutor(max_workers=len(LOCATION_ORDER)) as loc_exec:
+        future_to_name = {loc_exec.submit(_fetch_single_location, name): name for name in LOCATION_ORDER}
+        for future in as_completed(future_to_name):
+            loc_name, loc_res = future.result()
+            locations_data[loc_name] = loc_res
+
+    # LOCATION_ORDER 순서에 맞춰 딕셔너리 정렬
+    locations_data = {name: locations_data[name] for name in LOCATION_ORDER if name in locations_data}
 
     # 핵심 계열(단기·초단기예보)이 끊긴 경우에만 '이전 데이터 보존' 상태로 본다.
     # 특보나 미세먼지만 실패한 경우는 부분 결손이므로 WARNING에 그친다.

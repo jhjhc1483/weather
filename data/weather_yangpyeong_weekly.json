@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-08T22:40:39+09:00",
+  "updated_at": "2026-08-08T23:45:02+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
@@ -12,7 +12,7 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "3.2m/s"
+        "speed": "3.3m/s"
       }
     },
     {
@@ -25,7 +25,7 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "3.3m/s"
+        "speed": "3.2m/s"
       }
     },
     {
@@ -51,7 +51,7 @@
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "1.6m/s"
+        "speed": "1.5m/s"
       }
     },
     {
@@ -70,14 +70,14 @@
     {
       "label": "5일후",
       "date_display": "08.13 (목)",
-      "overview": "맑음",
+      "overview": "구름많음",
       "temperature": {
-        "min": "23.0",
-        "max": "33.0"
+        "min": "20.0",
+        "max": "20.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "1.2m/s"
+        "direction": "북동풍",
+        "speed": "1.0m/s"
       }
     },
     {
