@@ -1,49 +1,49 @@
 {
-  "updated_at": "2026-08-08T23:45:38+09:00",
-  "timestamp": "2026-08-08 23:45:38 KST",
-  "all_ok": true,
+  "updated_at": "2026-08-09T00:01:00+09:00",
+  "timestamp": "2026-08-09 00:01:00 KST",
+  "all_ok": false,
   "results": [
     {
       "name": "기상청 기상특보 API",
       "ok": true,
-      "elapsed": 1.5797649999999521,
+      "elapsed": 0.4306694480000033,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 초단기실황 API",
       "ok": true,
-      "elapsed": 2.0771091999999953,
+      "elapsed": 0.8110748280000024,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 초단기예보 API",
       "ok": true,
-      "elapsed": 2.1556111999998393,
+      "elapsed": 0.8579512980000032,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "기상청 단기예보 API",
       "ok": true,
-      "elapsed": 1.5479111999998167,
+      "elapsed": 0.8712229799999989,
       "message": "rc=00 (NORMAL_SERVICE)"
     },
     {
       "name": "에어코리아 미세먼지 API",
-      "ok": true,
-      "elapsed": 1.4894853999999214,
-      "message": "rc=00 (NORMAL_CODE)"
+      "ok": false,
+      "elapsed": 5.707960573000008,
+      "message": "타임아웃 초과"
     },
     {
       "name": "에어코리아 미세먼지 경보 API",
       "ok": true,
-      "elapsed": 2.1586630000001605,
+      "elapsed": 3.945855069000004,
       "message": "rc=00 (NORMAL_CODE)"
     },
     {
       "name": "기상청 API 허브 강수관측",
-      "ok": true,
-      "elapsed": 2.5193618999996943,
-      "message": "정상 관측 수집 (rc=00)"
+      "ok": false,
+      "elapsed": 5.530691144999992,
+      "message": "오류: ReadTimeout"
     }
   ]
 }
