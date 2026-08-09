@@ -8,8 +8,8 @@
     "code": "ERROR",
     "message": "공공데이터포털(기상청 API) 응답 지연으로 기존 관측 데이터를 유효 유지합니다.",
     "failed_services": [
-      "기상청 기상특보",
       "에어코리아 미세먼지경보",
+      "기상청 기상특보",
       "기상청 초단기실황",
       "기상청 초단기예보",
       "기상청 단기예보",
@@ -44,8 +44,8 @@
         "max": "20.3"
       },
       "wind": {
-        "direction": "북풍",
-        "speed": "0.0m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -78,10 +78,10 @@
         "max": "23.9"
       },
       "wind": {
-        "direction": "북동풍",
-        "speed": "1.2m/s"
+        "direction": "-",
+        "speed": "-"
       },
-      "rain_accumulated": 3.0,
+      "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
@@ -112,8 +112,8 @@
         "max": "28.2"
       },
       "wind": {
-        "direction": "동북동풍",
-        "speed": "4.1m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -146,8 +146,8 @@
         "max": "21.4"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "2.2m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -180,8 +180,8 @@
         "max": "23.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "0.9m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -214,8 +214,8 @@
         "max": "24.7"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "3.6m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -248,8 +248,8 @@
         "max": "23.4"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "4.3m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -282,8 +282,8 @@
         "max": "27.1"
       },
       "wind": {
-        "direction": "남남동풍",
-        "speed": "2.0m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
