@@ -38,20 +38,20 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "30.9",
-        "feels_like": "31.3",
-        "min": "20.0",
-        "max": "32.0"
+        "current": "31.0",
+        "feels_like": "30.5",
+        "min": "31.0",
+        "max": "31.0"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "동풍",
+        "speed": "2.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 32.0℃ / 최저 20.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 31.0℃)."
     },
     "경산": {
       "overview": "맑음 / 맑음",
@@ -72,20 +72,20 @@
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "26.6",
-        "feels_like": "27.5",
-        "min": "24.0",
-        "max": "32.0"
+        "current": "25.8",
+        "feels_like": "25.4",
+        "min": "25.8",
+        "max": "25.8"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "동북동풍",
+        "speed": "2.0m/s"
       },
-      "rain_accumulated": 0.0,
+      "rain_accumulated": 3.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 32.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 25.8℃)."
     },
     "사천": {
       "overview": "맑음 / 맑음",
@@ -106,20 +106,20 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "30.9",
-        "feels_like": "31.4",
-        "min": "24.0",
-        "max": "33.0"
+        "current": "28.1",
+        "feels_like": "27.7",
+        "min": "28.1",
+        "max": "28.1"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "동북동풍",
+        "speed": "7.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 33.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 28.1℃)."
     },
     "함안": {
       "overview": "맑음 / 맑음",
@@ -140,20 +140,20 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "31.1",
-        "feels_like": "31.5",
-        "min": "24.0",
-        "max": "31.1"
+        "current": "30.7",
+        "feels_like": "30.2",
+        "min": "30.7",
+        "max": "30.7"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "남풍",
+        "speed": "2.1m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 31.1℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 30.7℃)."
     },
     "성주": {
       "overview": "맑음 / 맑음",
@@ -174,20 +174,20 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "29.6",
-        "feels_like": "29.9",
-        "min": "24.0",
-        "max": "32.0"
+        "current": "28.4",
+        "feels_like": "28.0",
+        "min": "28.4",
+        "max": "28.4"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "남동풍",
+        "speed": "2.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 32.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 28.4℃)."
     },
     "세종": {
       "overview": "맑음 / 맑음",
@@ -208,20 +208,20 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "29.4",
-        "feels_like": "29.6",
-        "min": "24.0",
-        "max": "33.0"
+        "current": "29.9",
+        "feels_like": "29.4",
+        "min": "29.9",
+        "max": "29.9"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "동남동풍",
+        "speed": "2.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 33.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 29.9℃)."
     },
     "계룡": {
       "overview": "맑음 / 맑음",
@@ -242,20 +242,20 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "26.4",
-        "feels_like": "26.7",
-        "min": "24.0",
-        "max": "32.0"
+        "current": "27.7",
+        "feels_like": "27.3",
+        "min": "27.7",
+        "max": "27.7"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "남남동풍",
+        "speed": "3.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 32.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 27.7℃)."
     },
     "임실": {
       "overview": "맑음 / 맑음",
@@ -276,20 +276,20 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "29.6",
-        "feels_like": "30.0",
-        "min": "23.0",
-        "max": "32.0"
+        "current": "29.8",
+        "feels_like": "29.3",
+        "min": "29.8",
+        "max": "29.8"
       },
       "wind": {
-        "direction": "-",
-        "speed": "-"
+        "direction": "남풍",
+        "speed": "2.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 32.0℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 29.8℃)."
     }
   },
   "location_order": [
