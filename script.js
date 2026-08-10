@@ -43,7 +43,9 @@
   let currentApiStatus = null;
   let pollingStartUpdatedAt = '';
   let isPolling = false;
+  let isDeployWaiting = false; // 수집 완료 후 호스팅 서버 최신 데이터 반영 대기 중 여부
   let pollIntervalId = null;
+  let deployCheckIntervalId = null;
   let pollTimeoutId = null;
   let audioCtx = null;
 
@@ -51,13 +53,17 @@
   function updateButtonState() {
     if (!$btn) return;
 
-    // 1. Action 실행 중 (스마트 폴링 중)
+    // 1. Action 실행 중 또는 배포 반영 중 (스마트 폴링 중)
     if (isPolling) {
       $btn.disabled = true;
       $btn.classList.add('loading');
       $btn.classList.remove('cooldown');
-      if ($btnText) $btnText.textContent = '갱신 중...';
-      $btn.setAttribute('title', 'GitHub Actions 갱신 진행 중입니다 (약 2~3분 소요)');
+      if ($btnText) {
+        $btnText.textContent = isDeployWaiting ? '반영 중...' : '갱신 중...';
+      }
+      $btn.setAttribute('title', isDeployWaiting 
+        ? '수집이 완료되었습니다. 최신 데이터 반영 중입니다 (약 10~20초 소요)' 
+        : 'GitHub Actions 갱신 진행 중입니다 (약 2~3분 소요)');
       return;
     }
 
@@ -537,24 +543,30 @@
     }, duration || 4000);
   }
 
-  /* ======== 스마트 폴링 (갱신 완료 감지 — 동적 CHECK_URL 적용) ======== */
+  /* ======== 스마트 폴링 (2단계 갱신 & 배포 반영 최종 검증) ======== */
   function startPolling() {
     isPolling = true;
+    isDeployWaiting = false;
     pollingStartUpdatedAt = currentUpdatedAt;
     updateButtonState();
 
     clearInterval(pollIntervalId);
+    clearInterval(deployCheckIntervalId);
     clearTimeout(pollTimeoutId);
 
-    // 환경에 맞게 자동 지정된 CHECK_URL 사용
+    // 1단계: GitHub API(CHECK_URL)로 저장소 수집 완료 여부 체크
     pollIntervalId = setInterval(function () {
+      if (isDeployWaiting) return;
+
       fetch(CHECK_URL + '?t=' + Date.now(), { cache: 'no-store' })
         .then(function (res) { return res.json(); })
         .then(function (result) {
           if (result.updated_at && pollingStartUpdatedAt && result.updated_at !== pollingStartUpdatedAt) {
-            loadData(function () {
-              stopPolling(true);
-            });
+            // 1단계 성공: 수집 완료 감지 ➔ 2단계 최신 데이터 반영 검증 전환
+            isDeployWaiting = true;
+            updateButtonState();
+            showToast('🚀 데이터 수집 완료! 최신 데이터 반영 중...', 'info', 10000);
+            startDeployVerification();
           }
         })
         .catch(function (err) {
@@ -569,6 +581,44 @@
         showToast('ℹ️ 갱신 처리 시간이 길어지고 있습니다. 잠시 후 새로고침해 보세요.', 'info');
       }
     }, POLL_TIMEOUT_MS);
+  }
+
+  // 2단계: 실제 static data/weather.json 파일에 새 updated_at 이 반영될 때까지 5초 간격 검증
+  function startDeployVerification() {
+    clearInterval(pollIntervalId);
+    clearInterval(deployCheckIntervalId);
+
+    let attempts = 0;
+    const maxAttempts = 24; // 5초 * 24회 = 최대 2분 대기
+
+    deployCheckIntervalId = setInterval(function () {
+      attempts++;
+      fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          if (data.updated_at && pollingStartUpdatedAt && data.updated_at !== pollingStartUpdatedAt) {
+            // 정적 서버에 최신 파일 실제 반영 완료!
+            clearInterval(deployCheckIntervalId);
+            loadData(function () {
+              stopPolling(true);
+            });
+          } else if (attempts >= maxAttempts) {
+            clearInterval(deployCheckIntervalId);
+            loadData(function () {
+              stopPolling(true);
+            });
+          }
+        })
+        .catch(function () {
+          if (attempts >= maxAttempts) {
+            clearInterval(deployCheckIntervalId);
+            stopPolling(false);
+          }
+        });
+    }, 5000);
   }
 
   /* ======== 알림 소리 ======== */
@@ -612,7 +662,9 @@
 
   function stopPolling(isSuccess) {
     isPolling = false;
+    isDeployWaiting = false;
     clearInterval(pollIntervalId);
+    clearInterval(deployCheckIntervalId);
     clearTimeout(pollTimeoutId);
     localStorage.removeItem('weather_refresh_started_at');
     updateButtonState();
