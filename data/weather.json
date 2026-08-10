@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-11T05:51:29+09:00",
+  "updated_at": "2026-08-11T06:21:44+09:00",
   "base_date": "20260811",
   "date_display": "08.11",
   "day_of_week": "화",
-  "time_display": "05:51",
+  "time_display": "06:21",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상 완료",
@@ -21,7 +21,7 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "10",
+        "pm10": "11",
         "pm10_grade": "좋음",
         "pm25": "3",
         "pm25_grade": "좋음",
@@ -30,14 +30,14 @@
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "19.5",
-        "feels_like": "19.5",
+        "current": "19.8",
+        "feels_like": "19.8",
         "min": "18.0",
         "max": "30.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "0.8m/s"
+        "direction": "남동풍",
+        "speed": "0.6m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -55,29 +55,29 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "9",
+        "pm10": "14",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "4",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "20.0",
-        "feels_like": "21.7",
-        "min": "20.0",
+        "current": "20.9",
+        "feels_like": "22.6",
+        "min": "20.9",
         "max": "31.0"
       },
       "wind": {
-        "direction": "북서풍",
-        "speed": "1.4m/s"
+        "direction": "북북서풍",
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 31.0℃ / 최저 20.0℃)."
+      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 31.0℃ / 최저 20.9℃)."
     },
     "사천": {
       "overview": "흐림 / 흐림",
@@ -89,23 +89,23 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "10",
+        "pm10": "9",
         "pm10_grade": "좋음",
-        "pm25": "4",
+        "pm25": "3",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "26.1",
-        "feels_like": "28.1",
+        "current": "26.0",
+        "feels_like": "27.9",
         "min": "21.0",
         "max": "33.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "5.1m/s"
+        "direction": "동북동풍",
+        "speed": "5.6m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -123,7 +123,7 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "12",
+        "pm10": "13",
         "pm10_grade": "좋음",
         "pm25": "6",
         "pm25_grade": "좋음",
@@ -132,14 +132,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "20.6",
-        "feels_like": "22.5",
-        "min": "20.6",
+        "current": "21.1",
+        "feels_like": "22.9",
+        "min": "21.0",
         "max": "31.0"
       },
       "wind": {
         "direction": "북동풍",
-        "speed": "2.4m/s"
+        "speed": "2.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -164,29 +164,29 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "7",
+        "pm10": "10",
         "pm10_grade": "좋음",
-        "pm25": "4",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "19.1",
-        "feels_like": "19.1",
-        "min": "19.1",
+        "current": "19.4",
+        "feels_like": "19.4",
+        "min": "19.4",
         "max": "33.0"
       },
       "wind": {
-        "direction": "서풍",
+        "direction": "남동풍",
         "speed": "0.1m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 33.0℃ / 최저 19.1℃)."
+      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 33.0℃ / 최저 19.4℃)."
     },
     "세종": {
       "overview": "흐림 / 흐림",
@@ -198,23 +198,23 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "9",
+        "pm10": "24",
         "pm10_grade": "좋음",
         "pm25": "1",
         "pm25_grade": "좋음",
-        "is_fallback": true,
-        "station_used": "조치원읍",
+        "is_fallback": false,
+        "station_used": "아름동",
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "24.3",
-        "feels_like": "25.5",
+        "current": "24.1",
+        "feels_like": "25.3",
         "min": "21.0",
         "max": "32.0"
       },
       "wind": {
         "direction": "동풍",
-        "speed": "4.0m/s"
+        "speed": "3.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -232,29 +232,29 @@
       ],
       "overview_slot": "AM",
       "dust": {
-        "pm10": "12",
+        "pm10": "14",
         "pm10_grade": "좋음",
-        "pm25": "4",
+        "pm25": "1",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "엄사면",
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "19.2",
-        "feels_like": "19.2",
-        "min": "19.2",
+        "current": "19.5",
+        "feels_like": "19.5",
+        "min": "19.5",
         "max": "32.0"
       },
       "wind": {
-        "direction": "서북서풍",
-        "speed": "0.9m/s"
+        "direction": "북서풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 32.0℃ / 최저 19.2℃)."
+      "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 32.0℃ / 최저 19.5℃)."
     },
     "임실": {
       "overview": "흐림 / 구름많음",
@@ -268,20 +268,20 @@
       "dust": {
         "pm10": "11",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "5",
         "pm25_grade": "좋음",
-        "is_fallback": true,
-        "station_used": "삼천동",
+        "is_fallback": false,
+        "station_used": "임실읍",
         "primary_station": "임실읍"
       },
       "temperature": {
         "current": "21.3",
-        "feels_like": "23.7",
+        "feels_like": "23.6",
         "min": "20.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "동남동풍",
+        "direction": "동북동풍",
         "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
