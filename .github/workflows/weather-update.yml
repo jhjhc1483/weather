@@ -28,10 +28,15 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Fetch weather data
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 15
+          command: python scripts/fetch_weather.py
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           KMA_API_HUB_KEY: ${{ secrets.KMA_API_HUB_KEY }}
-        run: python scripts/fetch_weather.py
 
       - name: Commit and push
         run: |

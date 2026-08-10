@@ -77,9 +77,9 @@ REQUEST_HEADERS = {
     'Accept': 'application/json, text/plain, */*',
 }
 
-# HTTP Session 설정
+# HTTP Session 설정 (해외 Runner 및 네트워크 지연 대응을 위한 Retry 강화)
 session = requests.Session()
-retries = Retry(total=1, backoff_factor=0.3, status_forcelist=[500, 502, 503, 504])
+retries = Retry(total=3, backoff_factor=1.5, status_forcelist=[500, 502, 503, 504, 520, 522, 524])
 session.mount('https://', HTTPAdapter(max_retries=retries))
 session.mount('http://', HTTPAdapter(max_retries=retries))
 
@@ -97,7 +97,7 @@ def record_stat(service_name, is_ok):
 # ============================================================
 # API 호출 코어 헬퍼
 # ============================================================
-def safe_api_get(url, params, service_name=None, timeout=(3.0, 6.0)):
+def safe_api_get(url, params, service_name=None, timeout=(10.0, 25.0)):
     req_params = {'serviceKey': API_KEY}
     req_params.update(params)
 
@@ -323,7 +323,7 @@ def fetch_kma_hub_obs(stn_id):
     url = "https://apihub.kma.go.kr/api/typ01/cgi-bin/url/nph-aws2_min"
     try:
         resp = session.get(url, params={'stn': str(stn_id), 'disp': '1', 'help': '0', 'authKey': KMA_API_HUB_KEY},
-                           timeout=(2.0, 4.0), headers=REQUEST_HEADERS)
+                           timeout=(8.0, 15.0), headers=REQUEST_HEADERS)
         if resp.status_code == 200:
             lines = [line.strip() for line in resp.text.splitlines() if line.strip() and not line.startswith('#')]
             if lines:
@@ -349,7 +349,7 @@ def fetch_dust_alerts():
     data = safe_api_get("https://apis.data.go.kr/B552584/UlfptcaAlarmInqireSvc/getUlfptcaAlarmInfo", {
         'returnType': 'json', 'year': str(datetime.now(KST).year),
         'numOfRows': '100', 'pageNo': '1'
-    }, service_name='에어코리아 미세먼지경보', timeout=(3.0, 5.0))
+    }, service_name='에어코리아 미세먼지경보', timeout=(10.0, 20.0))
 
     if not data:
         return alerts_by_loc
@@ -395,7 +395,7 @@ def fetch_alerts():
     data = safe_api_get(f"{BASE_ALERT}/getWthrWrnMsg", {
         'pageNo': '1', 'numOfRows': '15', 'dataType': 'JSON',
         'stnId': '108', 'fromTmFc': from_str, 'toTmFc': today_str
-    }, service_name='기상청 기상특보', timeout=(3.0, 5.0))
+    }, service_name='기상청 기상특보', timeout=(10.0, 20.0))
 
     if not data:
         return alerts_by_loc
