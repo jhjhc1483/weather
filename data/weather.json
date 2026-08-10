@@ -44,8 +44,8 @@
         "max": "31.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "2.4m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -78,10 +78,10 @@
         "max": "25.8"
       },
       "wind": {
-        "direction": "동북동풍",
-        "speed": "2.0m/s"
+        "direction": "-",
+        "speed": "-"
       },
-      "rain_accumulated": 3.0,
+      "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
@@ -112,8 +112,8 @@
         "max": "28.1"
       },
       "wind": {
-        "direction": "동북동풍",
-        "speed": "7.3m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -146,8 +146,8 @@
         "max": "30.7"
       },
       "wind": {
-        "direction": "남풍",
-        "speed": "2.1m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -180,8 +180,8 @@
         "max": "28.4"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "2.4m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -214,8 +214,8 @@
         "max": "29.9"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "2.5m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -248,8 +248,8 @@
         "max": "27.7"
       },
       "wind": {
-        "direction": "남남동풍",
-        "speed": "3.2m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -282,8 +282,8 @@
         "max": "29.8"
       },
       "wind": {
-        "direction": "남풍",
-        "speed": "2.7m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
