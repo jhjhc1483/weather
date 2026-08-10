@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-10T21:12:44+09:00",
+  "updated_at": "2026-08-10T21:16:11+09:00",
   "base_date": "20260810",
   "date_display": "08.10",
   "day_of_week": "월",
-  "time_display": "21:12",
+  "time_display": "21:16",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상 완료",
@@ -37,7 +37,7 @@
       },
       "wind": {
         "direction": "동남동풍",
-        "speed": "1.8m/s"
+        "speed": "1.6m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -55,9 +55,9 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "14",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "1",
+        "pm25": "2",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
@@ -91,27 +91,27 @@
       "dust": {
         "pm10": "10",
         "pm10_grade": "좋음",
-        "pm25": "5",
+        "pm25": "4",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "27.2",
-        "feels_like": "28.1",
+        "current": "25.9",
+        "feels_like": "26.8",
         "min": "24.0",
         "max": "32.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "5.1m/s"
+        "direction": "북동풍",
+        "speed": "1.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☁️ 대체로 흐린 날씨입니다 (현재 27.2℃)."
+      "forecast_summary": "☁️ 대체로 흐린 날씨입니다 (현재 25.9℃)."
     },
     "함안": {
       "overview": "구름많음 / 구름많음",
@@ -132,14 +132,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "26.1",
-        "feels_like": "27.6",
+        "current": "26.0",
+        "feels_like": "27.5",
         "min": "23.0",
         "max": "30.0"
       },
       "wind": {
         "direction": "북북동풍",
-        "speed": "4.1m/s"
+        "speed": "4.0m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -173,20 +173,20 @@
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "25.9",
-        "feels_like": "27.0",
-        "min": "24.0",
+        "current": "23.6",
+        "feels_like": "24.7",
+        "min": "23.6",
         "max": "30.0"
       },
       "wind": {
-        "direction": "북동풍",
-        "speed": "1.7m/s"
+        "direction": "북서풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 25.9℃)."
+      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 23.6℃)."
     },
     "세종": {
       "overview": "구름많음 / 구름많음",
@@ -198,29 +198,29 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "12",
+        "pm10": "17",
         "pm10_grade": "좋음",
-        "pm25": "8",
+        "pm25": "4",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "아름동",
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "27.9",
-        "feels_like": "28.8",
+        "current": "26.8",
+        "feels_like": "27.7",
         "min": "24.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "3.3m/s"
+        "direction": "동풍",
+        "speed": "1.7m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 27.9℃)."
+      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 26.8℃)."
     },
     "계룡": {
       "overview": "구름많음 / 구름많음",
@@ -232,12 +232,12 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "6",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "2",
+        "pm25": "4",
         "pm25_grade": "좋음",
-        "is_fallback": true,
-        "station_used": "논산",
+        "is_fallback": false,
+        "station_used": "엄사면",
         "primary_station": "엄사면"
       },
       "temperature": {
@@ -248,7 +248,7 @@
       },
       "wind": {
         "direction": "남동풍",
-        "speed": "3.2m/s"
+        "speed": "3.4m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -275,20 +275,20 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "26.7",
-        "feels_like": "27.1",
+        "current": "26.8",
+        "feels_like": "27.2",
         "min": "23.0",
         "max": "29.0"
       },
       "wind": {
         "direction": "남풍",
-        "speed": "2.1m/s"
+        "speed": "2.0m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 26.7℃)."
+      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 26.8℃)."
     }
   },
   "location_order": [
