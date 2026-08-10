@@ -5,16 +5,24 @@
   "day_of_week": "월",
   "time_display": "19:27",
   "api_status": {
-    "code": "OK",
-    "message": "공공데이터포털 API 수집 정상 완료",
-    "failed_services": [],
+    "code": "ERROR",
+    "message": "공공데이터포털(기상청 API) 응답 지연으로 기존 관측 데이터를 유효 유지합니다.",
+    "failed_services": [
+      "기상청 기상특보",
+      "에어코리아 미세먼지경보",
+      "기상청 초단기실황",
+      "기상청 초단기예보",
+      "기상청 단기예보",
+      "기상청 단기예보(새벽)",
+      "에어코리아 미세먼지"
+    ],
     "degraded_services": []
   },
   "locations": {
     "양평": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -36,8 +44,8 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "2.3m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -46,9 +54,9 @@
       "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 30.0℃ / 최저 20.0℃)."
     },
     "경산": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -70,19 +78,19 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "3.0m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 25℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 30.0℃)."
     },
     "사천": {
-      "overview": "흐림 / 흐림",
-      "overview_1": "흐림",
-      "overview_2": "흐림",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -104,19 +112,19 @@
         "max": "32.0"
       },
       "wind": {
-        "direction": "동풍",
-        "speed": "6.1m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "☁️ 대체로 흐린 날씨입니다 (현재 27.5℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 32.0℃)."
     },
     "함안": {
-      "overview": "흐림 / 구름많음",
-      "overview_1": "흐림",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -138,26 +146,19 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "남서풍",
-        "speed": "1.1m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
-      "alerts": [
-        {
-          "name": "폭염주의보",
-          "status": "발효중",
-          "effective_time": "",
-          "is_new": false
-        }
-      ],
+      "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⚠️ 폭염주의보 발효 중! 안전에 유의하세요."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 30.0℃)."
     },
     "성주": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -179,19 +180,19 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "남동풍",
-        "speed": "2.1m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 25.8℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 30.0℃)."
     },
     "세종": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -213,19 +214,19 @@
         "max": "31.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "3.2m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 28.7℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 31.0℃)."
     },
     "계룡": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -247,19 +248,19 @@
         "max": "30.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "3.4m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 28.6℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 30.0℃)."
     },
     "임실": {
-      "overview": "구름많음 / 구름많음",
-      "overview_1": "구름많음",
-      "overview_2": "구름많음",
+      "overview": "맑음 / 맑음",
+      "overview_1": "맑음",
+      "overview_2": "맑음",
       "overview_labels": [
         "금일 오후",
         "다음날 오전"
@@ -281,14 +282,14 @@
         "max": "29.0"
       },
       "wind": {
-        "direction": "남남동풍",
-        "speed": "1.4m/s"
+        "direction": "-",
+        "speed": "-"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "⛅ 구름이 많은 날씨입니다 (현재 27.9℃)."
+      "forecast_summary": "☀️ 구름 없이 맑은 날씨입니다 (최고 29.0℃)."
     }
   },
   "location_order": [
