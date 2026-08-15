@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-15T22:09:35+09:00",
+  "updated_at": "2026-08-15T23:51:39+09:00",
   "base_date": "20260815",
   "date_display": "08.15",
   "day_of_week": "토",
-  "time_display": "22:09",
+  "time_display": "23:51",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상 완료",
@@ -21,29 +21,29 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "22",
+        "pm10": "21",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "22",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "양평읍",
         "primary_station": "양평읍"
       },
       "temperature": {
-        "current": "24.4",
-        "feels_like": "27.8",
+        "current": "23.9",
+        "feels_like": "27.2",
         "min": "21.0",
         "max": "28.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "0.7m/s"
+        "direction": "남동풍",
+        "speed": "0.1m/s"
       },
       "rain_accumulated": 6.5,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 소나기 / 비입니다 (24.4℃)."
+      "forecast_summary": "🌤️ 현재 날씨는 소나기 / 비입니다 (23.9℃)."
     },
     "경산": {
       "overview": "비 / 비",
@@ -55,23 +55,23 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "22",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "13",
-        "pm25_grade": "보통",
+        "pm25": "12",
+        "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "시지동",
         "primary_station": "시지동"
       },
       "temperature": {
-        "current": "24.6",
-        "feels_like": "26.7",
+        "current": "24.3",
+        "feels_like": "27.2",
         "min": "22.0",
         "max": "33.0"
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "0.9m/s"
+        "speed": "1.5m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -89,29 +89,29 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "18",
+        "pm10": "27",
         "pm10_grade": "좋음",
-        "pm25": "10",
+        "pm25": "17",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "사천읍",
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "25.6",
-        "feels_like": "28.9",
+        "current": "25.7",
+        "feels_like": "29.0",
         "min": "22.0",
         "max": "30.0"
       },
       "wind": {
-        "direction": "남남서풍",
-        "speed": "1.5m/s"
+        "direction": "남풍",
+        "speed": "0.4m/s"
       },
       "rain_accumulated": 2.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (25.6℃)."
+      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (25.7℃)."
     },
     "함안": {
       "overview": "비 / 비",
@@ -123,29 +123,29 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "17",
+        "pm10": "20",
         "pm10_grade": "좋음",
-        "pm25": "11",
+        "pm25": "16",
         "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "가야읍",
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "24.0",
-        "feels_like": "27.1",
+        "current": "23.8",
+        "feels_like": "26.9",
         "min": "22.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "북서풍",
+        "direction": "북북서풍",
         "speed": "1.8m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (24.0℃)."
+      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (23.8℃)."
     },
     "성주": {
       "overview": "비 / 비",
@@ -157,23 +157,23 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "21",
+        "pm10": "13",
         "pm10_grade": "좋음",
-        "pm25": "10",
-        "pm25_grade": "보통",
+        "pm25": "13",
+        "pm25_grade": "좋음",
         "is_fallback": false,
         "station_used": "성주군",
         "primary_station": "성주군"
       },
       "temperature": {
-        "current": "24.2",
-        "feels_like": "26.6",
+        "current": "23.8",
+        "feels_like": "26.7",
         "min": "23.0",
         "max": "33.0"
       },
       "wind": {
-        "direction": "서남서풍",
-        "speed": "0.0m/s"
+        "direction": "서풍",
+        "speed": "0.2m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
@@ -182,8 +182,8 @@
       "forecast_summary": "🧥 일교차가 크니 겉옷을 준비하세요 (최고 33.0℃ / 최저 23.0℃)."
     },
     "세종": {
-      "overview": "비 / 비",
-      "overview_1": "비",
+      "overview": "흐림 / 비",
+      "overview_1": "흐림",
       "overview_2": "비",
       "overview_labels": [
         "금일 오후",
@@ -191,33 +191,33 @@
       ],
       "overview_slot": "PM",
       "dust": {
-        "pm10": "15",
+        "pm10": "12",
         "pm10_grade": "좋음",
         "pm25": "-",
-        "pm25_grade": "좋음",
+        "pm25_grade": "-",
         "is_fallback": false,
         "station_used": "아름동",
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "24.9",
-        "feels_like": "27.7",
+        "current": "25.0",
+        "feels_like": "28.0",
         "min": "23.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "북풍",
-        "speed": "0.0m/s"
+        "direction": "남남서풍",
+        "speed": "1.9m/s"
       },
       "rain_accumulated": 1.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (24.9℃)."
+      "forecast_summary": "☁️ 대체로 흐린 날씨입니다 (현재 25.0℃)."
     },
     "계룡": {
-      "overview": "비 / 비",
-      "overview_1": "비",
+      "overview": "소나기 / 비",
+      "overview_1": "소나기",
       "overview_2": "비",
       "overview_labels": [
         "금일 오후",
@@ -234,20 +234,20 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "22.6",
-        "feels_like": "25.5",
+        "current": "22.5",
+        "feels_like": "25.4",
         "min": "22.0",
         "max": "31.0"
       },
       "wind": {
-        "direction": "북풍",
+        "direction": "서북서풍",
         "speed": "0.0m/s"
       },
       "rain_accumulated": 1.5,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (22.6℃)."
+      "forecast_summary": "🌤️ 현재 날씨는 소나기 / 비입니다 (22.5℃)."
     },
     "임실": {
       "overview": "비 / 비",
@@ -268,20 +268,20 @@
         "primary_station": "임실읍"
       },
       "temperature": {
-        "current": "24.2",
-        "feels_like": "26.6",
+        "current": "23.4",
+        "feels_like": "26.2",
         "min": "21.0",
         "max": "29.0"
       },
       "wind": {
-        "direction": "서풍",
-        "speed": "1.2m/s"
+        "direction": "남풍",
+        "speed": "0.3m/s"
       },
       "rain_accumulated": 0.0,
       "rain_forecast": [],
       "alerts": [],
       "hourly_rn1": {},
-      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (24.2℃)."
+      "forecast_summary": "🌤️ 현재 날씨는 비 / 비입니다 (23.4℃)."
     }
   },
   "location_order": [
