@@ -510,7 +510,7 @@ def generate_forecast_summary(loc_name, data):
 # ============================================================
 # 지역별 수집 및 데이터 결합 (Fallback 강화)
 # ============================================================
-def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None):
+def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, existing_base_date=None):
     nx, ny = cfg['nx'], cfg['ny']
 
     ncst = fetch_ncst(nx, ny, now)
@@ -546,7 +546,116 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None):
         try: w_spd_text = f"{float(w_spd_raw):.1f}m/s"
         except (ValueError, TypeError): w_spd_text = '-'
 
-    acc_rain = kma_obs.get('rn_day', 0.0) if (kma_obs and kma_obs.get('rn_day') is not None) else parse_rain_val(ncst.get('RN1', 0))
+    current_hour = now.hour
+
+    # 1. 시간별 누적 강수량(hourly_rn1) 보존 및 집계
+    hourly_rn1 = {}
+    if existing_loc and existing_base_date == today_str:
+        raw_hrn1 = existing_loc.get('hourly_rn1')
+        if isinstance(raw_hrn1, dict):
+            hourly_rn1 = dict(raw_hrn1)
+
+    curr_rn1 = parse_rain_val(ncst.get('RN1', 0))
+    hour_key = now.strftime('%H')
+    if curr_rn1 > 0:
+        hourly_rn1[hour_key] = max(hourly_rn1.get(hour_key, 0.0), curr_rn1)
+
+    for it in u_items:
+        if it.get('category') == 'RN1' and it.get('fcstDate') == today_str:
+            try:
+                fh = int(it.get('fcstTime', '0')[:2])
+                if fh <= current_hour:
+                    hk = f"{fh:02d}"
+                    v = parse_rain_val(it.get('fcstValue'))
+                    if v > 0 and hk not in hourly_rn1:
+                        hourly_rn1[hk] = v
+            except (ValueError, TypeError):
+                pass
+
+    if kma_obs and kma_obs.get('rn_day') is not None:
+        acc_rain = kma_obs['rn_day']
+    else:
+        acc_rain = sum(hourly_rn1.values())
+        if existing_loc and existing_base_date == today_str:
+            try:
+                prev_acc = float(existing_loc.get('rain_accumulated', 0.0) or 0.0)
+                acc_rain = max(acc_rain, prev_acc)
+            except (ValueError, TypeError):
+                pass
+
+    # 2. 일일 예상 강수량 (현재 시각 ~ 다음날 9시까지) 집계
+    tomorrow_str = (now.date() + timedelta(days=1)).strftime('%Y%m%d')
+    hourly_rain = {}
+
+    # 초단기예보(RN1) 반영
+    for it in u_items:
+        if it.get('category') == 'RN1':
+            fdate = it.get('fcstDate')
+            try:
+                fh = int(it.get('fcstTime', '0')[:2])
+                val = parse_rain_val(it.get('fcstValue'))
+                if (fdate == today_str and fh >= current_hour) or (fdate == tomorrow_str and fh <= 9):
+                    hourly_rain[(fdate, fh)] = val
+            except (ValueError, TypeError):
+                pass
+
+    # 단기예보(PCP) 반영 (초단기예보 미작성 시각 보완)
+    for it in v_items:
+        if it.get('category') == 'PCP':
+            fdate = it.get('fcstDate')
+            try:
+                fh = int(it.get('fcstTime', '0')[:2])
+                val = parse_rain_val(it.get('fcstValue'))
+                key = (fdate, fh)
+                if key not in hourly_rain:
+                    if (fdate == today_str and fh >= current_hour) or (fdate == tomorrow_str and fh <= 9):
+                        hourly_rain[key] = val
+            except (ValueError, TypeError):
+                pass
+
+    # 강수 시간대 그룹화 및 텍스트 변환
+    rain_slots = []
+    for (fdate, fh), amt in sorted(hourly_rain.items()):
+        if amt > 0:
+            d = datetime.strptime(fdate, '%Y%m%d').date()
+            rain_slots.append({'date': d, 'hour': fh, 'amount': amt, 'fdate': fdate})
+
+    rain_forecast = []
+    if rain_slots:
+        groups = []
+        cur_grp = [rain_slots[0]]
+        for i in range(1, len(rain_slots)):
+            prev = cur_grp[-1]
+            curr = rain_slots[i]
+            is_consecutive = (curr['date'] == prev['date'] and curr['hour'] == prev['hour'] + 1) or \
+                             (curr['date'] == prev['date'] + timedelta(days=1) and prev['hour'] == 23 and curr['hour'] == 0)
+            if is_consecutive:
+                cur_grp.append(curr)
+            else:
+                groups.append(cur_grp)
+                cur_grp = [curr]
+        groups.append(cur_grp)
+
+        for grp in groups:
+            st = grp[0]
+            ed = grp[-1]
+            tot_amt = sum(s['amount'] for s in grp)
+
+            st_date_label = "내일 " if st['fdate'] == tomorrow_str else ""
+            ed_date_label = "내일 " if ed['fdate'] == tomorrow_str else ""
+
+            ed_hour = ed['hour'] + 1
+            ed_hour_str = "24:00" if ed_hour == 24 else f"{ed_hour:02d}:00"
+
+            if st['fdate'] == ed['fdate']:
+                time_range = f"{st_date_label}{st['hour']:02d}:00~{ed_hour_str}"
+            else:
+                time_range = f"{st_date_label}{st['hour']:02d}:00~{ed_date_label}{ed_hour_str}"
+
+            rain_forecast.append({
+                'time_range': time_range,
+                'amount': round(tot_amt, 1)
+            })
 
     cur_reh = ncst.get('REH', '-')
     feels_like = calc_feels_like(cur_temp, cur_reh, w_spd_raw, now.month)
@@ -561,9 +670,9 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None):
         'temperature': {'current': cur_temp, 'feels_like': feels_like, 'min': min_t, 'max': max_t},
         'wind': {'direction': w_dir, 'speed': w_spd_text},
         'rain_accumulated': round(acc_rain, 1),
-        'rain_forecast': [],
+        'rain_forecast': rain_forecast,
         'alerts': alerts_data.get(name, []),
-        'hourly_rn1': {},
+        'hourly_rn1': hourly_rn1,
     }
 
     # ★ Fallback 검증: 만약 새 데이터의 기온/개황이 '-' 인 경우 기존 유효 데이터 유지
@@ -656,11 +765,12 @@ def main():
 
     # 8개 지역 초고속 병렬 수집 (Concurrent Execution)
     locations_data = {}
+    existing_base_date = existing_data.get('base_date') if existing_data else None
     def _fetch_single_location(name):
         cfg = LOCATIONS[name]
         existing_loc = existing_data.get('locations', {}).get(name) if existing_data else None
         try:
-            res = process_location(name, cfg, now, today_str, combined_alerts, existing_loc)
+            res = process_location(name, cfg, now, today_str, combined_alerts, existing_loc, existing_base_date)
             return name, res
         except Exception as e:
             print(f"  [{name}] 수집 오류: {e}")

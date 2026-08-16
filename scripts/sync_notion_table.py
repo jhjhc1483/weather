@@ -27,6 +27,13 @@ import os
 import sys
 import time
 
+# Windows 콘솔 인코딩 호환성 설정
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 import requests
 
 API = "https://api.notion.com/v1"
