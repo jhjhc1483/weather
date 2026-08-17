@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-08-17T22:53:00+09:00",
+  "updated_at": "2026-08-17T22:57:59+09:00",
   "base_date": "20260817",
   "date_display": "08.17",
   "day_of_week": "월",
-  "time_display": "22:53",
+  "time_display": "22:57",
   "api_status": {
     "code": "OK",
     "message": "공공데이터포털 API 수집 정상 완료",
@@ -37,7 +37,7 @@
       },
       "wind": {
         "direction": "남남동풍",
-        "speed": "0.2m/s"
+        "speed": "0.1m/s"
       },
       "rain_accumulated": 2.1,
       "rain_forecast": [],
@@ -76,7 +76,7 @@
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "1.4m/s"
+        "speed": "1.5m/s"
       },
       "rain_accumulated": 8.5,
       "rain_forecast": [
@@ -112,14 +112,14 @@
         "primary_station": "사천읍"
       },
       "temperature": {
-        "current": "25.4",
-        "feels_like": "28.7",
+        "current": "25.5",
+        "feels_like": "28.8",
         "min": "24.0",
         "max": "28.0"
       },
       "wind": {
-        "direction": "동북동풍",
-        "speed": "0.3m/s"
+        "direction": "북동풍",
+        "speed": "0.5m/s"
       },
       "rain_accumulated": 53.0,
       "rain_forecast": [
@@ -164,14 +164,14 @@
         "primary_station": "가야읍"
       },
       "temperature": {
-        "current": "23.8",
-        "feels_like": "27.0",
+        "current": "23.7",
+        "feels_like": "26.9",
         "min": "22.0",
         "max": "28.0"
       },
       "wind": {
-        "direction": "서북서풍",
-        "speed": "0.2m/s"
+        "direction": "북서풍",
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 60.5,
       "rain_forecast": [
@@ -227,8 +227,8 @@
         "max": "29.0"
       },
       "wind": {
-        "direction": "남풍",
-        "speed": "0.6m/s"
+        "direction": "동풍",
+        "speed": "0.7m/s"
       },
       "rain_accumulated": 0.5,
       "rain_forecast": [
@@ -267,14 +267,14 @@
         "primary_station": "아름동"
       },
       "temperature": {
-        "current": "24.3",
-        "feels_like": "27.4",
+        "current": "24.2",
+        "feels_like": "27.3",
         "min": "22.0",
         "max": "30.0"
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "1.0m/s"
+        "speed": "1.1m/s"
       },
       "rain_accumulated": 4.0,
       "rain_forecast": [],
@@ -303,14 +303,14 @@
         "primary_station": "엄사면"
       },
       "temperature": {
-        "current": "22.7",
-        "feels_like": "25.8",
+        "current": "22.6",
+        "feels_like": "25.6",
         "min": "22.0",
         "max": "30.0"
       },
       "wind": {
-        "direction": "동남동풍",
-        "speed": "0.3m/s"
+        "direction": "서북서풍",
+        "speed": "0.1m/s"
       },
       "rain_accumulated": 3.5,
       "rain_forecast": [],
