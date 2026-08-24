@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-08-24T07:50:55+09:00",
+  "updated_at": "2026-08-24T12:32:39+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
       "date_display": "08.24 (월)",
-      "overview": "구름많음",
+      "overview": "맑음",
       "temperature": {
         "min": "22.0",
         "max": "31.0"
