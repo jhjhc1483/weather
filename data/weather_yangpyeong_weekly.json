@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-09-12T06:12:17+09:00",
+  "updated_at": "2026-09-12T14:15:41+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
       "date_display": "09.12 (토)",
-      "overview": "맑음",
+      "overview": "구름많음",
       "temperature": {
         "min": "13.0",
         "max": "23.0"
