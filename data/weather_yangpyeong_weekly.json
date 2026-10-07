@@ -1,22 +1,9 @@
 {
-  "updated_at": "2026-10-07T18:09:49+09:00",
+  "updated_at": "2026-10-08T02:31:58+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
-      "date_display": "10.07 (수)",
-      "overview": "맑음",
-      "temperature": {
-        "min": "8.0",
-        "max": "21.0"
-      },
-      "wind": {
-        "direction": "서풍",
-        "speed": "1.5m/s"
-      }
-    },
-    {
-      "label": "내일",
       "date_display": "10.08 (목)",
       "overview": "맑음",
       "temperature": {
@@ -29,12 +16,12 @@
       }
     },
     {
-      "label": "모레",
+      "label": "내일",
       "date_display": "10.09 (금)",
       "overview": "맑음",
       "temperature": {
-        "min": "18.0",
-        "max": "28.0"
+        "min": "9.0",
+        "max": "23.0"
       },
       "wind": {
         "direction": "서풍",
@@ -42,7 +29,7 @@
       }
     },
     {
-      "label": "3일후",
+      "label": "모레",
       "date_display": "10.10 (토)",
       "overview": "맑음",
       "temperature": {
@@ -55,7 +42,7 @@
       }
     },
     {
-      "label": "4일후",
+      "label": "3일후",
       "date_display": "10.11 (일)",
       "overview": "맑음",
       "temperature": {
@@ -68,7 +55,7 @@
       }
     },
     {
-      "label": "5일후",
+      "label": "4일후",
       "date_display": "10.12 (월)",
       "overview": "맑음",
       "temperature": {
@@ -81,8 +68,21 @@
       }
     },
     {
-      "label": "6일후",
+      "label": "5일후",
       "date_display": "10.13 (화)",
+      "overview": "맑음",
+      "temperature": {
+        "min": "18.0",
+        "max": "28.0"
+      },
+      "wind": {
+        "direction": "서풍",
+        "speed": "1.5m/s"
+      }
+    },
+    {
+      "label": "6일후",
+      "date_display": "10.14 (수)",
       "overview": "맑음",
       "temperature": {
         "min": "18.0",
