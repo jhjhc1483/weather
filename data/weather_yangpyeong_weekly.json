@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T14:04:32+09:00",
+  "updated_at": "2026-10-15T20:58:54+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
@@ -18,7 +18,7 @@
     {
       "label": "내일",
       "date_display": "10.16 (금)",
-      "overview": "맑음",
+      "overview": "구름많음",
       "temperature": {
         "min": "10.0",
         "max": "22.0"
