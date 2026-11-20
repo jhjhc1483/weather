@@ -1323,8 +1323,11 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   font-size: 0.85rem;
 }
 
+/* fill-mode는 backwards: 'both'면 끝난 뒤에도 transform이 행에 남아
+   행마다 stacking context가 생기고, rowspan sticky 셀(개황·미세먼지)이
+   다음 행 아래로 깔려 모바일 가로 스크롤 시 데이터가 비쳐 보임 */
 tbody tr {
-  animation: fadeIn 0.3s ease both;
+  animation: fadeIn 0.3s ease backwards;
 }
 tbody tr:nth-child(1) { animation-delay: 0.02s; }
 tbody tr:nth-child(2) { animation-delay: 0.04s; }
