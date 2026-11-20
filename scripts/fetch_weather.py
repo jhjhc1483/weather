@@ -75,6 +75,11 @@ KST = timezone(timedelta(hours=9))
 BASE_WEATHER = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
 BASE_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc"
 BASE_ALERT = "https://apis.data.go.kr/1360000/WthrWrnInfoService"
+BASE_MID = "https://apis.data.go.kr/1360000/MidFcstInfoService"
+
+# 양평 주간예보용 중기예보 구역 (AWS 202 양평의 FCT_ID 기준)
+YP_MID_TA_REG = '11B20503'    # 중기기온: 양평
+YP_MID_LAND_REG = '11B00000'  # 중기육상: 서울·인천·경기도
 
 REQUEST_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 weather-dashboard/2.0',
@@ -303,7 +308,8 @@ def fetch_ultra_fcst(nx, ny, now_time):
             pass
     return []
 
-def fetch_vilage_fcst(nx, ny, now_time, today_str):
+def fetch_vilage_fcst(nx, ny, now_time, today_str, max_days=1):
+    """단기예보 항목 (오늘 ~ 오늘+max_days 일). 기본값 1 = 오늘·내일"""
     bd, bt = get_latest_vilage_base(now_time)
     data = safe_api_get(f"{BASE_WEATHER}/getVilageFcst", {
         'pageNo': '1', 'numOfRows': '1000', 'dataType': 'JSON',
@@ -331,8 +337,8 @@ def fetch_vilage_fcst(nx, ny, now_time, today_str):
             except (KeyError, TypeError):
                 pass
 
-    tomorrow_str = (now_time.date() + timedelta(days=1)).strftime('%Y%m%d')
-    return [i for i in items if i.get('fcstDate') in (today_str, tomorrow_str)]
+    wanted = {(now_time.date() + timedelta(days=d)).strftime('%Y%m%d') for d in range(max_days + 1)}
+    return [i for i in items if i.get('fcstDate') in wanted]
 
 def fetch_air(station, fallback_station=None):
     def _query(st):
@@ -818,34 +824,146 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
     loc_res['forecast_summary'] = generate_forecast_summary(name, loc_res)
     return loc_res
 
+def get_mid_tmfc_candidates(now):
+    """중기예보 발표시각(06시/18시) 후보 — 최신순 2개"""
+    d = now.date()
+    y = d - timedelta(days=1)
+    if now.hour >= 18:
+        return [(d, '1800'), (d, '0600')]
+    if now.hour >= 6:
+        return [(d, '0600'), (y, '1800')]
+    return [(y, '1800'), (y, '0600')]
+
+def fetch_mid_fcst(op, reg_id, now):
+    """중기예보 조회 → (발표일 date, item dict). 최신 발표분이 아직 없으면 직전 발표분 사용"""
+    for tm_date, hhmm in get_mid_tmfc_candidates(now):
+        data = safe_api_get(f"{BASE_MID}/{op}", {
+            'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON',
+            'regId': reg_id, 'tmFc': tm_date.strftime('%Y%m%d') + hhmm
+        }, service_name=f'기상청 중기예보({op})')
+        try:
+            item = data['response']['body']['items']['item'][0]
+            if item:
+                return tm_date, item
+        except (KeyError, TypeError, IndexError):
+            continue
+    return None, {}
+
+def _most_common(values):
+    """최빈값 (동률이면 큰 값 = 더 흐린/궂은 쪽)"""
+    counts = {}
+    for v in values:
+        counts[v] = counts.get(v, 0) + 1
+    return max(counts, key=lambda v: (counts[v], v))
+
+def _short_term_day(d_items):
+    """단기예보 하루치 → {'min','max','complete','overview','wind_dir','wind_spd'}"""
+    def _vals(cat):
+        out = []
+        for it in d_items:
+            if it.get('category') == cat:
+                try: out.append(float(it['fcstValue']))
+                except (KeyError, ValueError, TypeError): pass
+        return out
+
+    res = {}
+    tmp, tmn, tmx = _vals('TMP'), _vals('TMN'), _vals('TMX')
+    if tmp or tmn or tmx:
+        res['min'] = min(tmn + tmp)  if (tmn or tmp) else None
+        res['max'] = max(tmx + tmp)  if (tmx or tmp) else None
+        hours = {it.get('fcstTime', '')[:2] for it in d_items if it.get('category') == 'TMP'}
+        res['complete'] = bool(tmn and tmx) or len(hours) >= 20
+
+    # 개황: 낮(06~20시) 기준. 강수가 있으면 강수형태, 없으면 하늘상태 최빈값
+    day_items = [it for it in d_items if 6 <= int(it.get('fcstTime', '0000')[:2]) <= 20] or d_items
+    ptys, skys = [], []
+    for it in day_items:
+        try:
+            v = int(it.get('fcstValue'))
+        except (ValueError, TypeError):
+            continue
+        if it.get('category') == 'PTY' and v > 0:
+            ptys.append(v)
+        elif it.get('category') == 'SKY':
+            skys.append(v)
+    # D+3 이후는 3시간 간격이라 낮 시간 표본이 5개 남짓 → 4개 이상이면 하루 대표값으로 인정
+    if len(skys) >= 4:
+        sky = _most_common(skys)
+        if ptys:
+            # 중기예보 표기와 맞춤: '흐리고 비', '구름많고 눈', (맑음 + 강수) → '비'
+            prefix = {3: '구름많고 ', 4: '흐리고 '}.get(sky, '')
+            res['overview'] = prefix + {1: '비', 2: '비/눈', 3: '눈', 4: '소나기'}.get(_most_common(ptys), '비')
+        else:
+            res['overview'] = sky_pty_to_text(sky, 0)
+
+    # 바람: 풍속 평균, 풍향은 풍속 가중 벡터 평균
+    wind = {}
+    for it in d_items:
+        if it.get('category') in ('VEC', 'WSD'):
+            try:
+                wind.setdefault((it.get('fcstTime'), it.get('category')), float(it['fcstValue']))
+            except (KeyError, ValueError, TypeError):
+                pass
+    pairs = [(wind[(t, 'VEC')], wind[(t, 'WSD')]) for (t, c) in wind if c == 'VEC' and (t, 'WSD') in wind]
+    if len(pairs) >= 4:
+        u = sum(s * math.sin(math.radians(d)) for d, s in pairs)
+        v = sum(s * math.cos(math.radians(d)) for d, s in pairs)
+        res['wind_spd'] = sum(s for _, s in pairs) / len(pairs)
+        res['wind_dir'] = wind_dir_text(math.degrees(math.atan2(u, v)) % 360)
+    return res
+
+def _mid_term_day(target_date, ta_base, ta, land_base, land):
+    """중기예보 하루치 → {'min','max','overview'} (발표일 기준 n일 후 키 사용)"""
+    res = {}
+    if ta_base:
+        n = (target_date - ta_base).days
+        if ta.get(f'taMin{n}') is not None and ta.get(f'taMax{n}') is not None:
+            res['min'], res['max'] = float(ta[f'taMin{n}']), float(ta[f'taMax{n}'])
+    if land_base:
+        n = (target_date - land_base).days
+        am, pm = land.get(f'wf{n}Am'), land.get(f'wf{n}Pm')
+        if am and pm:
+            res['overview'] = am if am == pm else f"{am}/{pm}"
+        elif land.get(f'wf{n}'):
+            res['overview'] = land[f'wf{n}']
+    return res
+
 def fetch_yangpyeong_weekly_data(now, today_str):
+    """양평 7일 예보: 단기예보(약 4~5일) + 중기예보(그 이후). 자료가 없는 칸은 '-'"""
     cfg = LOCATIONS.get('양평', {'nx': 70, 'ny': 126})
-    v_items = fetch_vilage_fcst(cfg['nx'], cfg['ny'], now, today_str)
+    v_items = fetch_vilage_fcst(cfg['nx'], cfg['ny'], now, today_str, max_days=6)
+    ta_base, ta = fetch_mid_fcst('getMidTa', YP_MID_TA_REG, now)
+    land_base, land = fetch_mid_fcst('getMidLandFcst', YP_MID_LAND_REG, now)
+
     weekday_kr = ['월', '화', '수', '목', '금', '토', '일']
     weekly_list = []
 
     for i in range(7):
         target_date = now.date() + timedelta(days=i)
         dt_str = target_date.strftime('%Y%m%d')
-        disp_date = target_date.strftime('%m.%d')
-        w_day = weekday_kr[target_date.weekday()]
         label = "오늘" if i == 0 else ("내일" if i == 1 else ("모레" if i == 2 else f"{i}일후"))
 
-        d_items = [it for it in v_items if it.get('fcstDate') == dt_str]
-        temps = [float(it['fcstValue']) for it in d_items if it.get('category') in ('TMP', 'TMN', 'TMX') and it.get('fcstValue') not in ('-', None)]
-        skys = [int(it['fcstValue']) for it in d_items if it.get('category') == 'SKY' and it.get('fcstValue') not in ('-', None)]
+        s = _short_term_day([it for it in v_items if it.get('fcstDate') == dt_str])
+        m = _mid_term_day(target_date, ta_base, ta, land_base, land)
 
-        min_t = f"{min(temps):.1f}" if temps else "18.0"
-        max_t = f"{max(temps):.1f}" if temps else "28.0"
-        sky_val = round(sum(skys)/len(skys)) if skys else 1
-        overview = sky_pty_to_text(sky_val, 0)
-        if overview == '-': overview = '맑음'
+        # 기온: 하루가 온전한 단기예보 > 중기예보 > 일부 시간뿐인 단기예보
+        if s.get('complete') or ('min' not in m and s.get('min') is not None):
+            min_v, max_v = s.get('min'), s.get('max')
+        else:
+            min_v, max_v = m.get('min'), m.get('max')
 
         weekly_list.append({
-            'label': label, 'date_display': f"{disp_date} ({w_day})",
-            'overview': overview,
-            'temperature': {'min': min_t, 'max': max_t},
-            'wind': {'direction': '서풍', 'speed': '1.5m/s'}
+            'label': label,
+            'date_display': f"{target_date.strftime('%m.%d')} ({weekday_kr[target_date.weekday()]})",
+            'overview': s.get('overview') or m.get('overview') or '-',
+            'temperature': {
+                'min': f"{min_v:.1f}" if min_v is not None else '-',
+                'max': f"{max_v:.1f}" if max_v is not None else '-',
+            },
+            'wind': {
+                'direction': s.get('wind_dir', '-'),
+                'speed': f"{s['wind_spd']:.1f}m/s" if 'wind_spd' in s else '-',
+            },
         })
 
     return {

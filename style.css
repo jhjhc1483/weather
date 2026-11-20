@@ -500,7 +500,8 @@ body {
   position: sticky;
   left: 0;
   z-index: 3;
-  background: var(--bg-card);
+  /* 반투명(--bg-card)이나 미정의 변수면 가로 스크롤 시 뒤 칸이 비치므로 불투명 색 고정 */
+  background: var(--bg-category-solid) !important;
   font-weight: 700;
   color: var(--text-primary);
   width: 90px;
@@ -511,8 +512,12 @@ body {
   border-right: 2px solid var(--border);
 }
 .yp-weekly-table-pivoted thead .yp-th-cat {
-  background: var(--bg-hover);
   z-index: 4;
+}
+/* '구름많음/흐리고 비' 같은 긴 중기예보 문구는 칸 안에서 줄바꿈 */
+.yp-cell-overview span {
+  white-space: normal;
+  word-break: keep-all;
 }
 .yp-cell-overview {
   display: flex;

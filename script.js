@@ -1009,9 +1009,16 @@
                 <tr>
                   <td class="yp-td-cat">개황</td>
         `;
+        // 자료가 없는 칸은 '-' 만 표시 (단위·아이콘 생략)
+        const ypTemp = function (v) { return (v === '-' || v == null) ? '-' : escHtml(String(v)) + '℃'; };
         forecast.forEach(function (item) {
+          if (!item.overview || item.overview === '-') {
+            html += '<td>-</td>';
+            return;
+          }
           const emoji = getOverviewEmoji(item.overview);
-          html += `<td><div class="yp-cell-overview">${emoji}<br><span>${item.overview}</span></div></td>`;
+          const text = escHtml(item.overview).replace(/\//g, '/<wbr>');
+          html += `<td><div class="yp-cell-overview">${emoji}<br><span>${text}</span></div></td>`;
         });
         html += `</tr>`;
 
@@ -1020,7 +1027,7 @@
                   <td class="yp-td-cat">최저 기온</td>
         `;
         forecast.forEach(function (item) {
-          html += `<td class="temp-cell"><span class="temp-min">${item.temperature.min}℃</span></td>`;
+          html += `<td class="temp-cell"><span class="temp-min">${ypTemp(item.temperature.min)}</span></td>`;
         });
         html += `</tr>`;
 
@@ -1029,7 +1036,7 @@
                   <td class="yp-td-cat">최고 기온</td>
         `;
         forecast.forEach(function (item) {
-          html += `<td class="temp-cell"><span class="temp-max">${item.temperature.max}℃</span></td>`;
+          html += `<td class="temp-cell"><span class="temp-max">${ypTemp(item.temperature.max)}</span></td>`;
         });
         html += `</tr>`;
 
@@ -1038,7 +1045,12 @@
                   <td class="yp-td-cat">풍향 / 풍속</td>
         `;
         forecast.forEach(function (item) {
-          html += `<td><span class="wind-dir">${item.wind.direction}</span><br><span class="wind-speed">${item.wind.speed}</span></td>`;
+          const w = item.wind || {};
+          if (!w.direction || w.direction === '-') {
+            html += '<td>-</td>';
+            return;
+          }
+          html += `<td><span class="wind-dir">${escHtml(w.direction)}</span><br><span class="wind-speed">${escHtml(w.speed)}</span></td>`;
         });
 
         html += `
