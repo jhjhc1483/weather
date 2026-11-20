@@ -286,10 +286,19 @@
     return `<span class="wind-dir">${arrowHtml}${escHtml(dir)}</span><br><span class="wind-speed">${escHtml(loc.wind.speed)}</span>`;
   }
 
+  // 강수형태 배지: 비는 기존처럼 수치만, 눈이 섞이면 눈임을 명확히 표시
+  const PRECIP_BADGE = {
+    '눈': '<span class="precip-type precip-snow">❄️ 눈</span>',
+    '비/눈': '<span class="precip-type precip-mixed">🌨️ 비/눈</span>'
+  };
+
   function renderRainAcc(loc) {
     const v = loc.rain_accumulated;
     if (!v || v === 0) return '-';
-    return `<span class="rain-value">${v}mm</span>`;
+    const badge = PRECIP_BADGE[loc.rain_accumulated_type];
+    if (!badge) return `<span class="rain-value">${v}mm</span>`;
+    return `${badge}<br><span class="rain-value">${v}mm</span>`
+      + '<br><span class="precip-sub">녹은 물 기준 강수량</span>';
   }
 
   function renderRainFcst(loc) {
@@ -297,8 +306,15 @@
     if (!rf || rf.length === 0) return '-';
     return rf.map(function (item) {
       let html = `<div class="rain-forecast-item">${escHtml(item.time_range)}`;
-      if (item.amount > 0) html += `<br><strong>${item.amount}mm</strong>`;
-      if (item.snow_text) html += `<br><span class="snow-value">❄️ 적설 ${escHtml(item.snow_text)}</span>`;
+      const badge = PRECIP_BADGE[item.ptype];
+      if (badge) {
+        html += `<br>${badge}`;
+        if (item.snow_text) html += `<br><span class="snow-value">적설 ${escHtml(item.snow_text)}</span>`;
+        if (item.amount > 0) html += `<br><span class="precip-sub">강수량 ${item.amount}mm</span>`;
+      } else {
+        if (item.amount > 0) html += `<br><strong>${item.amount}mm</strong>`;
+        if (item.snow_text) html += `<br><span class="snow-value">❄️ 적설 ${escHtml(item.snow_text)}</span>`;
+      }
       return html + '</div>';
     }).join('');
   }

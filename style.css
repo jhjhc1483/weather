@@ -1038,6 +1038,22 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   color: var(--text-primary);
   font-weight: 600;
 }
+.precip-type {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  line-height: 1.5;
+}
+.precip-snow { color: #0369a1; background: #e0f2fe; }
+.precip-mixed { color: #4338ca; background: #e0e7ff; }
+[data-theme="dark"] .precip-snow { color: #bae6fd; background: rgba(56, 189, 248, 0.18); }
+[data-theme="dark"] .precip-mixed { color: #c7d2fe; background: rgba(129, 140, 248, 0.2); }
+.precip-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
 
 /* 기온 */
 .temp-value { font-weight: 500; }

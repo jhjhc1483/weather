@@ -13,6 +13,7 @@
 import json
 import math
 import os
+import re
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -157,36 +158,60 @@ def wind_dir_text(deg):
             '남풍', '남남서풍', '남서풍', '서남서풍', '서풍', '서북서풍', '북서풍', '북북서풍']
     return dirs[round(deg / 22.5) % 16]
 
-def parse_rain_val(value):
-    if not value or str(value).strip() in ('강수없음', '0', '0.0', '-'):
-        return 0.0
-    s_val = str(value).strip()
-    if '미만' in s_val: return 0.5
-    if '이상' in s_val: return 50.0
-    try:
-        return float(s_val.replace('mm', '').strip())
-    except (ValueError, TypeError):
-        return 0.0
+_NUM_RE = re.compile(r'-?\d+(?:\.\d+)?')
 
-def parse_snow_val(value):
-    """단기예보 신적설(SNO) 범주값 → (cm, '이상' 범주 여부)
+def _parse_category_amount(value, none_words):
+    """기상청 범주형 강수/적설 값 → (수치, '이상' 범주 여부)
 
-    기상청 표기: '적설없음' / '1.0cm 미만' / '1.0cm'~'4.9cm' / '5.0cm 이상'
+    지원 표기 (단위 mm/cm, 소수점 유무 무관):
+      '강수없음'/'적설없음' → 0
+      '1mm 미만'            → 0.5 (경계값의 절반)
+      '2.5mm'               → 2.5
+      '30.0~50.0mm', '30~50mm', '30.0mm~50.0mm' → 40.0 (구간 중간값)
+      '50.0mm 이상'         → 50.0 (is_over=True)
     """
     if value is None:
         return 0.0, False
     s_val = str(value).strip()
-    if s_val in ('', '적설없음', '0', '0.0', '-'):
+    if s_val in ('', '-') or s_val in none_words:
+        return 0.0, False
+    nums = [float(n) for n in _NUM_RE.findall(s_val)]
+    if not nums:
         return 0.0, False
     if '미만' in s_val:
-        return 0.5, False
-    try:
-        v = float(s_val.replace('cm', '').replace('이상', '').strip())
-    except (ValueError, TypeError):
+        v = nums[0] / 2
+    elif '~' in s_val and len(nums) >= 2:
+        v = (nums[0] + nums[1]) / 2
+    else:
+        v = nums[0]
+    if v <= 0:  # 결측값(-998.9 등) 및 0 처리
         return 0.0, False
-    if v <= 0:
-        return 0.0, False
-    return v, ('이상' in s_val)
+    return round(v, 1), ('이상' in s_val)
+
+def parse_rain_val(value):
+    return _parse_category_amount(value, ('강수없음',))[0]
+
+def parse_snow_val(value):
+    """단기예보 신적설(SNO) 범주값 → (cm, '이상' 범주 여부)"""
+    return _parse_category_amount(value, ('적설없음',))
+
+PTY_SNOW = {3, 7}        # 눈, 눈날림
+PTY_MIXED = {2, 6}       # 비/눈, 빗방울/눈날림
+PTY_RAIN = {1, 4, 5}     # 비, 소나기, 빗방울
+
+def classify_precip_type(ptys, has_snow_amount=False):
+    """시각별 PTY 목록 → '비' / '비/눈' / '눈'
+
+    PTY가 없는(0) 시각은 판단에서 제외하고, 신적설(SNO) 예보가 있으면 눈이 섞인 것으로 본다.
+    """
+    known = [p for p in ptys if p in PTY_SNOW | PTY_MIXED | PTY_RAIN]
+    if known and all(p in PTY_SNOW for p in known):
+        return '눈'
+    if not known and has_snow_amount:
+        return '눈'
+    if has_snow_amount or any(p in PTY_SNOW | PTY_MIXED for p in known):
+        return '비/눈'
+    return '비'
 
 def format_snow_text(amount, is_over=False):
     if not amount or amount <= 0:
@@ -513,6 +538,11 @@ def generate_forecast_summary(loc_name, data):
             return f"❄️ {ftime} 눈 예보(예상 적설 {format_snow_text(tot_snow, is_over)})! 빙판길 미끄럼에 주의하세요."
         tot = sum([item.get('amount', 0) for item in rain_fcst])
         ftime = rain_fcst[0].get('time_range', '')
+        ptypes = {item.get('ptype', '비') for item in rain_fcst}
+        if ptypes == {'눈'}:
+            return f"❄️ {ftime} 눈 예보(강수량 {round(tot, 1)}mm)! 빙판길 미끄럼에 주의하세요."
+        if ptypes & {'눈', '비/눈'}:
+            return f"🌨️ {ftime} 비 또는 눈 예보(강수량 {round(tot, 1)}mm)! 우산을 챙기고 미끄럼에 주의하세요."
         return f"☔ {ftime} 비 예보(예상 {round(tot, 1)}mm)! 우산을 챙기세요."
 
     pm10_g = dust.get('pm10_grade', '-')
@@ -588,10 +618,23 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
         if isinstance(raw_hrn1, dict):
             hourly_rn1 = dict(raw_hrn1)
 
+    # 시각별 관측 강수형태 — 누적 강수가 비였는지 눈이었는지 구분용 (하루 단위 보존)
+    hourly_pty = {}
+    if existing_loc and existing_base_date == today_str:
+        raw_hpty = existing_loc.get('hourly_pty')
+        if isinstance(raw_hpty, dict):
+            hourly_pty = dict(raw_hpty)
+
     curr_rn1 = parse_rain_val(ncst.get('RN1', 0))
     hour_key = now.strftime('%H')
     if curr_rn1 > 0:
         hourly_rn1[hour_key] = max(hourly_rn1.get(hour_key, 0.0), curr_rn1)
+    try:
+        curr_pty = int(ncst.get('PTY', 0))
+    except (ValueError, TypeError):
+        curr_pty = 0
+    if curr_pty > 0:
+        hourly_pty[hour_key] = curr_pty
 
     for it in u_items:
         if it.get('category') == 'RN1' and it.get('fcstDate') == today_str:
@@ -661,6 +704,25 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
                 if (fdate == today_str and fh >= current_hour) or (fdate == tomorrow_str and fh <= 9):
                     hourly_snow[key] = parse_snow_val(it.get('fcstValue'))
 
+    # 시각별 강수형태(PTY) — 단기예보 위에 초단기예보를 덮어써 최신값 우선
+    fcst_pty = {}
+    for src in (v_items, u_items):
+        for it in src:
+            if it.get('category') == 'PTY':
+                try:
+                    fcst_pty[(it.get('fcstDate'), int(it.get('fcstTime', '0')[:2]))] = int(it.get('fcstValue'))
+                except (ValueError, TypeError):
+                    pass
+
+    # 실황 PTY가 없던 강수 시각은 예보 PTY로 보완
+    for hk in hourly_rn1:
+        if hk not in hourly_pty:
+            p = fcst_pty.get((today_str, int(hk)), 0)
+            if p > 0:
+                hourly_pty[hk] = p
+    acc_ptys = [hourly_pty[h] for h in hourly_rn1 if h in hourly_pty] or list(hourly_pty.values())
+    acc_ptype = classify_precip_type(acc_ptys) if acc_rain > 0 else None
+
     # 강수 시간대 그룹화 및 텍스트 변환
     rain_slots = []
     for key in sorted(set(hourly_rain) | set(hourly_snow)):
@@ -673,7 +735,8 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
         if amt > 0 or snow > 0:
             d = datetime.strptime(fdate, '%Y%m%d').date()
             rain_slots.append({'date': d, 'hour': fh, 'amount': amt, 'fdate': fdate,
-                               'snow': snow, 'snow_over': snow_over})
+                               'snow': snow, 'snow_over': snow_over,
+                               'pty': fcst_pty.get(key, 0)})
 
     rain_forecast = []
     if rain_slots:
@@ -709,7 +772,8 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
 
             fcst_item = {
                 'time_range': time_range,
-                'amount': round(tot_amt, 1)
+                'amount': round(tot_amt, 1),
+                'ptype': classify_precip_type([s['pty'] for s in grp], any(s['snow'] > 0 for s in grp)),
             }
             tot_snow = sum(s['snow'] for s in grp)
             if tot_snow > 0:
@@ -730,9 +794,11 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
         'temperature': {'current': cur_temp, 'feels_like': feels_like, 'min': min_t, 'max': max_t},
         'wind': {'direction': w_dir, 'speed': w_spd_text},
         'rain_accumulated': round(acc_rain, 1),
+        'rain_accumulated_type': acc_ptype,
         'rain_forecast': rain_forecast,
         'alerts': alerts_data.get(name, []),
         'hourly_rn1': hourly_rn1,
+        'hourly_pty': hourly_pty,
     }
 
     # ★ Fallback 검증: 만약 새 데이터의 기온/개황이 '-' 인 경우 기존 유효 데이터 유지

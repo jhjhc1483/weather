@@ -181,7 +181,15 @@ def c_rain_acc(loc):
         v = 0.0
     if not v:
         return cell()
+    badge = PRECIP_BADGE.get(loc.get("rain_accumulated_type"))
+    if badge:
+        return cell(t(badge, bold=True), t(f" {v}mm", bold=True, color="blue"),
+                    t("\n녹은 물 기준 강수량", color="gray"))
     return cell(t(f"{v}mm", bold=True, color="blue"))
+
+
+# 눈이 섞인 강수는 비와 구분되도록 형태를 함께 표시
+PRECIP_BADGE = {"눈": "❄️ 눈", "비/눈": "🌨️ 비/눈"}
 
 
 def c_rain_fcst(loc):
@@ -195,10 +203,18 @@ def c_rain_fcst(loc):
         if i:
             parts.append(t("\n"))
         parts.append(t(item.get("time_range", ""), color="gray"))
-        if item.get("amount", 0) > 0:
-            parts.append(t(f" {item.get('amount', 0)}mm", bold=True, color="blue"))
-        if item.get("snow_text"):
-            parts.append(t(f" ❄️ 적설 {item['snow_text']}", bold=True))
+        badge = PRECIP_BADGE.get(item.get("ptype"))
+        if badge:
+            parts.append(t(f" {badge}", bold=True))
+            if item.get("snow_text"):
+                parts.append(t(f" 적설 {item['snow_text']}", bold=True))
+            if item.get("amount", 0) > 0:
+                parts.append(t(f" (강수량 {item.get('amount', 0)}mm)", color="gray"))
+        else:
+            if item.get("amount", 0) > 0:
+                parts.append(t(f" {item.get('amount', 0)}mm", bold=True, color="blue"))
+            if item.get("snow_text"):
+                parts.append(t(f" ❄️ 적설 {item['snow_text']}", bold=True))
     return cell(*parts)
 
 
