@@ -56,6 +56,13 @@ STATIONS = [
 ]
 
 
+def vilage_diag_base(now):
+    """단기예보 진단용 base: 오늘 02시 발표분(02:10 이후 제공), 그 전이면 전날 23시 발표분"""
+    if now.strftime('%H%M') < '0215':
+        return (now - timedelta(days=1)).strftime('%Y%m%d'), '2300'
+    return now.strftime('%Y%m%d'), '0200'
+
+
 def test_api_call(url, params, key, timeout=20.0):
     encoded_key = quote(key, safe='')
     full_url = f"{url}?serviceKey={encoded_key}"
@@ -143,6 +150,7 @@ def main():
 
     now = datetime.now(KST)
     today_str = now.strftime('%Y%m%d')
+    vil_bd, vil_bt = vilage_diag_base(now)
 
     print("=" * 72)
     print(" [종합 API 진단] 대한민국 기상 & 대기질 수집 API 전체 상태 점검")
@@ -201,7 +209,7 @@ def main():
     for loc in TEST_LOCATIONS:
         ok, elapsed, msg, size = test_api_call(
             f"{BASE_WEATHER}/getVilageFcst",
-            {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': str(loc['nx']), 'ny': str(loc['ny'])},
+            {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': vil_bd, 'base_time': vil_bt, 'nx': str(loc['nx']), 'ny': str(loc['ny'])},
             key, timeout=args.timeout
         )
         mark = "✓" if ok else "✗"
@@ -280,6 +288,7 @@ def run_and_save_diag(out_dir=None):
 
     now = datetime.now(KST)
     today_str = now.strftime('%Y%m%d')
+    vil_bd, vil_bt = vilage_diag_base(now)
     check_time = (now - timedelta(minutes=45))
     bd = check_time.strftime('%Y%m%d')
     bt = check_time.strftime('%H') + '00'
@@ -288,7 +297,7 @@ def run_and_save_diag(out_dir=None):
         {'name': '기상청 기상특보 API', 'type': 'portal', 'url': f"{BASE_ALERT}/getWthrWrnMsg", 'params': {'pageNo': '1', 'numOfRows': '5', 'dataType': 'JSON', 'stnId': '108', 'fromTmFc': today_str, 'toTmFc': today_str}},
         {'name': '기상청 초단기실황 API', 'type': 'portal', 'url': f"{BASE_WEATHER}/getUltraSrtNcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
         {'name': '기상청 초단기예보 API', 'type': 'portal', 'url': f"{BASE_WEATHER}/getUltraSrtFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': bd, 'base_time': bt, 'nx': '65', 'ny': '123'}},
-        {'name': '기상청 단기예보 API', 'type': 'portal', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': '65', 'ny': '123'}},
+        {'name': '기상청 단기예보 API', 'type': 'portal', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': vil_bd, 'base_time': vil_bt, 'nx': '65', 'ny': '123'}},
         {'name': '에어코리아 미세먼지 API', 'type': 'portal', 'url': f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", 'params': {'returnType': 'json', 'stationName': '양평읍', 'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1'}},
         {'name': '에어코리아 미세먼지 경보 API', 'type': 'portal', 'url': f"{BASE_DUST_ALARM}/getUlfptcaAlarmInfo", 'params': {'returnType': 'json', 'year': str(now.year), 'numOfRows': '5', 'pageNo': '1'}},
         {'name': '기상청 API 허브 강수관측', 'type': 'kma_hub', 'stn': '202'},
