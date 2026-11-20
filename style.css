@@ -1253,10 +1253,17 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   /* ---- 좌측 '구분' 열 고정: 가로 스크롤 중에도 행 이름이 보이도록 ---- */
   thead .th-cat,
   tbody .cat-main,
-  tbody .cat-sub {
+  tbody .cat-sub,
+  tfoot .tfoot-label {
     position: sticky;
     left: 0;
     z-index: 30;
+  }
+
+  /* 맨 아래 '상세예보' 행 라벨도 다른 행 이름처럼 고정 */
+  tfoot .tfoot-label {
+    background: var(--bg-category-solid);
+    box-shadow: 3px 0 6px rgba(0, 0, 0, 0.10);
   }
 
   /* 스크롤되는 지역 헤더가 고정 열을 덮지 않도록 쌓임 순서 정리
