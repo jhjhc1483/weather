@@ -296,7 +296,10 @@
     const rf = loc.rain_forecast;
     if (!rf || rf.length === 0) return '-';
     return rf.map(function (item) {
-      return `<div class="rain-forecast-item">${escHtml(item.time_range)}<br><strong>${item.amount}mm</strong></div>`;
+      let html = `<div class="rain-forecast-item">${escHtml(item.time_range)}`;
+      if (item.amount > 0) html += `<br><strong>${item.amount}mm</strong>`;
+      if (item.snow_text) html += `<br><span class="snow-value">❄️ 적설 ${escHtml(item.snow_text)}</span>`;
+      return html + '</div>';
     }).join('');
   }
 

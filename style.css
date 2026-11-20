@@ -1034,6 +1034,10 @@ tbody tr:nth-child(odd) td:not(.cat-main):not(.cat-sub) {
   color: var(--accent);
   font-weight: 600;
 }
+.snow-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
 
 /* 기온 */
 .temp-value { font-weight: 500; }

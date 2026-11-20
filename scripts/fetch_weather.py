@@ -168,6 +168,33 @@ def parse_rain_val(value):
     except (ValueError, TypeError):
         return 0.0
 
+def parse_snow_val(value):
+    """단기예보 신적설(SNO) 범주값 → (cm, '이상' 범주 여부)
+
+    기상청 표기: '적설없음' / '1.0cm 미만' / '1.0cm'~'4.9cm' / '5.0cm 이상'
+    """
+    if value is None:
+        return 0.0, False
+    s_val = str(value).strip()
+    if s_val in ('', '적설없음', '0', '0.0', '-'):
+        return 0.0, False
+    if '미만' in s_val:
+        return 0.5, False
+    try:
+        v = float(s_val.replace('cm', '').replace('이상', '').strip())
+    except (ValueError, TypeError):
+        return 0.0, False
+    if v <= 0:
+        return 0.0, False
+    return v, ('이상' in s_val)
+
+def format_snow_text(amount, is_over=False):
+    if not amount or amount <= 0:
+        return ''
+    if amount < 1.0:
+        return '1cm 미만'
+    return f"{round(amount, 1)}cm{' 이상' if is_over else ''}"
+
 def sky_pty_to_text(sky, pty):
     try: pty = int(pty)
     except (ValueError, TypeError): pty = 0
@@ -478,6 +505,12 @@ def generate_forecast_summary(loc_name, data):
             return f"⚠️ {astr} 발효 중! 안전에 유의하세요."
 
     if rain_fcst:
+        snow_items = [item for item in rain_fcst if item.get('snow', 0) > 0]
+        if snow_items:
+            tot_snow = sum(item['snow'] for item in snow_items)
+            is_over = any('이상' in item.get('snow_text', '') for item in snow_items)
+            ftime = snow_items[0].get('time_range', '')
+            return f"❄️ {ftime} 눈 예보(예상 적설 {format_snow_text(tot_snow, is_over)})! 빙판길 미끄럼에 주의하세요."
         tot = sum([item.get('amount', 0) for item in rain_fcst])
         ftime = rain_fcst[0].get('time_range', '')
         return f"☔ {ftime} 비 예보(예상 {round(tot, 1)}mm)! 우산을 챙기세요."
@@ -598,6 +631,7 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
                     hourly_rain[(fdate, fh)] = val
             except (ValueError, TypeError):
                 pass
+    ultra_keys = set(hourly_rain)
 
     # 단기예보(PCP) 반영 (초단기예보 미작성 시각 보완)
     for it in v_items:
@@ -613,12 +647,33 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
             except (ValueError, TypeError):
                 pass
 
+    # 단기예보(SNO) 신적설 반영 — 초단기예보에는 적설 항목이 없어 단기예보만 사용
+    hourly_snow = {}
+    for it in v_items:
+        if it.get('category') == 'SNO':
+            fdate = it.get('fcstDate')
+            try:
+                fh = int(it.get('fcstTime', '0')[:2])
+            except (ValueError, TypeError):
+                continue
+            key = (fdate, fh)
+            if key not in hourly_snow:
+                if (fdate == today_str and fh >= current_hour) or (fdate == tomorrow_str and fh <= 9):
+                    hourly_snow[key] = parse_snow_val(it.get('fcstValue'))
+
     # 강수 시간대 그룹화 및 텍스트 변환
     rain_slots = []
-    for (fdate, fh), amt in sorted(hourly_rain.items()):
-        if amt > 0:
+    for key in sorted(set(hourly_rain) | set(hourly_snow)):
+        fdate, fh = key
+        amt = hourly_rain.get(key, 0.0)
+        snow, snow_over = hourly_snow.get(key, (0.0, False))
+        # 초단기예보가 '강수없음'이라고 한 시각은 더 오래된 단기예보 적설보다 우선
+        if amt <= 0 and key in ultra_keys:
+            continue
+        if amt > 0 or snow > 0:
             d = datetime.strptime(fdate, '%Y%m%d').date()
-            rain_slots.append({'date': d, 'hour': fh, 'amount': amt, 'fdate': fdate})
+            rain_slots.append({'date': d, 'hour': fh, 'amount': amt, 'fdate': fdate,
+                               'snow': snow, 'snow_over': snow_over})
 
     rain_forecast = []
     if rain_slots:
@@ -652,10 +707,15 @@ def process_location(name, cfg, now, today_str, alerts_data, existing_loc=None, 
             else:
                 time_range = f"{st_date_label}{st['hour']:02d}:00~{ed_date_label}{ed_hour_str}"
 
-            rain_forecast.append({
+            fcst_item = {
                 'time_range': time_range,
                 'amount': round(tot_amt, 1)
-            })
+            }
+            tot_snow = sum(s['snow'] for s in grp)
+            if tot_snow > 0:
+                fcst_item['snow'] = round(tot_snow, 1)
+                fcst_item['snow_text'] = format_snow_text(tot_snow, any(s['snow_over'] for s in grp))
+            rain_forecast.append(fcst_item)
 
     cur_reh = ncst.get('REH', '-')
     feels_like = calc_feels_like(cur_temp, cur_reh, w_spd_raw, now.month)

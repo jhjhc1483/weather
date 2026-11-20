@@ -195,7 +195,10 @@ def c_rain_fcst(loc):
         if i:
             parts.append(t("\n"))
         parts.append(t(item.get("time_range", ""), color="gray"))
-        parts.append(t(f" {item.get('amount', 0)}mm", bold=True, color="blue"))
+        if item.get("amount", 0) > 0:
+            parts.append(t(f" {item.get('amount', 0)}mm", bold=True, color="blue"))
+        if item.get("snow_text"):
+            parts.append(t(f" ❄️ 적설 {item['snow_text']}", bold=True))
     return cell(*parts)
 
 
