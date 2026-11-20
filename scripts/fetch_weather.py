@@ -55,14 +55,17 @@ if KMA_API_HUB_KEY:
 # ============================================================
 # 상수 및 설정 (8개 지역)
 # ============================================================
+# kma_stn: 기상청 API 허브 AWS 지점번호 (stn_inf.php?inf=AWS 로 지역 주소 확인 후 지정)
+#   양평 202 양평읍 · 경산 827 중방동 · 사천 917 용현면 · 함안 920 가야읍
+#   성주 810 성주읍 · 세종 239 새롬동 · 계룡 636 신도안면 · 임실 244 임실읍
 LOCATIONS = {
-    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'sub_region': '서부', 'province': '경기도',   'wrn_stn': '109', 'kma_stn': '212'},
-    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '830'},
-    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '893'},
-    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '877'},
-    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '847'},
-    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'sub_region': '북부', 'province': '세종',    'wrn_stn': '133', 'kma_stn': '637'},
-    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133', 'kma_stn': '640'},
+    '양평': {'nx': 70, 'ny': 126, 'station': '양평읍',   'fallback_station': '가평읍', 'alert_region': '양평', 'sub_region': '서부', 'province': '경기도',   'wrn_stn': '109', 'kma_stn': '202'},
+    '경산': {'nx': 92, 'ny': 91,  'station': '시지동',   'fallback_station': '만촌동', 'alert_region': '경산', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '827'},
+    '사천': {'nx': 81, 'ny': 72,  'station': '사천읍',   'fallback_station': '향촌동', 'alert_region': '사천', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '917'},
+    '함안': {'nx': 87, 'ny': 78,  'station': '가야읍',   'fallback_station': '내서읍', 'alert_region': '함안', 'province': '경상남도', 'wrn_stn': '159', 'kma_stn': '920'},
+    '성주': {'nx': 85, 'ny': 92,  'station': '성주군',   'fallback_station': '다사읍', 'alert_region': '성주', 'province': '경상북도', 'wrn_stn': '143', 'kma_stn': '810'},
+    '세종': {'nx': 65, 'ny': 104, 'station': '아름동',   'fallback_station': '조치원읍', 'alert_region': '세종', 'sub_region': '북부', 'province': '세종',    'wrn_stn': '133', 'kma_stn': '239'},
+    '계룡': {'nx': 66, 'ny': 100, 'station': '엄사면',   'fallback_station': '논산',   'alert_region': '계룡', 'province': '충청남도', 'wrn_stn': '133', 'kma_stn': '636'},
     '임실': {'nx': 67, 'ny': 85,  'station': '임실읍',   'fallback_station': '삼천동', 'alert_region': '임실', 'province': '전북',     'wrn_stn': '146', 'kma_stn': '244'},
 }
 

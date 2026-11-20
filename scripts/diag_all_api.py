@@ -44,9 +44,9 @@ BASE_KMA_HUB = "https://apihub.kma.go.kr/api/typ01/cgi-bin/url"
 
 # 주요 테스트 대상
 TEST_LOCATIONS = [
-    {'name': '양평', 'nx': 65, 'ny': 123, 'station': '양평읍', 'stn': '212'},
-    {'name': '세종', 'nx': 66, 'ny': 103, 'station': '아름동', 'stn': '637'},
-    {'name': '계룡', 'nx': 65, 'ny': 99, 'station': '엄사면', 'stn': '640'},
+    {'name': '양평', 'nx': 65, 'ny': 123, 'station': '양평읍', 'stn': '202'},
+    {'name': '세종', 'nx': 66, 'ny': 103, 'station': '아름동', 'stn': '239'},
+    {'name': '계룡', 'nx': 65, 'ny': 99, 'station': '엄사면', 'stn': '636'},
 ]
 
 STATIONS = [
@@ -291,7 +291,7 @@ def run_and_save_diag(out_dir=None):
         {'name': '기상청 단기예보 API', 'type': 'portal', 'url': f"{BASE_WEATHER}/getVilageFcst", 'params': {'pageNo': '1', 'numOfRows': '10', 'dataType': 'JSON', 'base_date': today_str, 'base_time': '0200', 'nx': '65', 'ny': '123'}},
         {'name': '에어코리아 미세먼지 API', 'type': 'portal', 'url': f"{BASE_AIR}/getMsrstnAcctoRltmMesureDnsty", 'params': {'returnType': 'json', 'stationName': '양평읍', 'dataTerm': 'DAILY', 'ver': '1.3', 'numOfRows': '1'}},
         {'name': '에어코리아 미세먼지 경보 API', 'type': 'portal', 'url': f"{BASE_DUST_ALARM}/getUlfptcaAlarmInfo", 'params': {'returnType': 'json', 'year': str(now.year), 'numOfRows': '5', 'pageNo': '1'}},
-        {'name': '기상청 API 허브 강수관측', 'type': 'kma_hub', 'stn': '212'},
+        {'name': '기상청 API 허브 강수관측', 'type': 'kma_hub', 'stn': '202'},
     ]
 
     def _diag_single(s):
