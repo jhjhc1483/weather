@@ -1,22 +1,9 @@
 {
-  "updated_at": "2026-11-21T21:56:07+09:00",
+  "updated_at": "2026-11-22T05:38:35+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
-      "date_display": "11.21 (토)",
-      "overview": "맑음",
-      "temperature": {
-        "min": "-7.0",
-        "max": "0.0"
-      },
-      "wind": {
-        "direction": "서북서풍",
-        "speed": "2.0m/s"
-      }
-    },
-    {
-      "label": "내일",
       "date_display": "11.22 (일)",
       "overview": "맑음",
       "temperature": {
@@ -24,25 +11,25 @@
         "max": "3.0"
       },
       "wind": {
-        "direction": "서풍",
+        "direction": "남서풍",
         "speed": "1.1m/s"
       }
     },
     {
-      "label": "모레",
+      "label": "내일",
       "date_display": "11.23 (월)",
       "overview": "흐리고 비",
       "temperature": {
-        "min": "-3.0",
-        "max": "6.0"
+        "min": "-2.0",
+        "max": "7.0"
       },
       "wind": {
         "direction": "남남서풍",
-        "speed": "2.9m/s"
+        "speed": "3.0m/s"
       }
     },
     {
-      "label": "3일후",
+      "label": "모레",
       "date_display": "11.24 (화)",
       "overview": "맑음",
       "temperature": {
@@ -51,24 +38,24 @@
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "3.7m/s"
+        "speed": "3.9m/s"
       }
     },
     {
-      "label": "4일후",
+      "label": "3일후",
       "date_display": "11.25 (수)",
       "overview": "맑음",
       "temperature": {
-        "min": "-6.0",
+        "min": "-7.0",
         "max": "6.0"
       },
       "wind": {
-        "direction": "남서풍",
+        "direction": "남남서풍",
         "speed": "1.1m/s"
       }
     },
     {
-      "label": "5일후",
+      "label": "4일후",
       "date_display": "11.26 (목)",
       "overview": "맑음",
       "temperature": {
@@ -81,12 +68,25 @@
       }
     },
     {
-      "label": "6일후",
+      "label": "5일후",
       "date_display": "11.27 (금)",
       "overview": "구름많음/흐리고 비",
       "temperature": {
         "min": "4.0",
         "max": "15.0"
+      },
+      "wind": {
+        "direction": "-",
+        "speed": "-"
+      }
+    },
+    {
+      "label": "6일후",
+      "date_display": "11.28 (토)",
+      "overview": "흐림",
+      "temperature": {
+        "min": "4.0",
+        "max": "10.0"
       },
       "wind": {
         "direction": "-",
