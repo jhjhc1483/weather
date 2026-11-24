@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-24T05:29:03+09:00",
+  "updated_at": "2026-11-24T13:55:54+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
@@ -12,7 +12,7 @@
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "3.7m/s"
+        "speed": "3.4m/s"
       }
     },
     {
@@ -25,7 +25,7 @@
       },
       "wind": {
         "direction": "남남서풍",
-        "speed": "2.0m/s"
+        "speed": "1.7m/s"
       }
     },
     {
@@ -38,7 +38,7 @@
       },
       "wind": {
         "direction": "남풍",
-        "speed": "3.1m/s"
+        "speed": "2.9m/s"
       }
     },
     {
@@ -59,7 +59,7 @@
       "date_display": "11.28 (토)",
       "overview": "흐림",
       "temperature": {
-        "min": "4.0",
+        "min": "3.0",
         "max": "10.0"
       },
       "wind": {
@@ -73,7 +73,7 @@
       "overview": "맑음",
       "temperature": {
         "min": "-2.0",
-        "max": "9.0"
+        "max": "8.0"
       },
       "wind": {
         "direction": "-",
@@ -85,7 +85,7 @@
       "date_display": "11.30 (월)",
       "overview": "구름많음",
       "temperature": {
-        "min": "3.0",
+        "min": "1.0",
         "max": "14.0"
       },
       "wind": {
