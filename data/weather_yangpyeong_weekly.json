@@ -1,22 +1,9 @@
 {
-  "updated_at": "2026-11-26T20:24:15+09:00",
+  "updated_at": "2026-11-27T06:51:04+09:00",
   "location": "양평",
   "weekly_forecast": [
     {
       "label": "오늘",
-      "date_display": "11.26 (목)",
-      "overview": "구름많음",
-      "temperature": {
-        "min": "0.0",
-        "max": "13.0"
-      },
-      "wind": {
-        "direction": "남풍",
-        "speed": "2.5m/s"
-      }
-    },
-    {
-      "label": "내일",
       "date_display": "11.27 (금)",
       "overview": "흐리고 비",
       "temperature": {
@@ -25,11 +12,11 @@
       },
       "wind": {
         "direction": "남남서풍",
-        "speed": "3.3m/s"
+        "speed": "3.2m/s"
       }
     },
     {
-      "label": "모레",
+      "label": "내일",
       "date_display": "11.28 (토)",
       "overview": "맑음",
       "temperature": {
@@ -38,16 +25,16 @@
       },
       "wind": {
         "direction": "서북서풍",
-        "speed": "3.6m/s"
+        "speed": "3.4m/s"
       }
     },
     {
-      "label": "3일후",
+      "label": "모레",
       "date_display": "11.29 (일)",
       "overview": "맑음",
       "temperature": {
         "min": "-6.0",
-        "max": "6.0"
+        "max": "5.0"
       },
       "wind": {
         "direction": "서풍",
@@ -55,20 +42,20 @@
       }
     },
     {
-      "label": "4일후",
+      "label": "3일후",
       "date_display": "11.30 (월)",
       "overview": "흐림",
       "temperature": {
-        "min": "0.0",
+        "min": "-1.0",
         "max": "14.0"
       },
       "wind": {
-        "direction": "남풍",
+        "direction": "남남동풍",
         "speed": "1.1m/s"
       }
     },
     {
-      "label": "5일후",
+      "label": "4일후",
       "date_display": "12.01 (화)",
       "overview": "흐림/맑음",
       "temperature": {
@@ -81,9 +68,22 @@
       }
     },
     {
-      "label": "6일후",
+      "label": "5일후",
       "date_display": "12.02 (수)",
       "overview": "흐림",
+      "temperature": {
+        "min": "5.0",
+        "max": "14.0"
+      },
+      "wind": {
+        "direction": "-",
+        "speed": "-"
+      }
+    },
+    {
+      "label": "6일후",
+      "date_display": "12.03 (목)",
+      "overview": "구름많음/맑음",
       "temperature": {
         "min": "5.0",
         "max": "14.0"
